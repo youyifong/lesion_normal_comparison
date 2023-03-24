@@ -4,7 +4,7 @@
 For each sample, we will compare the distribution of each markers in the normal and lesion regions.
 
 - Samples: DD, 
-- Markers: ??
+- Markers: CD3, CD4, CD8, CD14, CD15, CD68, CD123, and others (to be added)
 
 
 Considerations on region boundary and distance metric:
