@@ -1,3 +1,3 @@
 # lesion_normal_comparison
  
-![](R/figures/dist2skin_comparison.pdf)
+![plot](R/figures/dist2skin_comparison.pdf?raw=true)
