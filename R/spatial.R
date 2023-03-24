@@ -39,7 +39,7 @@ compare.regions=function(dat, legend, ...) {
 
 compare.markers=function(dat.m1, dat.m2, legend, ...) {
     hist(dat.m1$dist2boundary, border=blue, xlab="Distance to skin (um)", ylab="Number of cells", breaks=20, col=NULL,
-        , ylim=range(c(hist(dat.m1$dist2boundary, plot=F)$counts, hist(dat.m2$dist2boundary, plot=F)$counts)),
+        , ylim=range(c(hist(dat.m1$dist2boundary, breaks=20, plot=F)$counts, hist(dat.m2$dist2boundary, breaks=20, plot=F)$counts)),
         , ...)
     hist(dat.m2$dist2boundary, border=red, breaks=20, col=NULL, add=T)
     mylegend(x=3, legend=legend, lty=1, col=c("blue","red"), y.intersp=1.5, text.width=700)
