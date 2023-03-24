@@ -1,6 +1,7 @@
 library(kyotil)
 
 region.labels=c(normal="intact epi", lesion="ulcerative")
+region.labels.title=c(normal="Intact Epidermis", lesion="Ulcerative")
 
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
@@ -64,6 +65,6 @@ mydev.off(file="figures/dist2skin_compare_regions", ext="png")
 
 myfigure(mfcol=c(2,2))
     xlim=c(0,2500)
-    compare.markers(subset(dat.cd4, in_DD_Les_normal_side), subset(dat.cd15, in_DD_Les_normal_side), xlim=xlim, main="DD Les, "%.%region.labels["normal"], legend=c("CD4","CD15"))    
-    compare.markers(subset(dat.cd4, in_DD_Les_lesion_side), subset(dat.cd15, in_DD_Les_lesion_side), xlim=xlim, main="DD Les, "%.%region.labels["lesion"], legend=c("CD4","CD15"))    
+    compare.markers(subset(dat.cd4, in_DD_Les_normal_side), subset(dat.cd15, in_DD_Les_normal_side), xlim=xlim, main="DD Les, "%.%region.labels.title["normal"], legend=c("CD4","CD15"))    
+    compare.markers(subset(dat.cd4, in_DD_Les_lesion_side), subset(dat.cd15, in_DD_Les_lesion_side), xlim=xlim, main="DD Les, "%.%region.labels.title["lesion"], legend=c("CD4","CD15"))    
 mydev.off(file="figures/dist2skin_compare_cd4_cd15", ext="png")
