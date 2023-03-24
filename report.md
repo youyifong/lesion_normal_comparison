@@ -7,7 +7,7 @@ For each sample, we will compare the distribution of each markers in the normal 
 - Markers: ??
 
 
-Region boundary and distance metric:
+Considerations on region boundary and distance metric:
 1. Should we draw the boundary between normal and lesion based on WGA only or all markers? 
 2. Shall each ROI be convex?
 
