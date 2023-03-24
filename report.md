@@ -20,4 +20,6 @@ These two questions are also intertwined. If we use WGA only to draw boundaries,
 ## Results
 
  
-![plot](R/figures/dist2skin_comparison.png?raw=true)
+![plot](R/figures/dist2skin_compare_regions.png?raw=true)
+
+![plot](R/figures/dist2skin_compare_cd4_cd15.png?raw=true)

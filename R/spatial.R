@@ -59,7 +59,7 @@ myfigure(mfcol=c(2,2))
     xlim=c(0,2500)
     compare.regions(dat.cd4, xlim=xlim, main="DD Les, CD4", legend=region.labels)    
     compare.regions(dat.cd15, xlim=xlim, main="DD Les, CD15", legend=region.labels)
-mydev.off(file="figures/dist2skin_compare_region", ext="png")
+mydev.off(file="figures/dist2skin_compare_regions", ext="png")
 
 
 myfigure(mfcol=c(2,2))
