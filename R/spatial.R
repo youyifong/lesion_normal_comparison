@@ -1,7 +1,7 @@
 library(kyotil)
 
 compare.dist=function(filename, ...) {
-    dat=read.csv(filename)
+    dat=read.csv("data/"%.%filename)
     dat$in_DD_Les_lesion_side = dat$in_DD_Les_lesion_side=="True"
     dat$in_DD_Les_normal_side = dat$in_DD_Les_normal_side=="True"
     
@@ -19,7 +19,7 @@ compare.dist=function(filename, ...) {
 }
 
 myfigure(mfcol=c(1,2))
-    xlim=c(0,5000)
-    compare.dist("data/DD_Les_CD4-PE_stitched_masks_d2b_regmem.csv", xlim=xlim)    
-    compare.dist("data/DD_Les_CD15_stitched_masks_d2b_regmem.csv", xlim=xlim)
+    xlim=c(0,2500)
+    compare.dist("DD_Les_CD4-PE_stitched_masks_d2b_regmem.csv", xlim=xlim)    
+    compare.dist("DD_Les_CD15_stitched_masks_d2b_regmem.csv", xlim=xlim)
 mydev.off(file="figures/dist2skin_comparison", ext="png")
