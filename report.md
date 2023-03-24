@@ -1,4 +1,6 @@
 # Distance to skin boundary
+
+## Methods
 Samples: DD, 
 Markers: 
 
@@ -13,7 +15,7 @@ For (2), a convex shape is a shape that a line connecting any two points in the 
 
 These two questions are also intertwined. If we use WGA only to draw boundaries, we can only use straight line boundaries because the difference between normal and lesion is only visible in epidermis in WGA staining. A straight line can be drawn in epidermis and extend to dermis, but not a curve.
 
-
+## Results
 
 
  
