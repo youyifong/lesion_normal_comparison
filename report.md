@@ -3,8 +3,8 @@
 ## Methods
 For each sample, we will compare the distribution of each markers in the normal and lesion regions.
 
-- Samples: DD, 
-- Markers: CD3, CD4, CD8, CD14, CD15, CD68, CD123, and others (to be added)
+- Samples: DD, CF
+- Markers: CD3, CD4, CD8a, CD15, CD45, CD68, CD69, CD123, CD279, and others (to be added)
 
 
 Considerations on region boundary and distance metric:
@@ -20,10 +20,22 @@ These two questions are also intertwined. If we use WGA only to draw boundaries,
 ## Results
 
  
-![plot](R/figures/dist2skin_compare_regions_cd4.png?raw=true)
+![plot](R/figures/DD_dist2skin_compare_regions_cd3.png?raw=true)
+    
+![plot](R/figures/DD_dist2skin_compare_regions_cd4.png?raw=true)
+    
+![plot](R/figures/DD_dist2skin_compare_regions_cd8a.png?raw=true)
+    
+![plot](R/figures/DD_dist2skin_compare_regions_cd15.png?raw=true)
+    
+![plot](R/figures/DD_dist2skin_compare_regions_cd45.png?raw=true)
   
-  
-![plot](R/figures/dist2skin_compare_regions_cd15.png?raw=true)
-  
-  
-![plot](R/figures/dist2skin_compare_cd4_cd15.png?raw=true)
+![plot](R/figures/DD_dist2skin_compare_regions_cd68.png?raw=true)
+    
+![plot](R/figures/DD_dist2skin_compare_regions_cd69.png?raw=true)
+    
+![plot](R/figures/DD_dist2skin_compare_regions_cd123.png?raw=true)
+    
+![plot](R/figures/DD_dist2skin_compare_regions_cd279.png?raw=true)
+    
+![plot](R/figures/DD_dist2skin_compare_cd4_cd15.png?raw=true)
