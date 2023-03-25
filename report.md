@@ -19,16 +19,29 @@ These two questions are also intertwined. If we use WGA only to draw boundaries,
 
 ## Results
 
- 
+![plot](R/figures/CF_dist2skin_compare_regions_CD1a.png?raw=true)
+   
 ![plot](R/figures/DD_dist2skin_compare_regions_CD3.png?raw=true)
+    
+![plot](R/figures/CF_dist2skin_compare_regions_CD3.png?raw=true)
     
 ![plot](R/figures/DD_dist2skin_compare_regions_CD4.png?raw=true)
     
+![plot](R/figures/CF_dist2skin_compare_regions_CD4.png?raw=true)
+    
 ![plot](R/figures/DD_dist2skin_compare_regions_CD8a.png?raw=true)
+    
+![plot](R/figures/CF_dist2skin_compare_regions_CD8a.png?raw=true)
+    
+![plot](R/figures/CF_dist2skin_compare_regions_CD11c.png?raw=true)
     
 ![plot](R/figures/DD_dist2skin_compare_regions_CD15.png?raw=true)
     
+![plot](R/figures/CF_dist2skin_compare_regions_CD15.png?raw=true)
+    
 ![plot](R/figures/DD_dist2skin_compare_regions_CD45.png?raw=true)
+  
+![plot](R/figures/CF_dist2skin_compare_regions_CD45.png?raw=true)
   
 ![plot](R/figures/DD_dist2skin_compare_regions_CD68.png?raw=true)
     
@@ -36,6 +49,11 @@ These two questions are also intertwined. If we use WGA only to draw boundaries,
     
 ![plot](R/figures/DD_dist2skin_compare_regions_CD123.png?raw=true)
     
+![plot](R/figures/CF_dist2skin_compare_regions_CD123.png?raw=true)
+    
 ![plot](R/figures/DD_dist2skin_compare_regions_CD279.png?raw=true)
     
+![plot](R/figures/CF_dist2skin_compare_regions_CD279.png?raw=true)
+    
 ![plot](R/figures/DD_dist2skin_compare_CD4_CD15.png?raw=true)
+  
