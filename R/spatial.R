@@ -1,13 +1,5 @@
 library(kyotil)
 
-
-region.labels=c(normal="intact epi", lesion="ulcerative")
-region.labels.title=c(normal="Intact Epidermis", lesion="Ulcerative")
-
-red=rgb(red=1, blue=0, green=0, alpha=1)
-blue=rgb(red=0, blue=1, green=0, alpha=1)
-
-
 get.dat=function(filename, sample.label) {
     dat=read.csv("data/"%.%filename)
     dat$in_Les_lesion_side = dat[["in_"%.%sample.label%.%"_Les_lesion_side"]]=="True"
@@ -49,37 +41,60 @@ compare.markers=function(dist.ls, legend, ...) {
     
     y.all = sapply(dist.ls, function (dist) density(dist)$y)
     ylim = range(y.all)    
-
+    
     plot(density(dist.ls[[1]]), col=1, xlab="Distance to skin (um)", ylab="Density", ylim=ylim, ...)
     for (i in 2:length(dist.ls)) lines(density(dist.ls[[i]]), col=i)
     mylegend(x=3, legend=legend, lty=1, col=1:i, y.intersp=1, text.width=700)
 }
 
 
+region.labels=c(normal="intact epi", lesion="ulcerative")
+region.labels.title=c(normal="Intact Epidermis", lesion="Ulcerative")
+
+red=rgb(red=1, blue=0, green=0, alpha=1)
+blue=rgb(red=0, blue=1, green=0, alpha=1)
+
 xlim=c(0,2500)
 
-#for (s in c("DD","CF")) {
-#    if (s=="DD") markers=c(        "CD3", "CD4", "CD8a",          "CD15", "CD45", "CD68", "CD69", "CD123", "CD279")
-#    if (s=="CF") markers=c("CD1a", "CD3", "CD4", "CD8a", "CD11c", "CD15", "CD45",                 "CD123", "CD279")
-#    for(m in markers) {
-#        myfigure(mfcol=c(1,2))
-#            compare.regions(get.dat(s%.%"_Les_"%.%m%.%"_masks_d2b_regmem.csv", s), xlim=xlim, main=s%.%" Les, "%.%m, legend=region.labels)    
-#        mydev.off(file="figures/"%.%s%.%"_dist2skin_compare_regions_"%.%m, ext="png")
-#    }
-#}
+
+### compare normal vs lesion tissues ####
+
+# generate one png per marker
+
+for (s in c("DD","CF")) {
+    if (s=="DD") markers=c(        "CD3", "CD4", "CD8a",          "CD15", "CD45", "CD68", "CD69", "CD123", "CD279")
+    if (s=="CF") markers=c("CD1a", "CD3", "CD4", "CD8a", "CD11c", "CD15", "CD45",                 "CD123", "CD279")
+    for(m in markers) {
+        #s="CF"; m="CD1a"
+        myfigure(mfcol=c(1,2))
+            compare.regions(get.dat(s%.%"_Les_"%.%m%.%"_masks_d2b_regmem.csv", s), xlim=xlim, main=s%.%" Les, "%.%m, legend=region.labels)    
+        mydev.off(file="figures/"%.%s%.%"_dist2skin_compare_regions_"%.%m, ext="png")
+    }
+}
+
+
+
+
+#### compare markers ####
+
+## DD
+legend=c("CD3","CD15","CD123","CD11c","CD68")
 
 dat.cd3=get.dat("DD_Les_CD3_masks_d2b_regmem.csv", "DD")
 dat.cd15=get.dat("DD_Les_CD15_masks_d2b_regmem.csv", "DD")
 dat.cd123=get.dat("DD_Les_CD123_masks_d2b_regmem.csv", "DD")
+dat.cd11c=get.dat("DD_Les_CD11c_masks_d2b_regmem.csv", "DD")
 dat.cd68=get.dat("DD_Les_CD68_masks_d2b_regmem.csv", "DD")
-legend=c("CD3","CD15","CD123","CD68")
+
 dist.ls.normal = list(subset(dat.cd3, in_Les_normal_side)$dist2boundary, 
                       subset(dat.cd15, in_Les_normal_side)$dist2boundary, 
                       subset(dat.cd123, in_Les_normal_side)$dist2boundary, 
+                      subset(dat.cd11c, in_Les_normal_side)$dist2boundary,
                       subset(dat.cd68, in_Les_normal_side)$dist2boundary)
 dist.ls.lesion = list(subset(dat.cd3, in_Les_lesion_side)$dist2boundary, 
                       subset(dat.cd15, in_Les_lesion_side)$dist2boundary, 
                       subset(dat.cd123, in_Les_lesion_side)$dist2boundary, 
+                      subset(dat.cd11c, in_Les_lesion_side)$dist2boundary,
                       subset(dat.cd68, in_Les_lesion_side)$dist2boundary)
 
 myfigure(mfcol=c(2,2))
@@ -89,11 +104,13 @@ mydev.off(file="figures/DD_dist2skin_compare_markers", ext="png")
 
 
 ## CF
+legend=c("CD3","CD15","CD123","CD11c") # CD68 did not pass QC
+
 dat.cd3=get.dat("CF_Les_CD3_masks_d2b_regmem.csv", "CF")
 dat.cd15=get.dat("CF_Les_CD15_masks_d2b_regmem.csv", "CF")
 dat.cd123=get.dat("CF_Les_CD123_masks_d2b_regmem.csv", "CF")
 dat.cd11c=get.dat("CF_Les_CD11c_masks_d2b_regmem.csv", "CF")
-legend=c("CD3","CD15","CD123","CD11c")
+
 dist.ls.normal = list(subset(dat.cd3, in_Les_normal_side)$dist2boundary, 
                       subset(dat.cd15, in_Les_normal_side)$dist2boundary, 
                       subset(dat.cd123, in_Les_normal_side)$dist2boundary, 
