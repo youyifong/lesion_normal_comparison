@@ -1,4 +1,3 @@
-# takes 40 min
 nohup python -m tsp runcellpose --f 'DD_Les_CD*.png' --l [3,0] --model cytotrain7 --s &
 
 # 
