@@ -19,6 +19,13 @@ These two questions are also intertwined. If we use WGA only to draw boundaries,
 
 ## Results
 
+    
+![plot](R/figures/DD_dist2skin_compare_markers.png?raw=true)
+
+![plot](R/figures/CF_dist2skin_compare_markers.png?raw=true)
+
+
+
 ![plot](R/figures/CF_dist2skin_compare_regions_CD1a.png?raw=true)
    
 ![plot](R/figures/DD_dist2skin_compare_regions_CD3.png?raw=true)
@@ -54,6 +61,4 @@ These two questions are also intertwined. If we use WGA only to draw boundaries,
 ![plot](R/figures/DD_dist2skin_compare_regions_CD279.png?raw=true)
     
 ![plot](R/figures/CF_dist2skin_compare_regions_CD279.png?raw=true)
-    
-![plot](R/figures/DD_dist2skin_compare_CD4_CD15.png?raw=true)
   
