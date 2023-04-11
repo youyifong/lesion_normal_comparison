@@ -2,7 +2,7 @@ dist="dist2DEJ"
 # dist="dist2skin"
 
 if(dist=="dist2DEJ") {
-  xlim=c(-1000,2000)
+  xlim=c(-750,1750)
 } else {
   xlim=c(0,2500)
 }
