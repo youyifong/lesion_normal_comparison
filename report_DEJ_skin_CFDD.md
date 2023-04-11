@@ -21,6 +21,30 @@ Todo
 ### Cell counts
 ![table](R/tables/input/DD_counts.tex?raw=true)
 
+```{=latex}
+
+\begin{table}[tbp]
+\begin{center}
+\begin{threeparttable}
+\caption{Descriptive statistics included in the present study.}
+\begin{tabular}{ll}
+\toprule
+cyl & \multicolumn{1}{c}{Some columnname}\\
+\midrule
+4.00 & 26.66 \&plusmn; 4.51\\
+6.00 & 19.74 \&plusmn; 1.45\\
+8.00 & 15.1 \&plusmn; 2.56\\
+\bottomrule
+\addlinespace
+\end{tabular}
+\begin{tablenotes}[para]
+\textit{Note.} There were no signnificant differences in the means between the groups.
+\end{tablenotes}
+\end{threeparttable}
+\end{center}
+\end{table}
+```
+
 <object data="R/tables/DD_counts.pdf" type="application/pdf" width="700px" height="700px">
     <embed src="R/tables/DD_counts.pdf">
         <p>This browser does not support PDFs. Please download the PDF to view it: <a href="R/tables/DD_counts.pdf">Download PDF</a>.</p>
