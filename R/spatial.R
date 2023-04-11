@@ -74,10 +74,10 @@ region.labels.title=c(normal="Intact Epidermis", lesion="Ulcerative")
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
-xlim=c(-500,1500)
+xlim=c(-1000,2000)
 
-dist="dist2DEJ"
-# dist="dist2skin"
+# dist="dist2DEJ"
+dist="dist2skin"
 
 
 #### compare markers ####
