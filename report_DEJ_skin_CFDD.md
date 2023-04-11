@@ -20,7 +20,7 @@ Todo
 
 ### Cell counts
 ```{=latex}
-<embed src="R/tables/input/DD_counts.tex">
+![table](R/tables/input/DD_counts.tex?raw=true)
 ```
 
 <object data="R/tables/DD_counts.pdf" type="application/pdf" width="700px" height="700px">
