@@ -19,9 +19,7 @@ Todo
 ## Results
 
 ### Cell counts
-```{=latex}
 ![table](R/tables/input/DD_counts.tex?raw=true)
-```
 
 <object data="R/tables/DD_counts.pdf" type="application/pdf" width="700px" height="700px">
     <embed src="R/tables/DD_counts.pdf">
