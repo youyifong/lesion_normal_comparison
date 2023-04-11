@@ -12,34 +12,30 @@ get.dat=function(filename, sample.label, dist) {
       dat$lesion.epi =    dat$in_DD_Les_epi_region_2_lesion=="True" 
       dat$lesion.dermis = dat$in_DD_Les_dermis_region_2_lesion=="True" 
 
-      dat$epi = dat$normal.epi | dat$lesion.epi
-      dat$dermis = dat$normal.dermis | dat$lesion.dermis
-      dat$normal = dat$normal.epi | dat$normal.dermis
-      dat$lesion = dat$lesion.epi | dat$lesion.dermis
-      
       # each pixel is 1/2 micron, negative dist in epi
       dat$dist2skin = dat$dist2DD_Les_skin_boundary/2
       dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI_v2/2
-      
-      if (dist=="dist2DEJ") {
-        dat$dist2skin=dat$dist2skin * ifelse(dat$epi, -1, 1)
-        dat$dist2DEJ =dat$dist2DEJ  * ifelse(dat$epi, -1, 1)
-      }
-      
+
     } else if (sample.label=="CF") {
       dat$normal.epi =    dat$in_CF_Les_epi_region_1_normal=="True" | dat$in_CF_Les_epi_region_3_normal=="True" 
       dat$normal.dermis = dat$in_CF_Les_dermis_region_1_normal=="True" | dat$in_CF_Les_dermis_region_3_normal=="True" 
       dat$lesion.epi =    dat$in_CF_Les_epi_region_2_lesion=="True" 
       dat$lesion.dermis = dat$in_CF_Les_dermis_region_2_lesion=="True" 
       
-      dat$epi = dat$normal.epi | dat$lesion.epi
-      dat$dermis = dat$normal.dermis | dat$lesion.dermis
-      dat$normal = dat$normal.epi | dat$normal.dermis
-      dat$lesion = dat$lesion.epi | dat$lesion.dermis
-      
       # each pixel is 1/2 micron, negative dist in epi
-      dat$dist2skin = dat$dist2CF_Les_skin_boundary/2 * ifelse(dat$epi, -1, 1)
-      dat$dist2DEJ  = dat$dist2CF_Les_DEJ_v2/2 * ifelse(dat$epi, -1, 1)
+      dat$dist2skin = dat$dist2CF_Les_skin_boundary/2
+      dat$dist2DEJ  = dat$dist2CF_Les_DEJ_v2/2
+    
+    }
+    
+    dat$epi = dat$normal.epi | dat$lesion.epi
+    dat$dermis = dat$normal.dermis | dat$lesion.dermis
+    dat$normal = dat$normal.epi | dat$normal.dermis
+    dat$lesion = dat$lesion.epi | dat$lesion.dermis
+    
+    if (dist=="dist2DEJ") {
+      dat$dist2skin=dat$dist2skin * ifelse(dat$epi, -1, 1)
+      dat$dist2DEJ =dat$dist2DEJ  * ifelse(dat$epi, -1, 1)
     }
     dat
 }
@@ -82,8 +78,12 @@ region.labels.title=c(normal="Intact Epidermis", lesion="Ulcerative")
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
-xlim=c(-1000,2000)
-
+if(dist=="dist2DEJ") {
+  xlim=c(-1000,2000)
+} else {
+  xlim=c(0,2500)
+}
+  
 
 
 #### compare markers ####
