@@ -76,8 +76,8 @@ blue=rgb(red=0, blue=1, green=0, alpha=1)
 
 xlim=c(-500,1500)
 
-# dist="dist2DEJ"
-dist="dist2skin"
+dist="dist2DEJ"
+# dist="dist2skin"
 
 
 #### compare markers ####
