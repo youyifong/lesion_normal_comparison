@@ -25,6 +25,3 @@ python -m tsp regionmembership --f 'CF_Les_CD*_masks_d2b.csv' --regionroi 'CF_Le
 
 
 
-1) compute neg distance
-2) region is now determined by above or below lines
-3) tabulate number of cells above and below DEJ line, normalized by the size of region above and below DEJ, for normal and lesion regions separately. 2x2 table for each cell
