@@ -9,7 +9,7 @@
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Tuesday, April 11, 2023 10:20:38}
+%TCIDATA{LastRevised=Tuesday, April 11, 2023 11:00:21}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -37,9 +37,7 @@
 \newtheorem{summary}[theorem]{Summary}
 \newenvironment{proof}[1][Proof]{\noindent\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
 \newcommand{\pwd}{D:/DeepLearning/images_from_K/lesion_normal_comparison/}
-
 \input{tcilatex}
-
 \begin{document}
 
 \title{Spatial Analysis}
@@ -53,19 +51,13 @@ normal and lesion regions.
 
 \begin{itemize}
 \item Markers for DD: CD3, CD4, CD8a, CD11c, CD15, CD45, CD68, CD69, CD123,
-CD279 
+CD279
 
 \item Markers for CF: CD1a, CD3, CD4, CD8a, CD11c, CD15, CD45, CD69, CD123,
 CD279 (CD68 did not pass QC)
 \end{itemize}
 
-\bigskip 
-
-Todo
-
-\begin{itemize}
-\item refine cell segmentation results
-\end{itemize}
+\bigskip
 
 \bigskip 
 %TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
@@ -80,14 +72,10 @@ Todo
 %\TeXButton{tab }{\begin{center}
 %\begin{table}[h] \centering
 %
-%% enter a full path to the file contain a tabular environmenet
 %\input{\pwd R/tables/input/DD_counts.tex}
 %
-%% enter a caption
 %\caption{DD}
-%\vspace{-5pt} % important to reduce white space and fit multiple tables onto same page
-%
-%% enter a marker that is the same as Encapsulated name
+%\vspace{-5pt} 
 %\label{tab DD counts}
 %
 %\end{table}
@@ -96,14 +84,10 @@ Todo
 \begin{center}
 \begin{table}[h] \centering
 
-% enter a full path to the file contain a tabular environmenet
 \input{\pwd R/tables/input/DD_counts.tex}
 
-% enter a caption
 \caption{DD}
-\vspace{-5pt} % important to reduce white space and fit multiple tables onto same page
-
-% enter a marker that is the same as Encapsulated name
+\vspace{-5pt} 
 \label{tab DD counts}
 
 \end{table}
@@ -114,14 +98,10 @@ Todo
 %\TeXButton{tab }{\begin{center}
 %\begin{table}[h] \centering
 %
-%% enter a full path to the file contain a tabular environmenet
 %\input{\pwd R/tables/input/CF_counts.tex}
 %
-%% enter a caption
 %\caption{CF}
-%\vspace{-5pt} % important to reduce white space and fit multiple tables onto same page
-%
-%% enter a marker that is the same as Encapsulated name
+%\vspace{-5pt} 
 %\label{tab DD counts}
 %
 %\end{table}
@@ -130,52 +110,35 @@ Todo
 \begin{center}
 \begin{table}[h] \centering
 
-% enter a full path to the file contain a tabular environmenet
 \input{\pwd R/tables/input/CF_counts.tex}
 
-% enter a caption
 \caption{CF}
-\vspace{-5pt} % important to reduce white space and fit multiple tables onto same page
-
-% enter a marker that is the same as Encapsulated name
+\vspace{-5pt} 
 \label{tab DD counts}
 
 \end{table}
 \end{center}%
 %EndExpansion
 
-
 \bigskip 
 %TCIMACRO{%
-%\TeXButton{fig}{% enter file name in 3 places: Encapsulated Name, includegraphics and label
-%\begin{center}
+%\TeXButton{fig}{\begin{center}
 %\begin{figure}[H] \centering
-%% enter a filename, trim:  l b r t
-%% {} around file name allows it to have .
 %\includegraphics[width=.45\textwidth]{\pwd R/figures/DD_dist2DEJ_compare_markers.png}
 %\includegraphics[width=.45\textwidth]{\pwd R/figures/DD_dist2skin_compare_markers.png}
 %
-%% for beamer change to 3in
-%% alternatively [scale=0.7,angle=00,clip=true,trim=0 0 0 0]
 %\caption{Distance to DEJ (left) and skin surface(right).}
-%% vspace here helps reduce white space
 %\vspace{-5pt}
 %\label{}
 %\end{figure}
 %\end{center}}}%
 %BeginExpansion
-% enter file name in 3 places: Encapsulated Name, includegraphics and label
 \begin{center}
 \begin{figure}[H] \centering
-% enter a filename, trim:  l b r t
-% {} around file name allows it to have .
 \includegraphics[width=.45\textwidth]{\pwd R/figures/DD_dist2DEJ_compare_markers.png}
 \includegraphics[width=.45\textwidth]{\pwd R/figures/DD_dist2skin_compare_markers.png}
 
-% for beamer change to 3in
-% alternatively [scale=0.7,angle=00,clip=true,trim=0 0 0 0]
 \caption{Distance to DEJ (left) and skin surface(right).}
-% vspace here helps reduce white space
 \vspace{-5pt}
 \label{}
 \end{figure}
@@ -183,35 +146,23 @@ Todo
 %EndExpansion
 
 %TCIMACRO{%
-%\TeXButton{fig}{% enter file name in 3 places: Encapsulated Name, includegraphics and label
-%\begin{center}
+%\TeXButton{fig}{\begin{center}
 %\begin{figure}[H] \centering
-%% enter a filename, trim:  l b r t
-%% {} around file name allows it to have .
 %\includegraphics[width=.45\textwidth]{\pwd R/figures/CF_dist2DEJ_compare_markers.png}
 %\includegraphics[width=.45\textwidth]{\pwd R/figures/CF_dist2skin_compare_markers.png}
 %
-%% for beamer change to 3in
-%% alternatively [scale=0.7,angle=00,clip=true,trim=0 0 0 0]
 %\caption{Distance to DEJ (left) and skin surface(right).}
-%% vspace here helps reduce white space
 %\vspace{-5pt}
 %\label{}
 %\end{figure}
 %\end{center}}}%
 %BeginExpansion
-% enter file name in 3 places: Encapsulated Name, includegraphics and label
 \begin{center}
 \begin{figure}[H] \centering
-% enter a filename, trim:  l b r t
-% {} around file name allows it to have .
 \includegraphics[width=.45\textwidth]{\pwd R/figures/CF_dist2DEJ_compare_markers.png}
 \includegraphics[width=.45\textwidth]{\pwd R/figures/CF_dist2skin_compare_markers.png}
 
-% for beamer change to 3in
-% alternatively [scale=0.7,angle=00,clip=true,trim=0 0 0 0]
 \caption{Distance to DEJ (left) and skin surface(right).}
-% vspace here helps reduce white space
 \vspace{-5pt}
 \label{}
 \end{figure}
