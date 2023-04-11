@@ -1,6 +1,9 @@
+# dist="dist2DEJ"
+dist="dist2skin"
+
 library(kyotil)
 
-get.dat=function(filename, sample.label) {
+get.dat=function(filename, sample.label, dist) {
     dat=read.csv("data/"%.%filename)
     
     if (sample.label=="DD") {
@@ -15,8 +18,13 @@ get.dat=function(filename, sample.label) {
       dat$lesion = dat$lesion.epi | dat$lesion.dermis
       
       # each pixel is 1/2 micron, negative dist in epi
-      dat$dist2skin = dat$dist2DD_Les_skin_boundary/2 * ifelse(dat$epi, -1, 1)
-      dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI_v2/2 * ifelse(dat$epi, -1, 1)
+      dat$dist2skin = dat$dist2DD_Les_skin_boundary/2
+      dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI_v2/2
+      
+      if (dist=="dist2DEJ") {
+        dat$dist2skin=dat$dist2skin * ifelse(dat$epi, -1, 1)
+        dat$dist2DEJ =dat$dist2DEJ  * ifelse(dat$epi, -1, 1)
+      }
       
     } else if (sample.label=="CF") {
       dat$normal.epi =    dat$in_CF_Les_epi_region_1_normal=="True" | dat$in_CF_Les_epi_region_3_normal=="True" 
@@ -76,8 +84,6 @@ blue=rgb(red=0, blue=1, green=0, alpha=1)
 
 xlim=c(-1000,2000)
 
-# dist="dist2DEJ"
-dist="dist2skin"
 
 
 #### compare markers ####
@@ -85,11 +91,11 @@ dist="dist2skin"
 ## DD
 legend=c("CD3","CD15","CD123","CD11c","CD68")
 
-dat.cd3=get.dat("DD_Les_CD3_masks_d2b_regmem.csv", "DD")
-dat.cd15=get.dat("DD_Les_CD15_masks_d2b_regmem.csv", "DD")
-dat.cd123=get.dat("DD_Les_CD123_masks_d2b_regmem.csv", "DD")
-dat.cd11c=get.dat("DD_Les_CD11c_masks_d2b_regmem.csv", "DD")
-dat.cd68=get.dat("DD_Les_CD68_masks_d2b_regmem.csv", "DD")
+dat.cd3=get.dat("DD_Les_CD3_masks_d2b_regmem.csv", "DD", dist)
+dat.cd15=get.dat("DD_Les_CD15_masks_d2b_regmem.csv", "DD", dist)
+dat.cd123=get.dat("DD_Les_CD123_masks_d2b_regmem.csv", "DD", dist)
+dat.cd11c=get.dat("DD_Les_CD11c_masks_d2b_regmem.csv", "DD", dist)
+dat.cd68=get.dat("DD_Les_CD68_masks_d2b_regmem.csv", "DD", dist)
 
 
 dist.ls.normal = list(subset(dat.cd3, normal)[[dist]], 
@@ -112,10 +118,10 @@ dev.off()
 ## CF
 legend=c("CD3","CD15","CD123","CD11c") # CD68 did not pass QC
 
-dat.cd3=get.dat("CF_Les_CD3_masks_d2b_regmem.csv", "CF")
-dat.cd15=get.dat("CF_Les_CD15_masks_d2b_regmem.csv", "CF")
-dat.cd123=get.dat("CF_Les_CD123_masks_d2b_regmem.csv", "CF")
-dat.cd11c=get.dat("CF_Les_CD11c_masks_d2b_regmem.csv", "CF")
+dat.cd3=get.dat("CF_Les_CD3_masks_d2b_regmem.csv", "CF", dist)
+dat.cd15=get.dat("CF_Les_CD15_masks_d2b_regmem.csv", "CF", dist)
+dat.cd123=get.dat("CF_Les_CD123_masks_d2b_regmem.csv", "CF", dist)
+dat.cd11c=get.dat("CF_Les_CD11c_masks_d2b_regmem.csv", "CF", dist)
 
 dist.ls.normal = list(subset(dat.cd3, normal)[[dist]], 
                       subset(dat.cd15, normal)[[dist]], 

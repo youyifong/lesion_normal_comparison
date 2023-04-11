@@ -22,10 +22,10 @@ These two questions are also intertwined. If we use WGA only to draw boundaries,
 ## Results
 
 ### DEJ DD
-![plot](R/figures/DD_dist2DEJ_compare_markers.png?raw=true)![plot](R/figures/DD_dist2skin_compare_markers.png?raw=true)
-
+![plot](R/figures/DD_dist2DEJ_compare_markers.png?raw=true)
 
 ### Skin DD  
+![plot](R/figures/DD_dist2skin_compare_markers.png?raw=true)
 
 
 ### DEJ CF 
