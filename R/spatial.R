@@ -1,5 +1,11 @@
-# dist="dist2DEJ"
-dist="dist2skin"
+dist="dist2DEJ"
+# dist="dist2skin"
+
+if(dist=="dist2DEJ") {
+  xlim=c(-1000,2000)
+} else {
+  xlim=c(0,2500)
+}
 
 library(kyotil)
 
@@ -78,11 +84,6 @@ region.labels.title=c(normal="Intact Epidermis", lesion="Ulcerative")
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
-if(dist=="dist2DEJ") {
-  xlim=c(-1000,2000)
-} else {
-  xlim=c(0,2500)
-}
   
 
 
