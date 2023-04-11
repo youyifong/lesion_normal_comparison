@@ -1,3 +1,6 @@
 
 R/data/
 R/.Rhistory
+*.aaa
+*.aux
+*.log

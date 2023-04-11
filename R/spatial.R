@@ -87,56 +87,80 @@ blue=rgb(red=0, blue=1, green=0, alpha=1)
   
 
 
+s="DD"
+# s="CF"
+
 #### compare markers ####
 
-## DD
-legend=c("CD3","CD15","CD123","CD11c","CD68")
+if (s=="DD") {
+  legend=c("CD3","CD15","CD123","CD11c","CD68")
+} else if (s=="CF") {
+  legend=c("CD3","CD15","CD123","CD11c") # CD68 did not pass QC
+}
+names(legend)=legend
 
-dat.cd3=get.dat("DD_Les_CD3_masks_d2b_regmem.csv", "DD", dist)
-dat.cd15=get.dat("DD_Les_CD15_masks_d2b_regmem.csv", "DD", dist)
-dat.cd123=get.dat("DD_Les_CD123_masks_d2b_regmem.csv", "DD", dist)
-dat.cd11c=get.dat("DD_Les_CD11c_masks_d2b_regmem.csv", "DD", dist)
-dat.cd68=get.dat("DD_Les_CD68_masks_d2b_regmem.csv", "DD", dist)
+alldat=lapply(legend, function (l) get.dat(s%.%"_Les_"%.%l%.%"_masks_d2b_regmem.csv", s, dist) )
 
+dist.ls.normal = lapply(alldat, function (dat) subset(dat, normal)[[dist]])
+                      
+dist.ls.lesion = lapply(alldat, function (dat) subset(dat, lesion)[[dist]])
 
-dist.ls.normal = list(subset(dat.cd3, normal)[[dist]], 
-                      subset(dat.cd15, normal)[[dist]], 
-                      subset(dat.cd123, normal)[[dist]], 
-                      subset(dat.cd11c, normal)[[dist]],
-                      subset(dat.cd68, normal)[[dist]])
-dist.ls.lesion = list(subset(dat.cd3, lesion)[[dist]], 
-                      subset(dat.cd15, lesion)[[dist]], 
-                      subset(dat.cd123, lesion)[[dist]], 
-                      subset(dat.cd11c, lesion)[[dist]],
-                      subset(dat.cd68, lesion)[[dist]])
-
-mypng(mfcol=c(2,2), file="figures/DD_"%.%dist%.%"_compare_markers")
-    compare.markers(dist.ls.normal, xlim=xlim, main="DD Les, "%.%region.labels.title["normal"], legend=legend)    
-    compare.markers(dist.ls.lesion, xlim=xlim, main="DD Les, "%.%region.labels.title["lesion"], legend=legend)    
+mypng(mfcol=c(2,2), file="figures/"%.%s%.%"_"%.%dist%.%"_compare_markers")
+    compare.markers(dist.ls.normal, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["normal"], legend=legend)    
+    compare.markers(dist.ls.lesion, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["lesion"], legend=legend)    
 dev.off()
 
+# make a table of cell counts
+if (s=="DD") {
+  tmp = read.csv("data/DD_region_size.csv")
+  size=tmp$size
+} else if (s=="CF") {
+  tmp = read.csv("data/CF_region_size.csv"); tmp
+  size=tmp$size
+  size=c(size[1]+size[6], size[2]+size[4], size[3], size[5])
+}
 
-## CF
-legend=c("CD3","CD15","CD123","CD11c") # CD68 did not pass QC
+counts = sapply(legend, function (l) 
+  c(nrow(subset(alldat[[l]], epi & normal)),
+    nrow(subset(alldat[[l]], dermis & normal)),
+    nrow(subset(alldat[[l]], epi & lesion)),
+    nrow(subset(alldat[[l]], dermis & lesion)))
+)
+# counts/mm2
+counts2=counts/size*4*1e6
+mode(counts2) <- "integer"
+counts=t(rbind(counts, counts2 )) 
 
-dat.cd3=get.dat("CF_Les_CD3_masks_d2b_regmem.csv", "CF", dist)
-dat.cd15=get.dat("CF_Les_CD15_masks_d2b_regmem.csv", "CF", dist)
-dat.cd123=get.dat("CF_Les_CD123_masks_d2b_regmem.csv", "CF", dist)
-dat.cd11c=get.dat("CF_Les_CD11c_masks_d2b_regmem.csv", "CF", dist)
+mytex(data.frame(counts), file.name="tables/"%.%s%.%"_counts", digit=0,  include.colnames = F, align="c",
+      col.headers="\\hline\n 
+         \\multicolumn{1}{c}{} & \\multicolumn{4}{c}{Counts} & \\multicolumn{4}{c}{Counts/mm2} \\\\ 
+         \\multicolumn{1}{c}{} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c}{lesion}  \\\\ 
+         \\multicolumn{1}{c}{} & epi & dermis & epi & dermis & epi & dermis & epi & dermis  \\\\ 
+    ")
 
-dist.ls.normal = list(subset(dat.cd3, normal)[[dist]], 
-                      subset(dat.cd15, normal)[[dist]], 
-                      subset(dat.cd123, normal)[[dist]], 
-                      subset(dat.cd11c, normal)[[dist]])
-dist.ls.lesion = list(subset(dat.cd3, lesion)[[dist]], 
-                      subset(dat.cd15, lesion)[[dist]], 
-                      subset(dat.cd123, lesion)[[dist]], 
-                      subset(dat.cd11c, lesion)[[dist]])
-    
-mypng(mfcol=c(2,2), file="figures/CF_"%.%dist%.%"_compare_markers")
-    compare.markers(dist.ls.normal, xlim=xlim, main="CF Les, "%.%region.labels.title["normal"], legend=legend)    
-    compare.markers(dist.ls.lesion, xlim=xlim, main="CF Les, "%.%region.labels.title["lesion"], legend=legend)    
-dev.off()
+
+
+
+# make a table of cell counts
+  
+counts = sapply(legend, function (l) 
+  c(nrow(subset(alldat[[l]], epi & normal)),
+    nrow(subset(alldat[[l]], dermis & normal)),
+    nrow(subset(alldat[[l]], epi & lesion)),
+    nrow(subset(alldat[[l]], dermis & lesion)))
+)
+# counts/mm2
+counts2=counts/size*4*1e6
+mode(counts2) <- "integer"
+counts=t(rbind(counts, counts2 )) 
+
+mytex(data.frame(counts), file.name="tables/CF_counts", digit=0,  include.colnames = F, align="c",
+      col.headers="\\hline\n 
+         \\multicolumn{1}{c}{} & \\multicolumn{4}{c}{Counts} & \\multicolumn{4}{c}{Counts/mm2} \\\\ 
+         \\multicolumn{1}{c}{} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c}{lesion}  \\\\ 
+         \\multicolumn{1}{c}{} & epi & dermis & epi & dermis & epi & dermis & epi & dermis  \\\\ 
+    ")
+
 
 
 # 
