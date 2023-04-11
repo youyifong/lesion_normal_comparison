@@ -2,31 +2,51 @@ library(kyotil)
 
 get.dat=function(filename, sample.label) {
     dat=read.csv("data/"%.%filename)
-    dat$in_Les_lesion_side = dat[["in_"%.%sample.label%.%"_Les_lesion_side"]]=="True"
-    dat$in_Les_normal_side = dat[["in_"%.%sample.label%.%"_Les_normal_side"]]=="True"
     
-    # each pixel is 1/2 micron
-    dat$dist2boundary=dat$dist2boundary/2
-    
-    mean(dat$in_Les_normal_side)
-    mean(dat$in_Les_lesion_side)
-    
-    with(dat, table(in_Les_normal_side, in_Les_lesion_side))
-    
+    if (sample.label=="DD") {
+      dat$normal.epi =    dat$in_DD_Les_epi_region_1_normal=="True" 
+      dat$normal.dermis = dat$in_DD_Les_dermis_region_1_normal=="True" 
+      dat$lesion.epi =    dat$in_DD_Les_epi_region_2_lesion=="True" 
+      dat$lesion.dermis = dat$in_DD_Les_dermis_region_2_lesion=="True" 
+
+      dat$epi = dat$normal.epi | dat$lesion.epi
+      dat$dermis = dat$normal.dermis | dat$lesion.dermis
+      dat$normal = dat$normal.epi | dat$normal.dermis
+      dat$lesion = dat$lesion.epi | dat$lesion.dermis
+      
+      # each pixel is 1/2 micron, negative dist in epi
+      dat$dist2skin = dat$dist2DD_Les_skin_boundary/2 * ifelse(dat$epi, -1, 1)
+      dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI_v2/2 * ifelse(dat$epi, -1, 1)
+      
+    } else if (sample.label=="CF") {
+      dat$normal.epi =    dat$in_CF_Les_epi_region_1_normal=="True" | dat$in_CF_Les_epi_region_3_normal=="True" 
+      dat$normal.dermis = dat$in_CF_Les_dermis_region_1_normal=="True" | dat$in_CF_Les_dermis_region_3_normal=="True" 
+      dat$lesion.epi =    dat$in_CF_Les_epi_region_2_lesion=="True" 
+      dat$lesion.dermis = dat$in_CF_Les_dermis_region_2_lesion=="True" 
+      
+      dat$epi = dat$normal.epi | dat$lesion.epi
+      dat$dermis = dat$normal.dermis | dat$lesion.dermis
+      dat$normal = dat$normal.epi | dat$normal.dermis
+      dat$lesion = dat$lesion.epi | dat$lesion.dermis
+      
+      # each pixel is 1/2 micron, negative dist in epi
+      dat$dist2skin = dat$dist2CF_Les_skin_boundary/2 * ifelse(dat$epi, -1, 1)
+      dat$dist2DEJ  = dat$dist2CF_Les_DEJ_v2/2 * ifelse(dat$epi, -1, 1)
+    }
     dat
 }
 
 compare.regions=function(dat, legend, ...) {
-    hist(dat$dist2boundary[dat$in_Les_lesion_side], border="red", col=NULL, xlab="Distance to skin (um)", ylab="Number of cells", breaks=20
-        , ylim=range(c(hist(dat$dist2boundary[dat$in_Les_lesion_side], breaks=20, plot=F)$counts, hist(dat$dist2boundary[dat$in_Les_normal_side], breaks=20, plot=F)$counts))
+    hist(dat[[dist]][dat$lesion], border="red", col=NULL, xlab=dist %.% " (um)", ylab="Number of cells", breaks=20
+        , ylim=range(c(hist(dat[[dist]][dat$lesion], breaks=20, plot=F)$counts, hist(dat[[dist]][dat$normal], breaks=20, plot=F)$counts))
         , ...)
-    hist(dat$dist2boundary[dat$in_Les_normal_side], border="blue", col=NULL, breaks=20, add=T)
+    hist(dat[[dist]][dat$normal], border="blue", col=NULL, breaks=20, add=T)
     mylegend(x=3, legend=legend, lty=1, col=c("blue","red"), y.intersp=1.5, text.width=700)
     
-    plot(density(dat$dist2boundary[dat$in_Les_lesion_side]), col="red", xlab="Distance to skin (um)", ylab="Density"
-        , ylim=range(c(density(dat$dist2boundary[dat$in_Les_lesion_side])$y, density(dat$dist2boundary[dat$in_Les_normal_side])$y))
+    plot(density(dat[[dist]][dat$lesion]), col="red", xlab=dist %.% " (um)", ylab="Density"
+        , ylim=range(c(density(dat[[dist]][dat$lesion])$y, density(dat[[dist]][dat$normal])$y))
         , ...)
-    lines(density(dat$dist2boundary[dat$in_Les_normal_side]), col="blue")
+    lines(density(dat[[dist]][dat$in_Les_normal_side]), col="blue")
     mylegend(x=3, legend=legend, lty=1, col=c("blue","red"), y.intersp=1, text.width=700)
 }
 
@@ -35,14 +55,14 @@ compare.markers=function(dist.ls, legend, ...) {
     cnts.all = sapply(dist.ls, function (dist) hist(dist, breaks=20, plot=F)$counts)
     ylim = range(cnts.all)    
     
-    hist(dist.ls[[1]], border=1, xlab="Distance to skin (um)", ylab="Number of cells", breaks=20, col=NULL, ylim=ylim, ...)
+    hist(dist.ls[[1]], border=1, xlab=dist %.% " (um)", ylab="Number of cells", breaks=20, col=NULL, ylim=ylim, ...)
     for (i in 2:length(dist.ls)) hist(dist.ls[[i]], border=i, breaks=20, col=NULL, add=T)
     mylegend(x=3, legend=legend, lty=1, col=1:length(dist.ls), y.intersp=1, text.width=700)
     
     y.all = sapply(dist.ls, function (dist) density(dist)$y)
     ylim = range(y.all)    
     
-    plot(density(dist.ls[[1]]), col=1, xlab="Distance to skin (um)", ylab="Density", ylim=ylim, ...)
+    plot(density(dist.ls[[1]]), col=1, xlab=dist %.% " (um)", ylab="Density", ylim=ylim, ...)
     for (i in 2:length(dist.ls)) lines(density(dist.ls[[i]]), col=i)
     mylegend(x=3, legend=legend, lty=1, col=1:i, y.intersp=1, text.width=700)
 }
@@ -54,25 +74,10 @@ region.labels.title=c(normal="Intact Epidermis", lesion="Ulcerative")
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
-xlim=c(0,2500)
+xlim=c(-500,1500)
 
-
-### compare normal vs lesion tissues ####
-
-# generate one png per marker
-
-for (s in c("DD","CF")) {
-    if (s=="DD") markers=c(        "CD3", "CD4", "CD8a",          "CD15", "CD45", "CD68", "CD69", "CD123", "CD279")
-    if (s=="CF") markers=c("CD1a", "CD3", "CD4", "CD8a", "CD11c", "CD15", "CD45",                 "CD123", "CD279")
-    for(m in markers) {
-        #s="CF"; m="CD1a"
-        myfigure(mfcol=c(1,2))
-            compare.regions(get.dat(s%.%"_Les_"%.%m%.%"_masks_d2b_regmem.csv", s), xlim=xlim, main=s%.%" Les, "%.%m, legend=region.labels)    
-        mydev.off(file="figures/"%.%s%.%"_dist2skin_compare_regions_"%.%m, ext="png")
-    }
-}
-
-
+# dist="dist2DEJ"
+dist="dist2skin"
 
 
 #### compare markers ####
@@ -86,21 +91,22 @@ dat.cd123=get.dat("DD_Les_CD123_masks_d2b_regmem.csv", "DD")
 dat.cd11c=get.dat("DD_Les_CD11c_masks_d2b_regmem.csv", "DD")
 dat.cd68=get.dat("DD_Les_CD68_masks_d2b_regmem.csv", "DD")
 
-dist.ls.normal = list(subset(dat.cd3, in_Les_normal_side)$dist2boundary, 
-                      subset(dat.cd15, in_Les_normal_side)$dist2boundary, 
-                      subset(dat.cd123, in_Les_normal_side)$dist2boundary, 
-                      subset(dat.cd11c, in_Les_normal_side)$dist2boundary,
-                      subset(dat.cd68, in_Les_normal_side)$dist2boundary)
-dist.ls.lesion = list(subset(dat.cd3, in_Les_lesion_side)$dist2boundary, 
-                      subset(dat.cd15, in_Les_lesion_side)$dist2boundary, 
-                      subset(dat.cd123, in_Les_lesion_side)$dist2boundary, 
-                      subset(dat.cd11c, in_Les_lesion_side)$dist2boundary,
-                      subset(dat.cd68, in_Les_lesion_side)$dist2boundary)
 
-myfigure(mfcol=c(2,2))
+dist.ls.normal = list(subset(dat.cd3, normal)[[dist]], 
+                      subset(dat.cd15, normal)[[dist]], 
+                      subset(dat.cd123, normal)[[dist]], 
+                      subset(dat.cd11c, normal)[[dist]],
+                      subset(dat.cd68, normal)[[dist]])
+dist.ls.lesion = list(subset(dat.cd3, lesion)[[dist]], 
+                      subset(dat.cd15, lesion)[[dist]], 
+                      subset(dat.cd123, lesion)[[dist]], 
+                      subset(dat.cd11c, lesion)[[dist]],
+                      subset(dat.cd68, lesion)[[dist]])
+
+mypng(mfcol=c(2,2), file="figures/DD_"%.%dist%.%"_compare_markers")
     compare.markers(dist.ls.normal, xlim=xlim, main="DD Les, "%.%region.labels.title["normal"], legend=legend)    
     compare.markers(dist.ls.lesion, xlim=xlim, main="DD Les, "%.%region.labels.title["lesion"], legend=legend)    
-mydev.off(file="figures/DD_dist2skin_compare_markers", ext="png")
+dev.off()
 
 
 ## CF
@@ -111,16 +117,35 @@ dat.cd15=get.dat("CF_Les_CD15_masks_d2b_regmem.csv", "CF")
 dat.cd123=get.dat("CF_Les_CD123_masks_d2b_regmem.csv", "CF")
 dat.cd11c=get.dat("CF_Les_CD11c_masks_d2b_regmem.csv", "CF")
 
-dist.ls.normal = list(subset(dat.cd3, in_Les_normal_side)$dist2boundary, 
-                      subset(dat.cd15, in_Les_normal_side)$dist2boundary, 
-                      subset(dat.cd123, in_Les_normal_side)$dist2boundary, 
-                      subset(dat.cd11c, in_Les_normal_side)$dist2boundary)
-dist.ls.lesion = list(subset(dat.cd3, in_Les_lesion_side)$dist2boundary, 
-                      subset(dat.cd15, in_Les_lesion_side)$dist2boundary, 
-                      subset(dat.cd123, in_Les_lesion_side)$dist2boundary, 
-                      subset(dat.cd11c, in_Les_lesion_side)$dist2boundary)
+dist.ls.normal = list(subset(dat.cd3, normal)[[dist]], 
+                      subset(dat.cd15, normal)[[dist]], 
+                      subset(dat.cd123, normal)[[dist]], 
+                      subset(dat.cd11c, normal)[[dist]])
+dist.ls.lesion = list(subset(dat.cd3, lesion)[[dist]], 
+                      subset(dat.cd15, lesion)[[dist]], 
+                      subset(dat.cd123, lesion)[[dist]], 
+                      subset(dat.cd11c, lesion)[[dist]])
     
-myfigure(mfcol=c(2,2))
+mypng(mfcol=c(2,2), file="figures/CF_"%.%dist%.%"_compare_markers")
     compare.markers(dist.ls.normal, xlim=xlim, main="CF Les, "%.%region.labels.title["normal"], legend=legend)    
     compare.markers(dist.ls.lesion, xlim=xlim, main="CF Les, "%.%region.labels.title["lesion"], legend=legend)    
-mydev.off(file="figures/CF_dist2skin_compare_markers", ext="png")
+dev.off()
+
+
+# 
+# 
+# ### compare normal vs lesion tissues ####
+# # generate one png per marker
+# 
+# for (s in c("DD","CF")) {
+#   if (s=="DD") markers=c(        "CD3", "CD4", "CD8a",          "CD15", "CD45", "CD68", "CD69", "CD123", "CD279")
+#   if (s=="CF") markers=c("CD1a", "CD3", "CD4", "CD8a", "CD11c", "CD15", "CD45",                 "CD123", "CD279")
+#   for(m in markers) {
+#     #s="CF"; m="CD1a"
+#     myfigure(mfcol=c(1,2))
+#     compare.regions(get.dat(s%.%"_Les_"%.%m%.%"_masks_d2b_regmem.csv", s), xlim=xlim, main=s%.%" Les, "%.%m, legend=region.labels)    
+#     mydev.off(file="figures/"%.%s%.%"_dist2skin_compare_regions_"%.%m, ext="png")
+#   }
+# }
+
+
