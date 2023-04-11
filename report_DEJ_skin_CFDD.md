@@ -13,6 +13,8 @@ Todo
 - compute areas in normal/lesion, epidermis/dermis 
 - normalize cell count by areas
 - save cell counts as tables
+- refine cell segmentation results
+
 
 ## Results
 
