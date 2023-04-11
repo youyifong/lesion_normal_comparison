@@ -1,5 +1,5 @@
-dist="dist2DEJ"
-# dist="dist2skin"
+#dist="dist2DEJ"
+ dist="dist2skin"
 
 if(dist=="dist2DEJ") {
   xlim=c(-750,1750)
