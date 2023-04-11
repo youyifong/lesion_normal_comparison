@@ -19,6 +19,10 @@ Todo
 ## Results
 
 ### Cell counts
+```{=latex}
+<embed src="R/tables/input/DD_counts.tex">
+```
+
 <object data="R/tables/DD_counts.pdf" type="application/pdf" width="700px" height="700px">
     <embed src="R/tables/DD_counts.pdf">
         <p>This browser does not support PDFs. Please download the PDF to view it: <a href="R/tables/DD_counts.pdf">Download PDF</a>.</p>
