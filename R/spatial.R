@@ -6,12 +6,12 @@ get.dat=function(filename, sample.label, dist) {
     if (sample.label=="DD") {
       dat$normal.epi =    dat$in_DD_Les_epi_region_1_normal=="True" 
       dat$normal.dermis = dat$in_DD_Les_dermis_region_1_normal=="True" 
-      dat$lesion.epi =    dat$in_DD_Les_epi_region_2_lesion=="True" 
-      dat$lesion.dermis = dat$in_DD_Les_dermis_region_2_lesion=="True" 
+      dat$lesion.epi =    dat$in_DD_Les_epi_region_2_lesion_alternate=="True" 
+      dat$lesion.dermis = dat$in_DD_Les_dermis_region_2_lesion_alternate=="True" 
 
       # each pixel is 1/2 micron, negative dist in epi
       dat$dist2skin = dat$dist2DD_Les_skin_boundary/2
-      dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI_v2/2
+      dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI.WGA_alternate/2
 
     } else if (sample.label=="CF") {
       dat$normal.epi =    dat$in_CF_Les_epi_region_1_normal=="True" | dat$in_CF_Les_epi_region_3_normal=="True" 
@@ -66,6 +66,7 @@ compare.markers=function(dist.ls, legend, ...) {
     plot(density(dist.ls[[1]]), col=1, xlab=dist %.% " (um)", ylab="Density", ylim=ylim, ...)
     for (i in 2:length(dist.ls)) lines(density(dist.ls[[i]]), col=i)
     mylegend(x=3, legend=legend, lty=1, col=1:i, y.intersp=1, text.width=700)
+    
 }
 
 
@@ -75,8 +76,11 @@ region.labels.title=c(normal="Intact", lesion="Ulcerative")
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
-for (s in c("DD","CF")) {
-for (dist in c("dist2skin", "dist2DEJ"))   {
+sample.labels=c("DD","CF"); names(sample.labels)=sample.labels
+dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
+
+dist.bt.peaks = sapply (sample.labels, function(s) {
+ sapply (dist.labels, function(dist) {
   # s="DD"; dist="dist2DEJ"
   
   if(dist=="dist2DEJ") {
@@ -89,6 +93,7 @@ for (dist in c("dist2skin", "dist2DEJ"))   {
     legend=c("CD3","CD15","CD123","CD11c","CD68")
   } else if (s=="CF") {
     legend=c("CD3","CD15","CD123","CD11c") # CD68 did not pass QC
+    # lesion.width=/2 # computed from analysis.py
   }
   names(legend)=legend
   
@@ -100,8 +105,8 @@ for (dist in c("dist2skin", "dist2DEJ"))   {
   dist.ls.lesion = lapply(alldat, function (dat) subset(dat, lesion)[[dist]])
   
   mypng(mfcol=c(2,2), file="figures/"%.%s%.%"_"%.%dist%.%"_compare_markers")
-  compare.markers(dist.ls.normal, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["normal"], legend=legend)    
-  compare.markers(dist.ls.lesion, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["lesion"], legend=legend)    
+    compare.markers(dist.ls.normal, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["normal"], legend=legend)    
+    compare.markers(dist.ls.lesion, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["lesion"], legend=legend)    
   dev.off()
   
   if (dist=="dist2DEJ"){
@@ -142,11 +147,23 @@ for (dist in c("dist2skin", "dist2DEJ"))   {
              \\multicolumn{1}{c}{} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & \\multicolumn{1}{c|}{dermis} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & dermis  \\\\ 
              \\hline
         ")
-    
+  }# end if dist
+  
+  # return distance between CD3 and CD15 peaks
+  get.peak = function(density_est) {
+    max_density_index <- which.max(density_est$y)
+    peak_location <- density_est$x[max_density_index]
+    return (peak_location)
   }
   
-}}# end s and dist loops
+  get.peak(density(dist.ls.lesion$CD3)) - get.peak(density(dist.ls.lesion$CD15))
+
+ }) # end dist loop
+})# end s loop
   
+
+lesion.width=c(DD=5884/2, CF=2/2) # computed from analysis.py
+dist.bt.peaks=rbind(dist.bt.peaks, lesion_width=lesion.width)
 
 
 # ### compare normal vs lesion tissues ####
