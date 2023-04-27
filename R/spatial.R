@@ -166,8 +166,10 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
 
 lesion.width=c(DD=5723/2, CF=2404/2) # computed from analysis.py
 tab=rbind(dist.bt.peaks, "lesion width"=lesion.width)
-rownames(tab)[1:2]=c("peaks distance - skin ref", "peaks distance - DEJ ref")
+rownames(tab)[1:2]=c("interval between peaks (skin)", "interval between peaks (DEJ)")
 mytex(tab, file="tables/peaks_distance_lesion_size", digits=0)
+
+
 
 # ### compare normal vs lesion tissues ####
 # # generate one png per marker
