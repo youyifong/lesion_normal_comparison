@@ -9,7 +9,7 @@
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Wednesday, April 19, 2023 22:06:48}
+%TCIDATA{LastRevised=Thursday, April 27, 2023 00:41:45}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -57,25 +57,21 @@ CD279
 CD279 (CD68 did not pass QC)
 \end{itemize}
 
-\bigskip 
+\bigskip
 
 For CD123, segmentation is done at flow=0.5 to get more masks in the bright
 area and a threshold of 5000 is set for total intensity to remove masks in
-the debris field in the lesion area. 
-
-To do
-
-\begin{itemize}
-\item compare distance between peaks with the width of lesion, as measured
-by a smooth outline drawn by K
-
-Skin tissue lesion area is determined by morphology using wheat germ agglutinin (WGA) flourescent stain.  ImageJ is used to demarcate the lesion area, 
-then a straight line ROI is drawn to span from one side of the lesion to the other side of the lesion, with the endpoints of the line positioned at the 
-outermost skin boundary.  
-
-\end{itemize}
+the debris field in the lesion area.
 
 \bigskip 
+
+The size of the skin tissue lesion area is determined by morphology using
+wheat germ agglutinin (WGA) flourescent stain. ImageJ is used to demarcate
+the lesion area, then a straight line ROI is drawn to span from one side of
+the lesion to the other side of the lesion, with the endpoints of the line
+positioned at the outermost skin boundary.
+
+\bigskip
 
 \bigskip 
 %TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
@@ -139,6 +135,34 @@ outermost skin boundary.
 %EndExpansion
 
 \bigskip 
+%TCIMACRO{%
+%\TeXButton{tab }{\begin{center}
+%\begin{table}[h] \centering
+%
+%\input{\pwd R/tables/input/peaks_distance_lesion_size.tex}
+%
+%\caption{Distance between CD3 peak and CD15 peak, measured in um.}
+%\vspace{-5pt} 
+%\label{tab DD counts}
+%
+%\end{table}
+%\end{center}}}%
+%BeginExpansion
+\begin{center}
+\begin{table}[h] \centering
+
+\input{\pwd R/tables/input/peaks_distance_lesion_size.tex}
+
+\caption{Distance between CD3 peak and CD15 peak, measured in um.}
+\vspace{-5pt} 
+\label{tab DD counts}
+
+\end{table}
+\end{center}%
+%EndExpansion
+
+\bigskip 
+
 %TCIMACRO{%
 %\TeXButton{fig}{\begin{center}
 %\begin{figure}[H] \centering

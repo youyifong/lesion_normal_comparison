@@ -1,13 +1,14 @@
-# compute area of intersection of polygons
-
 from shapely.geometry import Polygon
 import glob
 from read_roi import read_roi_file 
 import pandas as pd
 import numpy as np
 
-s="DD"
+s="CF"
 
+
+###############################################################################
+# compute area of intersection of polygons
 
 tmp = read_roi_file(s+"_Les_ROI_regions/"+s+"_Les_whole_tissue.roi")    
 val = list(tmp.values()) [0]
@@ -30,19 +31,23 @@ data.to_csv(s+"_region_size.csv", header=True, index=None, sep=',')
 
 
 
+###############################################################################
 # compute the length of the smooth curve to measure the size of the lesion
 
-tmp = read_roi_file(s+"_Les_ROI_regions/"+s+"_Les_lesion_skin_boundary_smooth.roi")    
+tmp = read_roi_file(s+"_Les_ROI_regions/"+s+"_Les_lesion_line.roi")    
 val = list(tmp.values()) [0]
-points = np.array(list(zip(val["x"], val["y"])))
+
+if val["type"]=="line":
+    points = np.array(list(zip([val["x1"], val["x2"]], [val["y1"], val["y2"]])))
+else:
+    points = np.array(list(zip(val["x"], val["y"])))
 
 # Calculate the length of each segment
 segment_lengths = np.linalg.norm(points[:-1] - points[1:], axis=1)
 
 # Sum the lengths of all segments to get the length of the polyline
 polyline_length = np.sum(segment_lengths)
+polyline_length
 
-
-data.to_csv(s+"_region_size.csv", header=True, index=None, sep=',')
 
 

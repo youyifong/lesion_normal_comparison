@@ -81,7 +81,8 @@ dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 
 dist.bt.peaks = sapply (sample.labels, function(s) {
  sapply (dist.labels, function(dist) {
-  # s="DD"; dist="dist2DEJ"
+  # s="DD"; dist="dist2skin"
+  myprint(s, dist)
   
   if(dist=="dist2DEJ") {
     xlim=c(-750,1750)
@@ -147,6 +148,7 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
              \\multicolumn{1}{c}{} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & \\multicolumn{1}{c|}{dermis} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & dermis  \\\\ 
              \\hline
         ")
+    
   }# end if dist
   
   # return distance between CD3 and CD15 peaks
@@ -162,9 +164,10 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
 })# end s loop
   
 
-lesion.width=c(DD=5884/2, CF=2/2) # computed from analysis.py
-dist.bt.peaks=rbind(dist.bt.peaks, lesion_width=lesion.width)
-
+lesion.width=c(DD=5723/2, CF=2404/2) # computed from analysis.py
+tab=rbind(dist.bt.peaks, "lesion width"=lesion.width)
+rownames(tab)[1:2]=c("peaks distance - skin ref", "peaks distance - DEJ ref")
+mytex(tab, file="tables/peaks_distance_lesion_size", digits=0)
 
 # ### compare normal vs lesion tissues ####
 # # generate one png per marker
