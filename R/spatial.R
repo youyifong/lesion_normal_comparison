@@ -1,5 +1,21 @@
 library(kyotil)
 
+region.labels=c(normal="intact", lesion="ulcerative")
+region.labels.title=c(normal="Intact", lesion="Ulcerative")
+
+red=rgb(red=1, blue=0, green=0, alpha=1)
+blue=rgb(red=0, blue=1, green=0, alpha=1)
+
+sample.labels=c("DD","CF"); names(sample.labels)=sample.labels
+dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
+
+markers=c("CD3","CD15","CD123","CD11c"); names(markers)=markers
+# CD68 did not pass QC for CF
+markers.ls=list(DD=c(markers,CD68="CD68"), CF=markers)
+
+xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
+
+
 get.dat=function(filename, sample.label, dist) {
     dat=read.csv("data/"%.%filename)
     
@@ -31,11 +47,22 @@ get.dat=function(filename, sample.label, dist) {
     dat$lesion = dat$lesion.epi | dat$lesion.dermis
     
     if (dist=="dist2DEJ") {
-      dat$dist2skin=dat$dist2skin * ifelse(dat$epi, -1, 1)
-      dat$dist2DEJ =dat$dist2DEJ  * ifelse(dat$epi, -1, 1)
+      dat$dist = dat$dist2DEJ  * ifelse(dat$epi, -1, 1)
+    } else {
+      dat$dist = dat$dist2skin 
     }
     dat
 }
+
+
+alldat = lapply (sample.labels, function(s) 
+  lapply (dist.labels, function(dist) 
+    lapply (markers.ls[[s]], function (l) 
+      get.dat(s%.%"_Les_"%.%l%.%"_masks_d2b_regmem.csv", s, dist)
+)))
+
+
+
 
 compare.regions=function(dat, legend, ...) {
     hist(dat[[dist]][dat$lesion], border="red", col=NULL, xlab=dist %.% " (um)", ylab="Number of cells", breaks=20
@@ -70,54 +97,37 @@ compare.markers=function(dist.ls, legend, ...) {
 }
 
 
-region.labels=c(normal="intact", lesion="ulcerative")
-region.labels.title=c(normal="Intact", lesion="Ulcerative")
 
-red=rgb(red=1, blue=0, green=0, alpha=1)
-blue=rgb(red=0, blue=1, green=0, alpha=1)
-
-sample.labels=c("DD","CF"); names(sample.labels)=sample.labels
-dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
+#################################################################################
+# compare distribution of distances to a line (skin or DEJ) between lesion and intact
 
 dist.bt.peaks = sapply (sample.labels, function(s) {
  sapply (dist.labels, function(dist) {
   # s="DD"; dist="dist2skin"
   myprint(s, dist)
   
-  if(dist=="dist2DEJ") {
-    xlim=c(-750,1750)
-  } else if (dist=="dist2skin") {
-    xlim=c(0,2500)
-  }
+  xlim=xlim.ls[[dist]]
+  legend=markers.ls[[s]]; names(legend)=legend
   
-  if (s=="DD") {
-    legend=c("CD3","CD15","CD123","CD11c","CD68")
-  } else if (s=="CF") {
-    legend=c("CD3","CD15","CD123","CD11c") # CD68 did not pass QC
-    # lesion.width=/2 # computed from analysis.py
-  }
-  names(legend)=legend
+  dat.ls=lapply(legend, function (l) alldat[[s]][[dist]][[l]] )
   
-  alldat=lapply(legend, function (l) get.dat(s%.%"_Les_"%.%l%.%"_masks_d2b_regmem.csv", s, dist) )
-  
-  ## compare distribution of markers
-  
-  dist.ls.normal = lapply(alldat, function (dat) subset(dat, normal)[[dist]])
-  dist.ls.lesion = lapply(alldat, function (dat) subset(dat, lesion)[[dist]])
+  dist.ls.normal = lapply(dat.ls, function (dat) dat[dat$normal, "dist"])
+  dist.ls.lesion = lapply(dat.ls, function (dat) dat[dat$lesion, "dist"])
   
   mypng(mfcol=c(2,2), file="figures/"%.%s%.%"_"%.%dist%.%"_compare_markers")
     compare.markers(dist.ls.normal, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["normal"], legend=legend)    
     compare.markers(dist.ls.lesion, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["lesion"], legend=legend)    
   dev.off()
   
+  
+  ## tabulate cell counts in epi/dermis x normal/lesion
   if (dist=="dist2DEJ"){
-    ## tabulate cell counts in epi/dermis x normal/lesion
     
     counts = sapply(legend, function (l) 
-      c(nrow(subset(alldat[[l]], epi & normal)),
-        nrow(subset(alldat[[l]], dermis & normal)),
-        nrow(subset(alldat[[l]], epi & lesion)),
-        nrow(subset(alldat[[l]], dermis & lesion)))
+      c(nrow(subset(dat.ls[[l]], epi & normal)),
+        nrow(subset(dat.ls[[l]], dermis & normal)),
+        nrow(subset(dat.ls[[l]], epi & lesion)),
+        nrow(subset(dat.ls[[l]], dermis & lesion)))
     )
 
     # counts/area
@@ -151,6 +161,8 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
     
   }# end if dist
   
+  
+  
   # return distance between CD3 and CD15 peaks
   get.peak = function(density_est) {
     max_density_index <- which.max(density_est$y)
@@ -160,14 +172,56 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
   
   get.peak(density(dist.ls.lesion$CD3)) - get.peak(density(dist.ls.lesion$CD15))
 
+  
  }) # end dist loop
 })# end s loop
   
 
 lesion.width=c(DD=5723/2, CF=2404/2) # computed from analysis.py
 tab=rbind(dist.bt.peaks, "lesion width"=lesion.width)
-rownames(tab)[1:2]=c("interval between peaks (skin)", "interval between peaks (DEJ)")
+rownames(tab)[1:2]=c("space between peaks (skin)", "space between peaks (DEJ)")
 mytex(tab, file="tables/peaks_distance_lesion_size", digits=0)
+
+
+
+################################################################################
+# compare DD and CF in 8 figures
+# one for each of the 4 markers in lesion and one for each of the 4 markers in intact
+
+for (dist in dist.labels) {
+  xlim=xlim.ls[[dist]]
+  
+  mypng(mfcol=c(2,4), file=paste0("figures/compare_DD_CF_",dist))
+  for (a in markers) {
+    for (i in 1:2) {
+      if (i==1) {
+        dat.dd=subset(alldat[["DD"]][[dist]][[a]], normal)
+        dat.cf=subset(alldat[["CF"]][[dist]][[a]], normal)
+      } else {
+        dat.dd=subset(alldat[["DD"]][[dist]][[a]], lesion)
+        dat.cf=subset(alldat[["CF"]][[dist]][[a]], lesion)
+      }
+      
+      ylim = range(density(dat.dd$dist)$y, 
+                   density(dat.cf$dist)$y)
+      
+      plot(density(dat.dd$dist), col=1, xlab=dist %.% " (um)", ylab="Density", ylim=ylim, xlim=xlim,
+           main=paste0("Les, ", region.labels.title[i], ", ", a))
+      lines(density(dat.cf$dist), col=2)
+      mylegend(x=3, legend=sample.labels, lty=1, col=1:2, y.intersp=1, text.width=700)
+      
+      # hist(dat.dd$dist, border="red",  col=NULL, breaks=20, 
+      #      xlab=dist %.% " (um)", ylab="Number of cells", ylim=ylim
+      #      # , xlim=xlim, main=s%.%" Les, "%.%region.labels.title["normal"], legend=legend
+      #      )
+      # hist(dat.cf$dist, border="blue", col=NULL, breaks=20, add=T)
+      # mylegend(x=3, legend=sample.labels, lty=1, col=c("blue","red"), y.intersp=1.5, text.width=700)
+      
+    }
+  }
+  dev.off()
+  
+}
 
 
 
