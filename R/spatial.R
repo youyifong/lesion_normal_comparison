@@ -16,6 +16,9 @@ markers.ls=list(DD=c(markers,CD68="CD68"), CF=markers)
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 
 
+################################################################################
+# load data
+
 get.dat=function(filename, sample.label, dist) {
     dat=read.csv("data/"%.%filename)
     
@@ -63,21 +66,8 @@ alldat = lapply (sample.labels, function(s)
 
 
 
-
-compare.regions=function(dat, legend, ...) {
-    hist(dat[[dist]][dat$lesion], border="red", col=NULL, xlab=dist %.% " (um)", ylab="Number of cells", breaks=20
-        , ylim=range(c(hist(dat[[dist]][dat$lesion], breaks=20, plot=F)$counts, hist(dat[[dist]][dat$normal], breaks=20, plot=F)$counts))
-        , ...)
-    hist(dat[[dist]][dat$normal], border="blue", col=NULL, breaks=20, add=T)
-    mylegend(x=3, legend=legend, lty=1, col=c("blue","red"), y.intersp=1.5, text.width=700)
-    
-    plot(density(dat[[dist]][dat$lesion]), col="red", xlab=dist %.% " (um)", ylab="Density"
-        , ylim=range(c(density(dat[[dist]][dat$lesion])$y, density(dat[[dist]][dat$normal])$y))
-        , ...)
-    lines(density(dat[[dist]][dat$in_Les_normal_side]), col="blue")
-    mylegend(x=3, legend=legend, lty=1, col=c("blue","red"), y.intersp=1, text.width=700)
-}
-
+################################################################################
+# compare distribution of distances to a line (skin or DEJ) between lesion and intact
 
 compare.markers=function(dist.ls, legend, ...) {
     cnts.all = sapply(dist.ls, function (dist) hist(dist, breaks=20, plot=F)$counts)
@@ -95,11 +85,6 @@ compare.markers=function(dist.ls, legend, ...) {
     mylegend(x=3, legend=legend, lty=1, col=1:i, y.intersp=1, text.width=700)
     
 }
-
-
-
-#################################################################################
-# compare distribution of distances to a line (skin or DEJ) between lesion and intact
 
 dist.bt.peaks = sapply (sample.labels, function(s) {
  sapply (dist.labels, function(dist) {
@@ -160,8 +145,6 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
     
   }# end if dist
   
-
-  
   # return distance between CD3 and CD15 peaks
   get.peak = function(density_est) {
     max_density_index <- which.max(density_est$y)
@@ -170,7 +153,6 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
   }
 
   get.peak(density(dist.ls.lesion$CD3)) - get.peak(density(dist.ls.lesion$CD15))
-
   
  }) # end dist loop
 })# end s loop
@@ -223,10 +205,24 @@ for (dist in dist.labels) {
 }
 
 
+################################################################################
+# compare normal vs lesion tissues, one png per marker
 
-# ### compare normal vs lesion tissues ####
-# # generate one png per marker
-# 
+# compare.regions=function(dat, legend, ...) {
+#   hist(dat[[dist]][dat$lesion], border="red", col=NULL, xlab=dist %.% " (um)", ylab="Number of cells", breaks=20
+#        , ylim=range(c(hist(dat[[dist]][dat$lesion], breaks=20, plot=F)$counts, hist(dat[[dist]][dat$normal], breaks=20, plot=F)$counts))
+#        , ...)
+#   hist(dat[[dist]][dat$normal], border="blue", col=NULL, breaks=20, add=T)
+#   mylegend(x=3, legend=legend, lty=1, col=c("blue","red"), y.intersp=1.5, text.width=700)
+#   
+#   plot(density(dat[[dist]][dat$lesion]), col="red", xlab=dist %.% " (um)", ylab="Density"
+#        , ylim=range(c(density(dat[[dist]][dat$lesion])$y, density(dat[[dist]][dat$normal])$y))
+#        , ...)
+#   lines(density(dat[[dist]][dat$in_Les_normal_side]), col="blue")
+#   mylegend(x=3, legend=legend, lty=1, col=c("blue","red"), y.intersp=1, text.width=700)
+# }
+
+
 # for (s in c("DD","CF")) {
 #   if (s=="DD") markers=c(        "CD3", "CD4", "CD8a",          "CD15", "CD45", "CD68", "CD69", "CD123", "CD279")
 #   if (s=="CF") markers=c("CD1a", "CD3", "CD4", "CD8a", "CD11c", "CD15", "CD45",                 "CD123", "CD279")
