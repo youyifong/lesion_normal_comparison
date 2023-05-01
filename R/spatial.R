@@ -83,14 +83,14 @@ compare.markers=function(dist.ls, legend, ...) {
     cnts.all = sapply(dist.ls, function (dist) hist(dist, breaks=20, plot=F)$counts)
     ylim = range(cnts.all)    
     
-    hist(dist.ls[[1]], border=1, xlab=dist %.% " (um)", ylab="Number of cells", breaks=20, col=NULL, ylim=ylim, ...)
+    hist(dist.ls[[1]], border=1, ylab="Number of cells", breaks=20, col=NULL, ylim=ylim, ...)
     for (i in 2:length(dist.ls)) hist(dist.ls[[i]], border=i, breaks=20, col=NULL, add=T)
     mylegend(x=3, legend=legend, lty=1, col=1:length(dist.ls), y.intersp=1, text.width=700)
     
     y.all = sapply(dist.ls, function (dist) density(dist)$y)
     ylim = range(y.all)    
     
-    plot(density(dist.ls[[1]]), col=1, xlab=dist %.% " (um)", ylab="Density", ylim=ylim, ...)
+    plot(density(dist.ls[[1]]), col=1, ylab="Density", ylim=ylim, ...)
     for (i in 2:length(dist.ls)) lines(density(dist.ls[[i]]), col=i)
     mylegend(x=3, legend=legend, lty=1, col=1:i, y.intersp=1, text.width=700)
     
@@ -110,13 +110,12 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
   legend=markers.ls[[s]]; names(legend)=legend
   
   dat.ls=lapply(legend, function (l) alldat[[s]][[dist]][[l]] )
-  
   dist.ls.normal = lapply(dat.ls, function (dat) dat[dat$normal, "dist"])
   dist.ls.lesion = lapply(dat.ls, function (dat) dat[dat$lesion, "dist"])
-  
+
   mypng(mfcol=c(2,2), file="figures/"%.%s%.%"_"%.%dist%.%"_compare_markers")
-    compare.markers(dist.ls.normal, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["normal"], legend=legend)    
-    compare.markers(dist.ls.lesion, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["lesion"], legend=legend)    
+    compare.markers(dist.ls.normal, legend=legend, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["normal"], xlab=dist %.% " (um)")    
+    compare.markers(dist.ls.lesion, legend=legend, xlim=xlim, main=s%.%" Les, "%.%region.labels.title["lesion"], xlab=dist %.% " (um)")    
   dev.off()
   
   
@@ -161,7 +160,7 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
     
   }# end if dist
   
-  
+
   
   # return distance between CD3 and CD15 peaks
   get.peak = function(density_est) {
@@ -169,7 +168,7 @@ dist.bt.peaks = sapply (sample.labels, function(s) {
     peak_location <- density_est$x[max_density_index]
     return (peak_location)
   }
-  
+
   get.peak(density(dist.ls.lesion$CD3)) - get.peak(density(dist.ls.lesion$CD15))
 
   
