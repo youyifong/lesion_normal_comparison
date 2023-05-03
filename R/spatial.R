@@ -172,36 +172,56 @@ mytex(tab, file="tables/peaks_distance_lesion_size", digits=0)
 for (dist in dist.labels) {
   xlim=xlim.ls[[dist]]
   
-  mypng(mfcol=c(2,4), file=paste0("figures/compare_DD_CF_",dist))
-  for (a in markers) {
-    for (i in 1:2) {
-      if (i==1) {
-        dat.dd=subset(alldat[["DD"]][[dist]][[a]], normal)
-        dat.cf=subset(alldat[["CF"]][[dist]][[a]], normal)
-      } else {
-        dat.dd=subset(alldat[["DD"]][[dist]][[a]], lesion)
-        dat.cf=subset(alldat[["CF"]][[dist]][[a]], lesion)
+  for (idx in 1:2) {
+    mypng(mfcol=c(2,4), file=paste0("figures/compare_DD_CF_",dist,"_",ifelse(idx==1,"density","count")))
+    for (a in markers) {
+      for (i in 1:2) {
+        if (i==1) {
+          dat.dd=subset(alldat[["DD"]][[dist]][[a]], normal)$dist
+          dat.cf=subset(alldat[["CF"]][[dist]][[a]], normal)$dist
+        } else {
+          dat.dd=subset(alldat[["DD"]][[dist]][[a]], lesion)$dist
+          dat.cf=subset(alldat[["CF"]][[dist]][[a]], lesion)$dist
+        }
+        
+        if (idx==1) {
+          ylim = range(density(dat.dd)$y, 
+                       density(dat.cf)$y)
+          
+          plot(density(dat.dd), col=1, xlab=dist %.% " (um)", ylab="Density", ylim=ylim, xlim=xlim,
+               main=paste0("Les, ", region.labels.title[i], ", ", a))
+          lines(density(dat.cf), col=2)
+          mylegend(x=3, legend=sample.labels, lty=1, col=1:2, y.intersp=1, text.width=700)
+          
+        } else {
+          hist_info.dd <- hist(dat.dd, breaks = 20, plot = FALSE) # Save histogram info without plotting
+          hist_info.cf <- hist(dat.cf, breaks = 20, plot = FALSE) # Save histogram info without plotting
+          densities.dd <- density(dat.dd)
+          densities.cf <- density(dat.cf)
+          # Scale the density curve to match the histogram's frequency
+          densities.dd$y <- densities.dd$y * diff(hist_info.dd$mids[1:2]) * length(dat.dd)
+          densities.cf$y <- densities.cf$y * diff(hist_info.cf$mids[1:2]) * length(dat.cf)
+          
+          ylim = range(hist_info.dd$counts, 
+                       hist_info.cf$counts)
+          
+          plot(hist_info.dd, freq = TRUE, 
+               border="white",  col=NULL, breaks=20,
+               xlab=dist %.% " (um)", ylab="Number of cells", 
+               xlim=xlim, ylim=ylim,
+               main=paste0("Les, ", region.labels.title[i], ", ", a))
+          
+          lines(densities.dd, col = 1)
+          lines(densities.cf, col = 2)
+          
+          mylegend(x=3, legend=sample.labels, lty=1, col=1:2, y.intersp=1.5, text.width=700)
+          
+        }
       }
-      
-      ylim = range(density(dat.dd$dist)$y, 
-                   density(dat.cf$dist)$y)
-      
-      plot(density(dat.dd$dist), col=1, xlab=dist %.% " (um)", ylab="Density", ylim=ylim, xlim=xlim,
-           main=paste0("Les, ", region.labels.title[i], ", ", a))
-      lines(density(dat.cf$dist), col=2)
-      mylegend(x=3, legend=sample.labels, lty=1, col=1:2, y.intersp=1, text.width=700)
-      
-      # hist(dat.dd$dist, border="red",  col=NULL, breaks=20, 
-      #      xlab=dist %.% " (um)", ylab="Number of cells", ylim=ylim
-      #      # , xlim=xlim, main=s%.%" Les, "%.%region.labels.title["normal"], legend=legend
-      #      )
-      # hist(dat.cf$dist, border="blue", col=NULL, breaks=20, add=T)
-      # mylegend(x=3, legend=sample.labels, lty=1, col=c("blue","red"), y.intersp=1.5, text.width=700)
-      
     }
-  }
-  dev.off()
+    dev.off()
   
+  }
 }
 
 
