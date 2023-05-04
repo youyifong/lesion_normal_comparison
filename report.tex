@@ -3,13 +3,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{geometry}
 \usepackage{graphicx}
+\usepackage{float}
 
 %TCIDATA{OutputFilter=LATEX.DLL}
 %TCIDATA{Version=5.50.0.2960}
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Wednesday, May 03, 2023 11:55:17}
+%TCIDATA{LastRevised=Thursday, May 04, 2023 08:16:29}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -37,10 +38,7 @@
 \newtheorem{summary}[theorem]{Summary}
 \newenvironment{proof}[1][Proof]{\noindent\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
 \newcommand{\pwd}{D:/DeepLearning/images_from_K/lesion_normal_comparison/}
-\usepackage{float}
-
 \input{tcilatex}
-
 \begin{document}
 
 \title{Spatial Analysis}
@@ -73,6 +71,36 @@ wheat germ agglutinin (WGA) flourescent stain. ImageJ is used to demarcate
 the lesion area, then a straight line ROI is drawn to span from one side of
 the lesion to the other side of the lesion, with the endpoints of the line
 positioned at the outermost skin boundary. \ 
+
+\bigskip 
+
+Some considerations on region boundary and distance metric:
+
+1. Should we draw the boundary between normal and lesion based on WGA only
+or all markers? 
+
+2. Shall each ROI be convex?
+
+For (1), the two choices lead are answering different questions. Drawing
+boundary based on WGA only answers a stronger question than drawing the
+boundary based on all markers. 
+
+For (2), a convex shape is a shape that a line connecting any two points in
+the shape completely lies within the shape. Practically speaking, in this
+context it is equivalent to drawing a straight line to separate normal from
+lesion. Pros for straight boundary: the span between any cell and the
+closest point on the skin lies completely within the region. So the distance
+measure is well defined. In contrast, if a line from a cell to its closest
+point on the skin surface cuts through both normal and lesion regions, the
+interpretation of distance to skin surface is muddled. Pros for curved
+boundary: Regions (which is a type of neighborhoods) do not necessarily have
+geometric shapes. 
+
+These two questions are also intertwined. If we use WGA only to draw
+boundaries, we can only use straight line boundaries because the difference
+between normal and lesion is only visible in epidermis in WGA staining. A
+straight line can be drawn in epidermis and extend to dermis, but not a
+curve.
 
 %TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
 %BeginExpansion
@@ -301,5 +329,7 @@ positioned at the outermost skin boundary. \
 %EndExpansion
 
 \bigskip 
+
+\section{Appendix}
 
 \end{document}
