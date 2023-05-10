@@ -32,8 +32,9 @@ data.to_csv(s+"_region_size.csv", header=True, index=None, sep=',')
 
 
 ###############################################################################
-# compute the length of the smooth curve to measure the size of the lesion
+# compute the length of the lines to measure the size of the lesion and the normal section
 
+# lesion
 tmp = read_roi_file(s+"_Les_ROI_regions/"+s+"_Les_lesion_line.roi")    
 val = list(tmp.values()) [0]
 
@@ -49,5 +50,23 @@ segment_lengths = np.linalg.norm(points[:-1] - points[1:], axis=1)
 polyline_length = np.sum(segment_lengths)
 polyline_length
 
+
+# normal
+segment_lengths=[]
+for i in range(1,2): # for DD
+#for i in range(1,3): # for CF
+    tmp = read_roi_file(s+f"_Les_normal_line_{i}.roi")    
+    val = list(tmp.values()) [0]
+    
+    if val["type"]=="line":
+        points = np.array(list(zip([val["x1"], val["x2"]], [val["y1"], val["y2"]])))
+    else:
+        points = np.array(list(zip(val["x"], val["y"])))
+    
+    # Calculate the length of each segment
+    segment_lengths.append(np.linalg.norm(points[:-1] - points[1:], axis=1))
+
+# Sum the lengths of all segments to get the length of the polyline
+np.sum(segment_lengths)
 
 

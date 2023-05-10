@@ -10,7 +10,7 @@
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Thursday, May 04, 2023 08:16:29}
+%TCIDATA{LastRevised=Tuesday, May 09, 2023 18:19:44}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -72,18 +72,18 @@ the lesion area, then a straight line ROI is drawn to span from one side of
 the lesion to the other side of the lesion, with the endpoints of the line
 positioned at the outermost skin boundary. \ 
 
-\bigskip 
+\bigskip
 
-Some considerations on region boundary and distance metric:
+Some considerations on region boundary and distance metric: \ 
 
 1. Should we draw the boundary between normal and lesion based on WGA only
-or all markers? 
+or all markers?
 
 2. Shall each ROI be convex?
 
 For (1), the two choices lead are answering different questions. Drawing
 boundary based on WGA only answers a stronger question than drawing the
-boundary based on all markers. 
+boundary based on all markers.
 
 For (2), a convex shape is a shape that a line connecting any two points in
 the shape completely lies within the shape. Practically speaking, in this
@@ -94,13 +94,13 @@ measure is well defined. In contrast, if a line from a cell to its closest
 point on the skin surface cuts through both normal and lesion regions, the
 interpretation of distance to skin surface is muddled. Pros for curved
 boundary: Regions (which is a type of neighborhoods) do not necessarily have
-geometric shapes. 
+geometric shapes.
 
 These two questions are also intertwined. If we use WGA only to draw
 boundaries, we can only use straight line boundaries because the difference
 between normal and lesion is only visible in epidermis in WGA staining. A
 straight line can be drawn in epidermis and extend to dermis, but not a
-curve.
+curve. \ \ \ \ \ 
 
 %TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
 %BeginExpansion
@@ -161,13 +161,21 @@ curve.
 \end{center}%
 %EndExpansion
 
+%TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
+%BeginExpansion
+\clearpage%
+%EndExpansion
+
+\bigskip 
+
 %TCIMACRO{%
-%\TeXButton{tab }{\begin{center}
+%\TeXButton{tab DD_CF_comparison}{\begin{center}
 %\begin{table}[h] \centering
 %
-%\input{\pwd R/tables/input/peaks_distance_lesion_size.tex}
+%\input{\pwd R/tables/input/DD_CF_comparison.tex}
 %
-%\caption{Comparing the space between CD3 and CD15 peaks with lesion size. Distance is measured in um, size is measured in square mm.}
+%\caption{All numbers are for the lesion except the second row.
+%The cell counts are per mm2. The widths and seperation are measured in um.}
 %\vspace{-5pt} 
 %\label{tab DD counts}
 %
@@ -177,13 +185,78 @@ curve.
 \begin{center}
 \begin{table}[h] \centering
 
-\input{\pwd R/tables/input/peaks_distance_lesion_size.tex}
+\input{\pwd R/tables/input/DD_CF_comparison.tex}
 
-\caption{Comparing the space between CD3 and CD15 peaks with lesion size. Distance is measured in um, size is measured in square mm.}
+\caption{All numbers are for the lesion except the second row.
+The cell counts are per mm2. The widths and seperation are measured in um.}
 \vspace{-5pt} 
 \label{tab DD counts}
 
 \end{table}
+\end{center}%
+%EndExpansion
+
+%TCIMACRO{%
+%\TeXButton{fig compare_DD_CF_dist2DEJ_hist}{\begin{center}
+%\begin{figure}[H] \centering
+%\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_hist.png}
+%
+%
+%\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ.
+%The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
+%Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
+%For example, CD123 epi count 1038/2862*100=36.
+%}
+%
+%\vspace{-5pt}
+%\label{}
+%\end{figure}
+%\end{center}}}%
+%BeginExpansion
+\begin{center}
+\begin{figure}[H] \centering
+\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_hist.png}
+
+
+\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ.
+The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
+Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
+For example, CD123 epi count 1038/2862*100=36.
+}
+
+\vspace{-5pt}
+\label{}
+\end{figure}
+\end{center}%
+%EndExpansion
+
+\bigskip 
+
+%TCIMACRO{%
+%\TeXButton{fig compare_DD_CF_dist2skin_hist}{\begin{center}
+%\begin{figure}[H] \centering
+%\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}
+%
+%\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
+%The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
+%Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
+%}
+%\vspace{-5pt}
+%\label{}
+%\end{figure}
+%\end{center}}}%
+%BeginExpansion
+\begin{center}
+\begin{figure}[H] \centering
+\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}
+
+\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
+The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
+Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
+}
+\vspace{-5pt}
+\label{}
+\end{figure}
 \end{center}%
 %EndExpansion
 
@@ -192,101 +265,15 @@ curve.
 \clearpage%
 %EndExpansion
 
-%TCIMACRO{%
-%\TeXButton{fig}{\begin{center}
-%\begin{figure}[H] \centering
-%\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_count.png}
-%
-%\caption{Distance to skin, counts.}
-%\vspace{-5pt}
-%\label{}
-%\end{figure}
-%\end{center}}}%
-%BeginExpansion
-\begin{center}
-\begin{figure}[H] \centering
-\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_count.png}
-
-\caption{Distance to skin, counts.}
-\vspace{-5pt}
-\label{}
-\end{figure}
-\end{center}%
-%EndExpansion
+\bigskip 
 
 %TCIMACRO{%
-%\TeXButton{fig}{\begin{center}
-%\begin{figure}[H] \centering
-%\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_count.png}
-%
-%\caption{Distance to DEJ, counts.}
-%\vspace{-5pt}
-%\label{}
-%\end{figure}
-%\end{center}}}%
-%BeginExpansion
-\begin{center}
-\begin{figure}[H] \centering
-\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_count.png}
-
-\caption{Distance to DEJ, counts.}
-\vspace{-5pt}
-\label{}
-\end{figure}
-\end{center}%
-%EndExpansion
-
-%TCIMACRO{%
-%\TeXButton{fig}{\begin{center}
-%\begin{figure}[H] \centering
-%\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_density.png}
-%
-%\caption{Distance to skin, density.}
-%\vspace{-5pt}
-%\label{}
-%\end{figure}
-%\end{center}}}%
-%BeginExpansion
-\begin{center}
-\begin{figure}[H] \centering
-\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_density.png}
-
-\caption{Distance to skin, density.}
-\vspace{-5pt}
-\label{}
-\end{figure}
-\end{center}%
-%EndExpansion
-
-%TCIMACRO{%
-%\TeXButton{fig}{\begin{center}
-%\begin{figure}[H] \centering
-%\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_density.png}
-%
-%\caption{Distance to DEJ, density.}
-%\vspace{-5pt}
-%\label{}
-%\end{figure}
-%\end{center}}}%
-%BeginExpansion
-\begin{center}
-\begin{figure}[H] \centering
-\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_density.png}
-
-\caption{Distance to DEJ, density.}
-\vspace{-5pt}
-\label{}
-\end{figure}
-\end{center}%
-%EndExpansion
-
-%TCIMACRO{%
-%\TeXButton{fig}{\begin{center}
+%\TeXButton{DD compare_markers.png}{\begin{center}
 %\begin{figure}[H] \centering
 %\includegraphics[width=.45\textwidth]{\pwd R/figures/DD_dist2DEJ_compare_markers.png}
 %\includegraphics[width=.45\textwidth]{\pwd R/figures/DD_dist2skin_compare_markers.png}
 %
-%\caption{Distance to DEJ (left) and skin surface (right).}
+%\caption{DD. Probability density curves of distance to DEJ (left) and skin surface (right),}
 %\vspace{-5pt}
 %\label{}
 %\end{figure}
@@ -297,7 +284,7 @@ curve.
 \includegraphics[width=.45\textwidth]{\pwd R/figures/DD_dist2DEJ_compare_markers.png}
 \includegraphics[width=.45\textwidth]{\pwd R/figures/DD_dist2skin_compare_markers.png}
 
-\caption{Distance to DEJ (left) and skin surface (right).}
+\caption{DD. Probability density curves of distance to DEJ (left) and skin surface (right),}
 \vspace{-5pt}
 \label{}
 \end{figure}
@@ -305,12 +292,12 @@ curve.
 %EndExpansion
 
 %TCIMACRO{%
-%\TeXButton{fig}{\begin{center}
+%\TeXButton{CF compare_markers.png}{\begin{center}
 %\begin{figure}[H] \centering
 %\includegraphics[width=.45\textwidth]{\pwd R/figures/CF_dist2DEJ_compare_markers.png}
 %\includegraphics[width=.45\textwidth]{\pwd R/figures/CF_dist2skin_compare_markers.png}
 %
-%\caption{Distance to DEJ (left) and skin surface (right).}
+%\caption{CF. Probability density curves of distance to DEJ (left) and skin surface (right).}
 %\vspace{-5pt}
 %\label{}
 %\end{figure}
@@ -321,15 +308,11 @@ curve.
 \includegraphics[width=.45\textwidth]{\pwd R/figures/CF_dist2DEJ_compare_markers.png}
 \includegraphics[width=.45\textwidth]{\pwd R/figures/CF_dist2skin_compare_markers.png}
 
-\caption{Distance to DEJ (left) and skin surface (right).}
+\caption{CF. Probability density curves of distance to DEJ (left) and skin surface (right).}
 \vspace{-5pt}
 \label{}
 \end{figure}
 \end{center}%
 %EndExpansion
-
-\bigskip 
-
-\section{Appendix}
 
 \end{document}
