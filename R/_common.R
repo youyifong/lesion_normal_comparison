@@ -8,7 +8,6 @@ blue=rgb(red=0, blue=1, green=0, alpha=1)
 
 sample.labels=c("DD","CF"); names(sample.labels)=sample.labels
 dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
-
 tissue.types=c("lesion","normal"); names(tissue.types)=tissue.types
 
 markers=c("CD3","CD15","CD123","CD11c"); names(markers)=markers

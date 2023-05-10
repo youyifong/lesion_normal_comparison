@@ -13,7 +13,8 @@ get.peak = function(density_est) {
 mypng(mfrow=c(2,4), file="figures/compare_markers", 
       width=10, height=5, mar=c(4,4,2,1), oma=c(1,3,0,0))
       
-dist.bt.peaks = lapply (tissue.types, function(tissue.type) { 
+dist.bt.peaks = 
+  lapply (tissue.types, function(tissue.type) { 
   sapply (dist.labels, function(dist) {
   sapply (sample.labels, function(s) {
     # tissue.type="lesion"; dist="dist2skin"; s="DD"; 
@@ -22,7 +23,7 @@ dist.bt.peaks = lapply (tissue.types, function(tissue.type) {
     xlim=xlim.ls[[dist]]
     markers=markers.ls[[s]]; names(markers)=markers
     
-    dat.ls=lapply(markers, function (l) alldat[[s]][[dist]][[l]] )
+    dat.ls=lapply(markers, function (a) alldat[[s]][[dist]][[a]] )
     dat.ls = lapply(dat.ls, function (dat) dat[dat[[tissue.type]], "dist"])
 
     # compare.markers(dat.ls, 

@@ -1,7 +1,7 @@
 
 \documentclass{article}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{geometry}
+\usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{float}
 
@@ -10,7 +10,7 @@
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Wednesday, May 10, 2023 12:39:40}
+%TCIDATA{LastRevised=Wednesday, May 10, 2023 13:30:26}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -100,7 +100,7 @@ These two questions are also intertwined. If we use WGA only to draw
 boundaries, we can only use straight line boundaries because the difference
 between normal and lesion is only visible in epidermis in WGA staining. A
 straight line can be drawn in epidermis and extend to dermis, but not a
-curve. \ \ \ \ \ 
+curve. \ \ \ \ \ \ \ \ 
 
 %TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
 %BeginExpansion
@@ -161,13 +161,6 @@ curve. \ \ \ \ \
 \end{center}%
 %EndExpansion
 
-%TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
-%BeginExpansion
-\clearpage%
-%EndExpansion
-
-\bigskip
-
 %TCIMACRO{%
 %\TeXButton{tab DD_CF_comparison}{\begin{center}
 %\begin{table}[h] \centering
@@ -196,13 +189,20 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 \end{center}%
 %EndExpansion
 
+%TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
+%BeginExpansion
+\clearpage%
+%EndExpansion
+
 %TCIMACRO{%
 %\TeXButton{fig compare_DD_CF_dist2DEJ_hist}{\begin{center}
 %\begin{figure}[H] \centering
+%
+%\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}\\
+%\vspace{50pt}
 %\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_hist.png}
 %
-%
-%\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ.
+%\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
 %The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 %Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
 %For example, CD123 epi count 1038/2862*100=36.
@@ -215,10 +215,12 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 %BeginExpansion
 \begin{center}
 \begin{figure}[H] \centering
+
+\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}\\
+\vspace{50pt}
 \includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_hist.png}
 
-
-\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ.
+\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
 For example, CD123 epi count 1038/2862*100=36.
@@ -231,14 +233,19 @@ For example, CD123 epi count 1038/2862*100=36.
 %EndExpansion
 
 %TCIMACRO{%
-%\TeXButton{fig compare_DD_CF_dist2skin_hist}{\begin{center}
+%\TeXButton{fig compare_normal_lesion_dist2skin}{\begin{center}
 %\begin{figure}[H] \centering
-%\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}
 %
-%\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
+%\includegraphics[width=\textwidth]{\pwd R/figures/compare_normal_lesion_dist2skin.png}\\
+%\vspace{50pt}
+%\includegraphics[width=\textwidth]{\pwd R/figures/compare_normal_lesion_dist2DEJ.png}
+%
+%\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
 %The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 %Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
+%For example, CD123 epi count 1038/2862*100=36.
 %}
+%
 %\vspace{-5pt}
 %\label{}
 %\end{figure}
@@ -246,19 +253,22 @@ For example, CD123 epi count 1038/2862*100=36.
 %BeginExpansion
 \begin{center}
 \begin{figure}[H] \centering
-\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}
 
-\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
+\includegraphics[width=\textwidth]{\pwd R/figures/compare_normal_lesion_dist2skin.png}\\
+\vspace{50pt}
+\includegraphics[width=\textwidth]{\pwd R/figures/compare_normal_lesion_dist2DEJ.png}
+
+\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
+For example, CD123 epi count 1038/2862*100=36.
 }
+
 \vspace{-5pt}
 \label{}
 \end{figure}
 \end{center}%
 %EndExpansion
-
-\bigskip 
 
 %TCIMACRO{%
 %\TeXButton{fig compare_markers.png}{\begin{center}
