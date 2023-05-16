@@ -23,15 +23,13 @@ dist.bt.peaks =
     xlim=xlim.ls[[dist]]
     markers=markers.ls[[s]]; names(markers)=markers
     
-    dat.ls=lapply(markers, function (a) alldat[[s]][[dist]][[a]] )
+    dat.ls = lapply(markers, function (a) alldat[[s]][[dist]][[a]] )
     dat.ls = lapply(dat.ls, function (dat) dat[dat[[tissue.type]], "dist"])
-
-    # compare.markers(dat.ls, 
-    #                 xlim=xlim, 
-    #                 main=s%.%" Les, "%.%region.labels.title["normal"], 
-    #                 xlab=dist %.% " (um)",
-    #                 markers=markers
-    # )    
+    
+    # tmp.skin=alldat$DD$dist2skin$CD15$dist[alldat$DD$dist2skin$CD15$lesion]
+    # tmp.DEJ=alldat$DD$dist2DEJ$CD15$dist[alldat$DD$dist2DEJ$CD15$lesion]
+    # hist(tmp.skin)
+    # hist(tmp.DEJ)
     
     # plot smoothed histogram
     

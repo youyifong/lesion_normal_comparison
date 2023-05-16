@@ -15,6 +15,7 @@ for (dist in dist.labels) {
     for (a in markers) {
       
       for (tissue.type in tissue.types) { 
+        # dist="dist2skin"; a="CD15"; tissue.type="lesion"
         
         if (tissue.type=="normal") {
           dat.dd=subset(alldat[["DD"]][[dist]][[a]], normal)$dist
