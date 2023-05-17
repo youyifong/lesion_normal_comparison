@@ -10,7 +10,7 @@
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Tuesday, May 16, 2023 16:55:32}
+%TCIDATA{LastRevised=Tuesday, May 16, 2023 17:35:45}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -199,7 +199,7 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 %\begin{figure}[H] \centering
 %
 %\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}\\
-%\vspace{50pt}
+%\vspace{30pt}
 %\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_hist.png}
 %
 %\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
@@ -217,7 +217,7 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 \begin{figure}[H] \centering
 
 \includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}\\
-\vspace{50pt}
+\vspace{30pt}
 \includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2DEJ_hist.png}
 
 \caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
@@ -237,7 +237,7 @@ For example, CD123 epi count 1038/2862*100=36.
 %\begin{figure}[H] \centering
 %
 %\includegraphics[width=\textwidth]{\pwd R/figures/compare_normal_lesion_dist2skin.png}\\
-%\vspace{50pt}
+%\vspace{30pt}
 %\includegraphics[width=\textwidth]{\pwd R/figures/compare_normal_lesion_dist2DEJ.png}
 %
 %\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
@@ -255,7 +255,7 @@ For example, CD123 epi count 1038/2862*100=36.
 \begin{figure}[H] \centering
 
 \includegraphics[width=\textwidth]{\pwd R/figures/compare_normal_lesion_dist2skin.png}\\
-\vspace{50pt}
+\vspace{30pt}
 \includegraphics[width=\textwidth]{\pwd R/figures/compare_normal_lesion_dist2DEJ.png}
 
 \caption{Number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
@@ -270,6 +270,13 @@ For example, CD123 epi count 1038/2862*100=36.
 \end{center}%
 %EndExpansion
 
+The ratio between lesion and normal is about 1 for CD3/CF, but about 1/3 in
+CD3/DD. This suggests that CD3 is depleted in lesion in DD, but not in CF.
+
+Compare lesion with normal in CD15/CF, we see that the lesion peak is
+shifted to the left compared to the normal peak. This pattern is more clear
+in CF than in DD. We don't see this pattern for CD3.
+
 %TCIMACRO{%
 %\TeXButton{fig compare_markers.png}{\begin{center}
 %\begin{figure}[H] \centering
@@ -278,8 +285,6 @@ For example, CD123 epi count 1038/2862*100=36.
 %\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
 %The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 %Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
-%That DD CD15 peak in dist2skin is near skin while the corresponding peak in dist2DEJ is near DEJ 
-%is due to the fact that the DEJ line is very curvy.
 %}
 %
 %\vspace{-5pt}
@@ -294,8 +299,67 @@ For example, CD123 epi count 1038/2862*100=36.
 \caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
-That DD CD15 peak in dist2skin is near skin while the corresponding peak in dist2DEJ is near DEJ 
-is due to the fact that the DEJ line is very curvy.
+}
+
+\vspace{-5pt}
+\label{}
+\end{figure}
+\end{center}%
+%EndExpansion
+
+That the CD15 dist2skin peak in DD/lesion is near skin while the
+corresponding dist2DEJ peak is near DEJ is due to the fact that the DEJ line
+is very curvy.
+
+%TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
+%BeginExpansion
+\clearpage%
+%EndExpansion
+
+%TCIMACRO{%
+%\TeXButton{fig DD_CD15gold_CD3green}{\begin{center}
+%\begin{figure}[H] \centering
+%\includegraphics[width=\textwidth]{\pwd DD_CD15gold_CD3green.png}
+%
+%\caption{DD, CD15 gold, CD3 green.
+%}
+%
+%\vspace{-5pt}
+%\label{}
+%\end{figure}
+%\end{center}}}%
+%BeginExpansion
+\begin{center}
+\begin{figure}[H] \centering
+\includegraphics[width=\textwidth]{\pwd DD_CD15gold_CD3green.png}
+
+\caption{DD, CD15 gold, CD3 green.
+}
+
+\vspace{-5pt}
+\label{}
+\end{figure}
+\end{center}%
+%EndExpansion
+
+%TCIMACRO{%
+%\TeXButton{fig CF_CD15gold_CD3green}{\begin{center}
+%\begin{figure}[H] \centering
+%\includegraphics[width=\textwidth]{\pwd CF_CD15gold_CD3green.png}
+%
+%\caption{CF, CD15 gold, CD3 green.
+%}
+%
+%\vspace{-5pt}
+%\label{}
+%\end{figure}
+%\end{center}}}%
+%BeginExpansion
+\begin{center}
+\begin{figure}[H] \centering
+\includegraphics[width=\textwidth]{\pwd CF_CD15gold_CD3green.png}
+
+\caption{CF, CD15 gold, CD3 green.
 }
 
 \vspace{-5pt}
