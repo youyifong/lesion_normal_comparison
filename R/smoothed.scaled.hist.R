@@ -1,4 +1,4 @@
-smoothed.scaled.hist = function(dat.ls, bin_width, scale.factors, cols=NULL, ...) {
+smoothed.scaled.hist = function(dat.ls, bin_width, scale.factors, cols=NULL, legend=NULL, ...) {
   
   bin_width <- 100
   min_break <- floor(min(unlist(dat.ls)) / bin_width) * bin_width
@@ -32,6 +32,6 @@ smoothed.scaled.hist = function(dat.ls, bin_width, scale.factors, cols=NULL, ...
   plot(hist_info[[1]], freq = TRUE, border="white",  col=hist.col, ...)
   for (i in 1:length(labels)) lines(densities[[i]], col = cols[i])
   
-  mylegend(x=3, legend=labels, lty=1, col=cols, y.intersp=1, text.width=700)
+  mylegend(x=3, legend=if(is.null(legend)) labels else legend, lty=1, col=cols, y.intersp=1, text.width=700)
   
 }

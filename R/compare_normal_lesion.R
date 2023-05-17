@@ -22,7 +22,8 @@ for (dist in dist.labels) {
                            xlim=xlim.ls[[dist]], ylim=c(0,150),
                            xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
                            main=ifelse(s=="DD",a,""),
-                           col=c("red","blue")
+                           col=c("red","blue"),
+                           legend=c("ulcerative","intact")
                           )
       
       # to divide between epi and dermis
