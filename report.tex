@@ -4,13 +4,14 @@
 \usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{hyperref}
 
 %TCIDATA{OutputFilter=LATEX.DLL}
 %TCIDATA{Version=5.50.0.2960}
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Wednesday, May 17, 2023 09:21:02}
+%TCIDATA{LastRevised=Wednesday, May 17, 2023 13:42:59}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -195,7 +196,7 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 %EndExpansion
 
 %TCIMACRO{%
-%\TeXButton{fig compare_DD_CF_dist2DEJ_hist}{\begin{center}
+%\TeXButton{fig:compare_DD_CF_dist2DEJ_hist}{\begin{center}
 %\begin{figure}[H] \centering
 %
 %\includegraphics[width=\textwidth]{\pwd R/figures/compare_DD_CF_dist2skin_hist.png}\\
@@ -209,7 +210,7 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 %}
 %
 %\vspace{-5pt}
-%\label{}
+%\label{fig:compare_DD_CF_dist2DEJ_hist}
 %\end{figure}
 %\end{center}}}%
 %BeginExpansion
@@ -227,7 +228,7 @@ For example, CD123 epi count 1038/2862*100=36.
 }
 
 \vspace{-5pt}
-\label{}
+\label{fig:compare_DD_CF_dist2DEJ_hist}
 \end{figure}
 \end{center}%
 %EndExpansion
@@ -314,19 +315,17 @@ corresponding dist2DEJ peak is near DEJ is due to the fact that the DEJ line
 is very curvy.
 
 %TCIMACRO{%
-%\TeXButton{fig DD_CD15cyan_CD3green}{\begin{center}
+%\TeXButton{fig:CD15cyanCD3green}{\begin{center}
 %\begin{figure}[H] \centering
 %DD ($6540\times 5262$)\\
 %\includegraphics[width=.9\textwidth]{\pwd DD_CD15cyan_CD3green.png}\\
 %CF ($5296\times 4040$)\\
 %\includegraphics[width=.9\textwidth]{\pwd CF_CD15cyan_CD3green.png}
-%\caption{CD3: green, contrast limits 0-0.5; CD15: cyan. The intact/ulcerative boundary and the epidmeris/dermis boundary are shown in white.
+%\caption{CD3: green, contrast limits 0-0.5; CD15: cyan. The intact/ulcerative boundary and the epidmeris/dermis boundary are shown in white. Outer boundaries are not tight.
 %}
-%\label{}
+%\label{fig:CD15cyanCD3green}
 %\end{figure}
-%\end{center}
-%
-%}}%
+%\end{center}}}%
 %BeginExpansion
 \begin{center}
 \begin{figure}[H] \centering
@@ -334,13 +333,35 @@ DD ($6540\times 5262$)\\
 \includegraphics[width=.9\textwidth]{\pwd DD_CD15cyan_CD3green.png}\\
 CF ($5296\times 4040$)\\
 \includegraphics[width=.9\textwidth]{\pwd CF_CD15cyan_CD3green.png}
-\caption{CD3: green, contrast limits 0-0.5; CD15: cyan. The intact/ulcerative boundary and the epidmeris/dermis boundary are shown in white.
+\caption{CD3: green, contrast limits 0-0.5; CD15: cyan. The intact/ulcerative boundary and the epidmeris/dermis boundary are shown in white. Outer boundaries are not tight.
 }
-\label{}
+\label{fig:CD15cyanCD3green}
 \end{figure}
-\end{center}
-
-%
+\end{center}%
 %EndExpansion
+
+In Figure \ref{fig:CD15cyanCD3green}\ we see that DD lesion has less CD3 and
+is further away from DEJ than CF. Correspondingly, in Figure %
+\ref{fig:compare_DD_CF_dist2DEJ_hist}, we see that in the dermis region
+close to DEJ, the count density is about 50 for CF/ulcerative, CF/intact,
+and CF/ulcerative; but for DD/ulcerative, the count density is much lower. 
+
+
+\section{Discussion}
+
+Neutraphil to lymphocyte ratio (NLR) in blood is a prognostic factor for
+cancer. Lower is better.
+
+Chan A, Bentzen S, Rout A, Miller K. Predicting if lung cancer will
+relapse-the role of neutrophil/lymphocyte ratio. Hematol Oncol Stem Cell
+Ther. 2023;16(2):158--61.
+
+Costa T, Nogueiro J, Ribeiro D, Viegas P, Santos-Sousa H. Impact of serum
+albumin concentration and neutrophil-lymphocyte ratio score on gastric
+cancer prognosis. Langenbecks Arch Surg. 2023;408(1):57.
+
+Chen W, Xin S, Xu B. Value research of NLR, PLR, and RDW in prognostic
+assessment of patients with colorectal cancer. J Healthcare Eng.
+2022;16(2022):7971415.
 
 \end{document}
