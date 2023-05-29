@@ -11,9 +11,9 @@ import numpy as np
 
 
 ############################################################################
-# compute region area
+# compute size of regions
 
-region_roi_files = [f for f in glob.glob('*.roi') if "epi" in f or "dermis" in f]
+region_roi_files = [f for f in glob.glob('*.roi') if "epi_region" in f or "dermis_region" in f]
 region_roi_files.sort()
 print(region_roi_files)
 
