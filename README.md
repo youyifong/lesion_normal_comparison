@@ -14,7 +14,7 @@ Environment requirement:
 A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files:
 - epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
 - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
-- region length. Type: line or polyline. File name example: AS_Les_**length**_1_normal.roi. Note that **region** is not part of the file name, which allows us to pick up the region boundary files by matching with 'region'.z
+- region length. Type: line or polyline. File name example: AS_Les_**length**_1_normal.roi. Note that **region** is not part of the file name, which allows us to pick up the region boundary files by matching with 'region'.
 
 In addition to the three roi files per region, each biopsy ROI folder also contains:
 - whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi
