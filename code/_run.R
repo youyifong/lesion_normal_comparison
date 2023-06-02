@@ -1,7 +1,8 @@
 source("_common.R")
 source("smoothed.scaled.hist.R")
 
-source("compare_DD_CF.R")
+# source("compare_DD_CF.R")
+source("compare_tissues.R")
 
 source("compare_normal_lesion.R")
 

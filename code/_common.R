@@ -6,7 +6,7 @@ region.labels.title=c(normal="Intact", lesion="Ulcerative")
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
-sample.labels=c("DD","CF"); names(sample.labels)=sample.labels
+sample.labels=c("DD","CF","AS","CJ","JM","LG","LS"); names(sample.labels)=sample.labels
 dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 tissue.types=c("lesion","normal"); names(tissue.types)=tissue.types
 
@@ -46,6 +46,8 @@ get.dat=function(filename, sample.label, dist) {
     dat$dist2skin = dat$dist2CF_Les_skin_boundary/2
     dat$dist2DEJ  = dat$dist2CF_Les_DEJ_v2/2
     
+  } else {
+    stop("tissue not recognized: "%.%sample.label)
   }
   
   dat$epi = dat$normal.epi | dat$lesion.epi

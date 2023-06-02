@@ -8,7 +8,7 @@ for (dist in dist.labels) {
   xlim=xlim.ls[[dist]]
   myprint(dist)
   
-  for (idx in 1:2) { # 1: pdf, 2: smoothed histogram
+  for (idx in 2) { # 1: density, 2: smoothed histogram
     mypng(mfcol=c(2,4), width=10, height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
           file=paste0("figures/compare_DD_CF_",dist,"_",ifelse(idx==1,"pdf","hist")))
     
@@ -26,7 +26,7 @@ for (dist in dist.labels) {
         }
         
         if (idx==1) {
-          # plot pdf
+          # plot density
           ylim = range(density(dat.dd)$y, 
                        density(dat.cf)$y)
           
