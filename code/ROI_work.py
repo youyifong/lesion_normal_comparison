@@ -3,10 +3,20 @@ working dir: folder containing ROI files
 '''
 
 from shapely.geometry import Polygon
-import glob
+import glob,argparse,os
 from read_roi import read_roi_file 
 import pandas as pd
 import numpy as np
+
+
+parser = argparse.ArgumentParser(description='parameters')
+parser.add_argument('--XX', type=str, help='tissue label')    
+args = parser.parse_args()
+
+# set tissue label here if not set in command line
+if args.XX is None:
+    args.XX=os.environ.get('XX')
+print(args.XX)
 
 
 
@@ -20,15 +30,18 @@ print(region_roi_files)
 # whole tissue boundary ROI file
 tissue_boundary_roi = [f for f in glob.glob('*.roi') if "whole" in f]
 print(tissue_boundary_roi)
+if len(tissue_boundary_roi)!=1:
+    print("STOP: there should only be one whole tissue roi file !!!!!!!!!!!!!!!!!!!!!!!")
 try:
-    tmp = read_roi_file(tissue_boundary_roi)    
+    tmp = read_roi_file(tissue_boundary_roi[0])    
     val = list(tmp.values()) [0]
     whole_tissue = Polygon(list(zip(val["x"], val["y"])))
-except Exception as e:
+except Exception: # as e
     # Catch any other type of exception
     print("Something went wrong reading tissue boundary roi")
-    print("Error:", str(e))
+    # print("Error:", str(e))
     whole_tissue = None
+
 
 # compute the area of each region
 areas=[]
@@ -71,15 +84,16 @@ for length_roi_file in length_roi_files:
 ###############################################################################
 # save
 
-# CJ
-# remove _v3.roi from name
-region_roi_files=[f.replace("_v3.roi","") for f in region_roi_files]
-# add the two line segments length to get tissue length 
-data = pd.DataFrame({"name": region_roi_files+["CJ_Les_length_1_normal"], 'size': areas+[lengths[0]+lengths[1]]}); data
-data.to_csv("region_area_length.csv", header=True, index=None, sep=',')
+# remove .roi from names
+region_roi_files=[f.replace(".roi","") for f in region_roi_files]
 
-# else
-data = pd.DataFrame({"name": region_roi_files+length_roi_files, 'size': areas+lengths}); data
-data.to_csv("region_area_length.csv", header=True, index=None, sep=',')
+if args.XX == 'CJ':
+    # remove _v3 from name
+    region_roi_files=[f.replace("_v3","") for f in region_roi_files]
+    # add the two line segments length to get tissue length 
+    data = pd.DataFrame({"name": region_roi_files+["CJ_Les_length_1_normal"], 'size': areas+[lengths[0]+lengths[1]]})
+else: 
+    data = pd.DataFrame({"name": region_roi_files+length_roi_files, 'size': areas+lengths})
+print(data)
 
-
+data.to_csv("../"+args.XX+"_region_area_length.csv", header=True, index=None, sep=',')
