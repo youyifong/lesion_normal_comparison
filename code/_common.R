@@ -6,7 +6,8 @@ region.labels.title=c(normal="Intact", lesion="Ulcerative")
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
-sample.labels=c("DD","CF","AS","CJ","JM","LG","LS"); names(sample.labels)=sample.labels
+sample.labels=c("DD","CF","JM"); names(sample.labels)=sample.labels
+sample.labels.all=c("DD","CF","JM","AS","CJ","LG","LS"); names(sample.labels.all)=sample.labels.all
 dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 tissue.types=c("lesion","normal"); names(tissue.types)=tissue.types
 
