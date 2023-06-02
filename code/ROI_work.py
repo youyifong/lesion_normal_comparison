@@ -76,10 +76,10 @@ for length_roi_file in length_roi_files:
 region_roi_files=[f.replace("_v3.roi","") for f in region_roi_files]
 # add the two line segments length to get tissue length 
 data = pd.DataFrame({"name": region_roi_files+["CJ_Les_length_1_normal"], 'size': areas+[lengths[0]+lengths[1]]}); data
-data.to_csv("../region_area_length.csv", header=True, index=None, sep=',')
+data.to_csv("region_area_length.csv", header=True, index=None, sep=',')
 
 # else
 data = pd.DataFrame({"name": region_roi_files+length_roi_files, 'size': areas+lengths}); data
-data.to_csv("../region_area_length.csv", header=True, index=None, sep=',')
+data.to_csv("region_area_length.csv", header=True, index=None, sep=',')
 
 

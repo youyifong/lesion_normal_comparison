@@ -28,17 +28,21 @@ In addition to the three roi files per region, each biopsy ROI folder also conta
 - DEJ. Type: line or polyline. File name example: AS_Les_**DEJ**_v2.roi
 - whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi. Note that this file is not needed if the regions have tight boundaries.
 
+All the ROI files are under a folder named ROI_regions.
 
-Make a png file with region boundaries in the roi directory. 
+
+```bash
+cd /fh/fast/fong_y/images_from_K/ROI_lesion_vs_normal_TSP
+cd ${XX}_Les_stitched_alignedtoCD45_cropped/ROI_regions
+```
+
+Make a png file with region boundaries. 
 ```bash
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_Les_CD3.png" --savemasksonly --saveas "${XX}_regions" 
 ```
 
-
-The script writes region_area_length.csv in the parent directory.
+Create region_area_length.csv.
 ```bash
-cd /fh/fast/fong_y/images_from_K/ROI_lesion_vs_normal_TSP
-cd CJ_Les_stitched_alignedtoCD45_cropped/CJ_Les_ROI
 ipython # run ROI_work.py
 ```
 
@@ -48,9 +52,10 @@ ipython # run ROI_work.py
 
 The default command is:
 ```bash
-python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100
+python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
 ```
-Without the normalize100 option, when the number of cells is small, we may get errors. 
+- normalize100 is set because 1) it avoids errors when the number of cells in the image is small, 2) it leads to more specific results, e.g. some fibers will not be predicted masks. The downside is that it can be less sensitive to dim signals.
+
 
 Special care are needed for the following:
 
@@ -65,7 +70,7 @@ For CD279 CF, one cell is wrongly segmented as two masks under the default setti
 python -m tsp runcellpose --f 'CF_Les_CD279.png' --l [3,0] --model cytotrain7 --cellprob -5
 ```
 
-For CD68 JM, 
+For CD68 JM, a high background makes it necessary to set a higher min_avgintensity
 ```bash
 python -m tsp runcellpose --f 'JM_Les_CD68.png' --l [3,0] --model cytotrain7 --normalize100 --min_size 100 --min_avgintensity 30 --flow 0.5
 ```
