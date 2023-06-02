@@ -24,9 +24,9 @@ A biopsy is divided into contiguous regions. A region is either lesion (ulcerati
 - region length. Type: line or polyline. File name example: AS_Les_**length**_1_normal.roi. Note that **region** is not part of the file name, which allows us to pick up all region roi (both epi and dermis) files by matching with 'region'.
 
 In addition to the three roi files per region, each biopsy ROI folder also contains:
-- whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi
 - skin boundary. Type: line or polyline. File name example: AS_Les_**skin_boundary**.roi
 - DEJ. Type: line or polyline. File name example: AS_Les_**DEJ**_v2.roi
+- whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi. Note that this file is not needed if the regions have tight boundaries.
 
 
 Make a png file with region boundaries in the roi directory. 
