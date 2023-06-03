@@ -15,6 +15,7 @@ biopsies=c("DD","CF","JM","AS","CJ","LG","LS"); names(biopsies)=biopsies
 biopsies.1=c("DD","CF","JM"); names(biopsies.1)=biopsies.1
 
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
+ylim=c(0,175)
 
 data.dir = "/fh/fast/fong_y/images_from_K/ROI_lesion_vs_normal_TSP"
 

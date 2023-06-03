@@ -27,11 +27,12 @@ smoothed.scaled.hist = function(dat.ls, bin_width, scale.factors, cols=NULL, leg
   }
   
   hist.col = col2rgb(cols[1])
-  hist.col = rgb(hist.col[1], hist.col[2], hist.col[3], alpha=255*.25, maxColorValue=255)
+  hist.col = rgb(hist.col[1], hist.col[2], hist.col[3], alpha=255*.15, maxColorValue=255)
 
   plot(hist_info[[1]], freq = TRUE, border="white",  col=hist.col, ...)
   for (i in 1:length(labels)) lines(densities[[i]], col = cols[i])
   
   mylegend(x=3, legend=if(is.null(legend)) labels else legend, lty=1, col=cols, y.intersp=1, text.width=700)
   
+  densities
 }

@@ -1,7 +1,7 @@
 source("_common.R")
 source("smoothed.scaled.hist.R")
 
-# source("compare_DD_CF.R")
+# source("compare_DD_CF_JM.R")
 source("compare_tissues.R")
 
 source("compare_normal_lesion.R")
@@ -9,7 +9,7 @@ source("compare_normal_lesion.R")
 source("compare_markers.R")
 
 # depends on output from compare_markers.R
-source("make_tables.R")
+# source("make_tables.R")
 
 
 
