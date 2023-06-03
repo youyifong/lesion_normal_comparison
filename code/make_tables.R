@@ -1,7 +1,7 @@
 ################################################################################
 ## tabulate cell counts in epi/dermis x normal/lesion
 
-count.tables = lapply (sample.labels, function(s) {
+count.tables = lapply (biopsies, function(s) {
   # s="DD"
   dist="dist2DEJ"
   

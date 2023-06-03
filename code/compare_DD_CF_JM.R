@@ -1,10 +1,8 @@
 ################################################################################
-# compare DD and CF in one plot
-# 8 plots for each of dist2skin and dist2DEJ:
-# 4 markers in lesion 
-# 4 markers in intact
-
-if (!file.exists("../figures")) dir.create("../figures")
+# compare different biopsies in one plot
+# CF, DD and JM have both ulcerative and intact regions, others just have intact regions
+# separately for dist2skin and dist2DEJ
+# separately for ulcerative and intact
 
 for (dist in dist.labels) {
   xlim=xlim.ls[[dist]]
@@ -12,21 +10,21 @@ for (dist in dist.labels) {
   
   for (idx in 2) { # 1: density, 2: smoothed histogram
     mypng(mfcol=c(2,4), width=10, height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
-          file=paste0("../figures/compare_DD_CF_JM_",dist,"_",ifelse(idx==1,"pdf","hist")))
+          file=paste0("figures/compare_DD_CF_JM_",dist,"_",ifelse(idx==1,"pdf","hist")))
     
     for (a in markers) {
       
       for (tissue.type in tissue.types) { 
-        # dist="dist2skin"; a="CD15"; tissue.type="lesion"
+        # dist="dist2skin"; a="CD15"; tissue.type="ulcerative"
         
-        if (tissue.type=="normal") {
-          dat.dd=subset(alldat[["DD"]][[dist]][[a]], normal)$dist
-          dat.cf=subset(alldat[["CF"]][[dist]][[a]], normal)$dist
-          dat.jm=subset(alldat[["JM"]][[dist]][[a]], normal)$dist
+        if (tissue.type=="intact") {
+          dat.dd=subset(alldat[["DD"]][[dist]][[a]], intact)$dist
+          dat.cf=subset(alldat[["CF"]][[dist]][[a]], intact)$dist
+          dat.jm=subset(alldat[["JM"]][[dist]][[a]], intact)$dist
         } else {
-          dat.dd=subset(alldat[["DD"]][[dist]][[a]], lesion)$dist
-          dat.cf=subset(alldat[["CF"]][[dist]][[a]], lesion)$dist
-          dat.jm=subset(alldat[["JM"]][[dist]][[a]], lesion)$dist
+          dat.dd=subset(alldat[["DD"]][[dist]][[a]], ulcerative)$dist
+          dat.cf=subset(alldat[["CF"]][[dist]][[a]], ulcerative)$dist
+          dat.jm=subset(alldat[["JM"]][[dist]][[a]], ulcerative)$dist
         }
         
         if (idx==1) {
@@ -82,7 +80,7 @@ for (dist in dist.labels) {
                border="white",  col=rgb(red=1, blue=0, green=0, alpha=.1), 
                xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
                xlim=xlim, ylim=ylim,
-               main=ifelse(tissue.type=="lesion",a,"") )
+               main=ifelse(tissue.type=="ulcerative",a,"") )
           
           # plot density curves, which can be viewed as smoothed histograms
           lines(densities.dd, col = "red")

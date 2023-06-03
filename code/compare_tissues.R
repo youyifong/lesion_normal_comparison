@@ -1,7 +1,7 @@
 ################################################################################
 # compare DD and CF in one plot
 # 8 plots for each of dist2skin and dist2DEJ:
-# 4 markers in lesion 
+# 4 markers in ulcerative 
 # 4 markers in intact
 
 for (dist in dist.labels) {
@@ -15,14 +15,14 @@ for (dist in dist.labels) {
     for (a in markers) {
       
       for (tissue.type in tissue.types) { 
-        # dist="dist2skin"; a="CD15"; tissue.type="lesion"
+        # dist="dist2skin"; a="CD15"; tissue.type="ulcerative"
         
-        if (tissue.type=="normal") {
-          dat.dd=subset(alldat[["DD"]][[dist]][[a]], normal)$dist
-          dat.cf=subset(alldat[["CF"]][[dist]][[a]], normal)$dist
+        if (tissue.type=="intact") {
+          dat.dd=subset(alldat[["DD"]][[dist]][[a]], intact)$dist
+          dat.cf=subset(alldat[["CF"]][[dist]][[a]], intact)$dist
         } else {
-          dat.dd=subset(alldat[["DD"]][[dist]][[a]], lesion)$dist
-          dat.cf=subset(alldat[["CF"]][[dist]][[a]], lesion)$dist
+          dat.dd=subset(alldat[["DD"]][[dist]][[a]], ulcerative)$dist
+          dat.cf=subset(alldat[["CF"]][[dist]][[a]], ulcerative)$dist
         }
         
         if (idx==1) {
@@ -33,7 +33,7 @@ for (dist in dist.labels) {
           plot(density(dat.dd), col=1, xlab=dist %.% " (um)", ylab="Density", ylim=ylim, xlim=xlim,
                main=a)
           lines(density(dat.cf), col=2)
-          mylegend(x=3, legend=sample.labels, lty=1, col=1:2, y.intersp=1, text.width=700)
+          mylegend(x=3, legend=biopsies, lty=1, col=1:2, y.intersp=1, text.width=700)
           
         } else {
           # plot smoothed histogram
@@ -71,7 +71,7 @@ for (dist in dist.labels) {
                border="white",  col="pink", 
                xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
                xlim=xlim, ylim=ylim,
-               main=ifelse(tissue.type=="lesion",a,"") )
+               main=ifelse(tissue.type=="ulcerative",a,"") )
           
           # plot density curves, which can be viewed as smoothed histograms
           lines(densities.dd, col = "red")
@@ -79,7 +79,7 @@ for (dist in dist.labels) {
           # to divide between epi and dermis
           if (dist == "dist2DEJ") abline(v=0, lty=2)
           
-          mylegend(x=3, legend=sample.labels, lty=1, col=c("red","blue"), y.intersp=1.5, text.width=700)
+          mylegend(x=3, legend=biopsies, lty=1, col=c("red","blue"), y.intersp=1.5, text.width=700)
           
         }
       }

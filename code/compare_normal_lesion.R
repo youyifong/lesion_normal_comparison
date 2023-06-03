@@ -9,7 +9,7 @@ for (dist in dist.labels) {
   mypng(mfrow=c(2,4), width=10, height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
         file=paste0("figures/compare_normal_lesion_"%.%dist))
   
-  for (s in sample.labels) { 
+  for (s in biopsies) { 
   for (a in markers) {
       # dist="dist2skin"; a="CD3"; s="DD"
       
@@ -32,8 +32,8 @@ for (dist in dist.labels) {
   }
   }
 
-  mtext(sample.labels[1], side = 2, line = 1.5, outer = T, at = .75, adj = NA, padj = NA, cex = NA, col = NA, font = NA)
-  mtext(sample.labels[2], side = 2, line = 1.5, outer = T, at = .25, adj = NA, padj = NA, cex = NA, col = NA, font = NA)
+  mtext(biopsies[1], side = 2, line = 1.5, outer = T, at = .75, adj = NA, padj = NA, cex = NA, col = NA, font = NA)
+  mtext(biopsies[2], side = 2, line = 1.5, outer = T, at = .25, adj = NA, padj = NA, cex = NA, col = NA, font = NA)
   
   dev.off()
   

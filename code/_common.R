@@ -9,10 +9,10 @@ blue=rgb(red=0, blue=1, green=0, alpha=1)
 
 dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 
-tissue.types=c("lesion","normal"); names(tissue.types)=tissue.types
+tissue.types=c("ulcerative","intact"); names(tissue.types)=tissue.types
 
-sample.labels=c("DD","CF","JM","AS","CJ","LG","LS"); names(sample.labels)=sample.labels
-sample.labels.1=c("DD","CF","JM"); names(sample.labels.1)=sample.labels.1
+biopsies=c("DD","CF","JM","AS","CJ","LG","LS"); names(biopsies)=biopsies
+biopsies.1=c("DD","CF","JM"); names(biopsies.1)=biopsies.1
 
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 
@@ -20,7 +20,7 @@ data.dir = "/fh/fast/fong_y/images_from_K/ROI_lesion_vs_normal_TSP"
 
 markers=c("CD3","CD15","CD123","CD11c"); names(markers)=markers
 # CD68 did not pass QC for CF
-markers.ls = lapply(sample.labels, function(s) {
+markers.ls = lapply(biopsies, function(s) {
   files <- list.files(path = data.dir)
   tmp = list.files(data.dir%.%"/"%.%files[startsWith(files, s%.%"_Les_")], pattern=".*_Les_CD.*.masks.png")
   out = sapply(tmp, function(n) sub("_masks.png", "", sub(s%.%"_Les_","",n)))
@@ -30,7 +30,7 @@ markers.ls = lapply(sample.labels, function(s) {
 markers.ls
 
 
-tissue.widths = lapply(sample.labels, function(s) {
+tissue.widths = lapply(biopsies, function(s) {
 # s="LS"
   dat=read.csv(glue("{data.dir}/{s}_Les_stitched_alignedtoCD45_cropped/{s}_Les_region_area_length.csv"))
   
@@ -140,8 +140,8 @@ get.dat=function(s, dist, marker) {
   
   dat$epi = dat$normal.epi | dat$lesion.epi
   dat$dermis = dat$normal.dermis | dat$lesion.dermis
-  dat$normal = dat$normal.epi | dat$normal.dermis
-  dat$lesion = dat$lesion.epi | dat$lesion.dermis
+  dat$intact = dat$normal.epi | dat$normal.dermis
+  dat$ulcerative = dat$lesion.epi | dat$lesion.dermis
   
   if (dist=="dist2DEJ") {
     dat$dist = dat$dist2DEJ  * ifelse(dat$epi, -1, 1)
@@ -152,10 +152,10 @@ get.dat=function(s, dist, marker) {
 }
 
 
-alldat = lapply (sample.labels, function(s) 
+alldat = lapply (biopsies, function(s) 
   lapply (dist.labels, function(dist) 
     lapply (markers.ls[[s]], function (marker) {
-      myprint(marker, dist, s)
+      myprint(s, dist, marker)
       get.dat(s, dist, marker)
     }
 )))

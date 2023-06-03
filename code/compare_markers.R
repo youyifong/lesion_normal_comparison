@@ -1,7 +1,7 @@
 ################################################################################
 # compare several markers in one plot
 # 4 plots for each of dist2skin and dist2DEJ:
-# lesion/normal x DD/CF
+# ulcerative/intact x DD/CF
 
 get.peak = function(density_est) {
   max_density_index <- which.max(density_est$y)
@@ -16,8 +16,8 @@ mypng(mfrow=c(2,4), file="figures/compare_markers",
 dist.bt.peaks = 
   lapply (tissue.types, function(tissue.type) { 
   sapply (dist.labels, function(dist) {
-  sapply (sample.labels, function(s) {
-    # tissue.type="lesion"; dist="dist2skin"; s="DD"; 
+  sapply (biopsies, function(s) {
+    # tissue.type="ulcerative"; dist="dist2skin"; s="DD"; 
     myprint(tissue.type, dist, s)
     
     xlim=xlim.ls[[dist]]
@@ -26,8 +26,8 @@ dist.bt.peaks =
     dat.ls = lapply(markers, function (a) alldat[[s]][[dist]][[a]] )
     dat.ls = lapply(dat.ls, function (dat) dat[dat[[tissue.type]], "dist"])
     
-    # tmp.skin=alldat$DD$dist2skin$CD15$dist[alldat$DD$dist2skin$CD15$lesion]
-    # tmp.DEJ=alldat$DD$dist2DEJ$CD15$dist[alldat$DD$dist2DEJ$CD15$lesion]
+    # tmp.skin=alldat$DD$dist2skin$CD15$dist[alldat$DD$dist2skin$CD15$ulcerative]
+    # tmp.DEJ=alldat$DD$dist2DEJ$CD15$dist[alldat$DD$dist2DEJ$CD15$ulcerative]
     # hist(tmp.skin)
     # hist(tmp.DEJ)
     
@@ -63,7 +63,7 @@ dist.bt.peaks =
          border="white",  col="gray", 
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
          xlim=xlim, ylim=ylim,
-         main=ifelse(tissue.type=="lesion",s,"") )
+         main=ifelse(tissue.type=="ulcerative",s,"") )
     
     # plot density curves, which can be viewed as smoothed histograms
     for (a in markers) {
