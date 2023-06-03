@@ -66,8 +66,8 @@ python -m tsp regionmembership --f "${XX}_Les_CD*_masks_d2b.csv" --regionroi "RO
 export XX=CF
 cd /fh/fast/fong_y/images_from_K/ROI_lesion_vs_normal_TSP/CF_Les_stitched_alignedtoCD45_cropped
 cd ROI_regions
-python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_Les_CD3.png" --savemasksonly --saveas "../${XX}_Les_region_boundary" 
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/ROI_work.py
+python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_Les_CD3.png" --savemasksonly --saveas "../${XX}_Les_region_boundary" 
 cd ..
 if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f "*_Les_CD*.png" --l [3,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
@@ -80,8 +80,8 @@ python -m tsp regionmembership --f "${XX}_Les_CD*_masks_d2b.csv" --regionroi "RO
 export XX=JM
 cd /fh/fast/fong_y/images_from_K/ROI_lesion_vs_normal_TSP/JM_Les_stitched_alignedtoCD45_cropped
 cd ROI_regions
-python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_Les_CD3.png" --savemasksonly --saveas "../${XX}_Les_region_boundary" 
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/ROI_work.py
+python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_Les_CD3.png" --savemasksonly --saveas "../${XX}_Les_region_boundary" 
 cd ..
 if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
