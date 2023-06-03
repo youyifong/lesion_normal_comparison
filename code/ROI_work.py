@@ -86,10 +86,9 @@ for length_roi_file in length_roi_files:
 
 # remove .roi from names
 region_roi_files=[f.replace(".roi","") for f in region_roi_files]
+length_roi_files=[f.replace(".roi","") for f in length_roi_files]
 
 if args.XX == 'CJ':
-    # remove _v3 from name
-    region_roi_files=[f.replace("_v3","") for f in region_roi_files]
     # add the two line segments length to get tissue length 
     data = pd.DataFrame({"name": region_roi_files+["CJ_Les_length_1_normal"], 'size': areas+[lengths[0]+lengths[1]]})
 else: 
