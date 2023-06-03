@@ -14,13 +14,20 @@ tissue.types=c("lesion","normal"); names(tissue.types)=tissue.types
 sample.labels=c("DD","CF","JM","AS","CJ","LG","LS"); names(sample.labels)=sample.labels
 sample.labels.1=c("DD","CF","JM"); names(sample.labels.1)=sample.labels.1
 
-markers=c("CD3","CD15","CD123","CD11c"); names(markers)=markers
-# CD68 did not pass QC for CF
-markers.ls=list(DD=c(markers,CD68="CD68"), CF=markers)
-
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 
 data.dir = "/fh/fast/fong_y/images_from_K/ROI_lesion_vs_normal_TSP"
+
+markers=c("CD3","CD15","CD123","CD11c"); names(markers)=markers
+# CD68 did not pass QC for CF
+markers.ls = lapply(sample.labels, function(s) {
+  files <- list.files(path = data.dir)
+  tmp = list.files(data.dir%.%"/"%.%files[startsWith(files, s%.%"_Les_")], pattern=".*_Les_CD.*.masks.png")
+  out = sapply(tmp, function(n) sub("_masks.png", "", sub(s%.%"_Les_","",n)))
+  names(out)=out
+  out
+})
+markers.ls
 
 
 tissue.widths = lapply(sample.labels, function(s) {
@@ -60,7 +67,7 @@ tissue.widths = lapply(sample.labels, function(s) {
 
 # load mask-level data
 get.dat=function(s, dist, marker) {
-# s="LS"; dist="dist2skin"; marker="CD3"
+# s="JM"; dist="dist2skin"; marker="CD3"
   dat=read.csv(glue("{data.dir}/{s}_Les_stitched_alignedtoCD45_cropped/{s}_Les_{marker}_masks_d2b_regmem.csv"))
   
   if (s=="DD") {
@@ -102,8 +109,8 @@ get.dat=function(s, dist, marker) {
   } else if (s=="CJ") {
     dat$normal.epi =    dat$in_CJ_Les_epi_region_1_normal_v3   =="True" 
     dat$normal.dermis = dat$in_CJ_Les_dermis_region_1_normal_v3=="True"
-    dat$lesion.epi =    dat$in_CF_Les_epi_region_2_lesion=="True" 
-    dat$lesion.dermis = dat$in_CF_Les_dermis_region_2_lesion=="True" 
+    dat$lesion.epi =    FALSE
+    dat$lesion.dermis = FALSE
     # each pixel is 1/2 micron, negative dist in epi
     dat$dist2skin = dat$dist2CJ_Les_skin_boundary_v3       /2
     dat$dist2DEJ  = dat$dist2CJ_Les_DEJ_v3                 /2
@@ -147,6 +154,8 @@ get.dat=function(s, dist, marker) {
 
 alldat = lapply (sample.labels, function(s) 
   lapply (dist.labels, function(dist) 
-    lapply (markers.ls[[s]], function (marker) 
+    lapply (markers.ls[[s]], function (marker) {
+      myprint(marker, dist, s)
       get.dat(s, dist, marker)
-    )))
+    }
+)))
