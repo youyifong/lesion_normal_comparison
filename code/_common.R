@@ -35,32 +35,32 @@ tissue.widths = lapply(biopsies, function(s) {
   dat=read.csv(glue("{data.dir}/{s}_Les_stitched_alignedtoCD45_cropped/{s}_Les_region_area_length.csv"))
   
   if (s=="DD") {
-    c(lesion=dat$size[dat$name=='DD_Les_length_2_lesion'], 
-      normal=dat$size[dat$name=='DD_Les_length_1_normal'])/2
+    c(ulcerative=dat$size[dat$name=='DD_Les_length_2_lesion'], 
+      intact=dat$size[dat$name=='DD_Les_length_1_normal'])/2
     
   } else if (s=="CF") {
-    c(lesion=dat$size[dat$name=='CF_Les_length_2_lesion'], 
-      normal=dat$size[dat$name=='CF_Les_length_1_normal'] + dat$size[dat$name=='CF_Les_length_3_normal'])/2
+    c(ulcerative=dat$size[dat$name=='CF_Les_length_2_lesion'], 
+      intact=dat$size[dat$name=='CF_Les_length_1_normal'] + dat$size[dat$name=='CF_Les_length_3_normal'])/2
     
   } else if (s=="JM") {
-    c(lesion=dat$size[dat$name=='JM_Les_length_2_lesion'] + dat$size[dat$name=='JM_Les_length_4_lesion'], 
-      normal=dat$size[dat$name=='JM_Les_length_1_normal'] + dat$size[dat$name=='JM_Les_length_3_normal'])/2
+    c(ulcerative=dat$size[dat$name=='JM_Les_length_2_lesion'] + dat$size[dat$name=='JM_Les_length_4_lesion'], 
+      intact=dat$size[dat$name=='JM_Les_length_1_normal'] + dat$size[dat$name=='JM_Les_length_3_normal'])/2
     
   } else if (s=="AS") {
-      c(lesion=NA, 
-        normal=1000)
+    c(ulcerative=NA, 
+      intact=1000)
     
   } else if (s=="CJ") {
-    c(lesion=NA,
-      normal=dat$size[dat$name=='CJ_Les_length_1_normal'])/2
+    c(ulcerative=NA,
+      intact=dat$size[dat$name=='CJ_Les_length_1_normal'])/2
     
   } else if (s=="LG") {
-    c(lesion=NA, 
-      normal=1000)/2
+    c(ulcerative=NA, 
+      intact=1000)/2
     
   } else if (s=="LS") {
-    c(lesion=NA, 
-      normal=1000)/2
+    c(ulcerative=NA, 
+      intact=1000)/2
   }    
 })
 
