@@ -14,9 +14,9 @@ mypng(mfrow=c(length(biopsies),4), file="figures/compare_markers",
       width=10, height=5/2*length(biopsies), mar=c(4,4,2,1), oma=c(1,3,0,0))
       
 dist.bt.peaks = 
-sapply (biopsies, function(s) {
-sapply (dist.labels, function(dist) {
-lapply (tissue.types, function(tissue.type) { 
+lapply (biopsies, function(s) {
+sapply (dist.labels, simplify="array", function(dist) {
+sapply (tissue.types, function(tissue.type) { 
   # tissue.type="ulcerative"; dist="dist2skin"; s="AS"; 
   myprint(tissue.type, dist, s)
 
@@ -27,13 +27,9 @@ lapply (tissue.types, function(tissue.type) {
   } else {
     markers=markers.ls[[s]]; names(markers)=markers
     
-    if (tissue.type=="intact") {
-      dat.ls = lapply(markers, function (a) subset(alldat[[s]][[dist]][[a]], intact)$dist)
-    } else {
-      dat.ls = lapply(markers, function (a) subset(alldat[[s]][[dist]][[a]], ulcerative)$dist)
-    }
+    dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
     
-    scale.factors=sapply(markers, function(a) unname(100/tissue.widths[[s]][[tissue.type]]))
+    scale.factors=sapply(markers, function(a) unname(100/tissue.widths[[s]][tissue.type]))
     
     all.densities = smoothed.scaled.hist(dat.ls, bin_width=100, scale.factors=scale.factors,
                                          xlim=xlim.ls[[dist]], ylim=ylim,
@@ -53,8 +49,12 @@ lapply (tissue.types, function(tissue.type) {
 })
 })
 
-for (i in 1:length(biopsies)) {
-  mtext(biopsies[i], side = 2, line = 1.5, outer = T, at = (i*2-1)/(length(biopsies)*2), adj = NA, padj = NA, cex = NA, col = NA, font = NA)
+
+# leftmost labeling
+tmp=biopsies
+for (i in 1:length(tmp)) {
+  mtext(tmp[i], side = 2, line = 1.5, outer = T, at = (i*2-1)/(length(tmp)*2), 
+        adj = NA, padj = NA, cex = NA, col = NA, font = NA)
 }
 
 dev.off()

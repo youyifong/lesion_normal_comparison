@@ -3,30 +3,29 @@
 
 count.tables = lapply (biopsies, function(s) {
   # s="DD"
+  
   dist="dist2DEJ"
   
-  xlim=xlim.ls[[dist]]
   markers=markers.ls[[s]]; names(markers)=markers
   
-  dat.ls=lapply(markers, function (l) alldat[[s]][[dist]][[l]] )
-  dist.ls.normal = lapply(dat.ls, function (dat) dat[dat$normal, "dist"])
-  dist.ls.lesion = lapply(dat.ls, function (dat) dat[dat$lesion, "dist"])
-  
-  
-  counts = sapply(markers, function (l) 
-    c(nrow(subset(dat.ls[[l]], epi & normal)),
-      nrow(subset(dat.ls[[l]], dermis & normal)),
-      nrow(subset(dat.ls[[l]], epi & lesion)),
-      nrow(subset(dat.ls[[l]], dermis & lesion)))
+  counts = sapply(markers, function (a) 
+    c(nrow(subset(alldat[[s]][[a]], epi &    region=="intact")),
+      nrow(subset(alldat[[s]][[a]], dermis & region=="intact")),
+      nrow(subset(alldat[[s]][[a]], epi &    region=="ulcerative")),
+      nrow(subset(alldat[[s]][[a]], dermis & region=="ulcerative")))
   )
   
-  # counts/area
-  tmp = read.csv("data/"%.%s%.%"_region_size.csv")
-  tmp$epi = contain(tmp$name, "epi")
-  tmp$dermis = contain(tmp$name, "dermis")
-  tmp$normal = contain(tmp$name, "normal")
-  tmp$lesion = contain(tmp$name, "lesion")
-  sizes = with(tmp, c(sum(size[epi&normal]), 
+  dat=read.csv(glue("{data.dir}/{s}_Les_stitched_alignedtoCD45_cropped/{s}_Les_region_area_length.csv"))
+  
+  # remove rows that are lengths
+  dat = dat[!contain(dat$name, "length"), ]
+  
+  dat$epi = contain(dat$name, "epi")
+  dat$dermis = contain(dat$name, "dermis")
+  dat$normal = contain(dat$name, "normal")
+  dat$lesion = contain(dat$name, "lesion")
+  
+  sizes = with(dat, c(sum(size[epi&normal]), 
                       sum(size[dermis & normal]), 
                       sum(size[epi & lesion]), 
                       sum(size[dermis & lesion])
@@ -41,6 +40,7 @@ count.tables = lapply (biopsies, function(s) {
   tab=data.frame(tab)
   # add area
   tab=rbind(tab, area=formatDouble(c(sizes/4/1e6, rep(NA,4)), digits = 2, remove.leading0=F))
+  print(tab)
   
   mytex(data.frame(tab), file.name="tables/"%.%s%.%"_counts", digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r"),
         col.headers="\\hline\n 
@@ -60,24 +60,33 @@ count.tables = lapply (biopsies, function(s) {
 # table to compare DD and CF
 
 tab=rbind(
-  round(tissue.widths$lesion), 
-  round(tissue.widths$normal), 
-  round(t(dist.bt.peaks$lesion)),
-  cbind(c(t(count.tables$DD)), c(t(count.tables$CF)))
+  round(sapply(biopsies.1, function(b) tissue.widths[[b]]['ulcerative'])), 
+  round(sapply(biopsies.1, function(b) tissue.widths[[b]]['intact'])), 
+  
+  round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]]["ulcerative","dist2skin"])),
+  round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]]["ulcerative","dist2DEJ"])),
+  
+  cbind(c(t(count.tables$DD)), 
+        c(t(count.tables$CF)),
+        c(t(count.tables$JM)))
 )
+
 rownames(tab)=c(
   "lesion width",
   "normal width",
-  "separation between CD3/CD15 peaks (ref: skin)", 
-  "separation between CD3/CD15 peaks (ref: DEJ)", 
+  "separation between CD3/CD15 peaks (ref: skin)",
+  "separation between CD3/CD15 peaks (ref: DEJ)",
   c(t(outer(markers, c("epi","dermis","e/d"), paste)))
 )
-
-# add ratio col
-tab=cbind(tab, "DD/CF" = formatDouble(as.numeric(tab[,1])/as.numeric(tab[,2]),2,remove.leading0 = F))
 tab
 
-mytex(tab, file="tables/DD_CF_comparison", 
+# add ratio cols
+tab=cbind(tab, 
+          "CF/DD" = formatDouble(as.numeric(tab[,2])/as.numeric(tab[,1]),2,remove.leading0 = F),
+          "JM/DD" = formatDouble(as.numeric(tab[,3])/as.numeric(tab[,1]),2,remove.leading0 = F))
+tab
+
+mytex(tab, file="tables/DD_CF_JM_comparison", 
       add.to.row=list(as.list(seq(4,by=3,length=4)),
                       rep("\\hline\n",4)
       )
