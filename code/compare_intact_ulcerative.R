@@ -10,7 +10,7 @@ for (dist in dist.labels) {
         file=paste0("figures/compare_normal_lesion_"%.%dist))
   
   for (b in biopsies.1) { 
-  for (a in markers) {
+  for (a in markers.1) {
       # dist="dist2skin"; a="CD11c"; b="DD"
       
     dat.ls = lapply(tissue.types, function (t) subset(alldat[[b]][[a]], region==t)[[dist]])

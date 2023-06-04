@@ -16,7 +16,7 @@ biopsies.1=c("DD","CF","JM"); names(biopsies.1)=biopsies.1
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 ylim=c(0,175)
 
-markers=c("CD3","CD15","CD123","CD11c"); names(markers)=markers
+markers.1=c("CD3","CD15","CD123","CD11c"); names(markers.1)=markers.1
 # CD68 did not pass QC for CF
 
 markers.ls = lapply(biopsies, function(s) {

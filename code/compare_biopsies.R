@@ -11,10 +11,10 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   xlim=xlim.ls[[dist]]
   myprint(dist)
   
-  mypng(mfcol=c(2,length(markers)), width=10/4*length(markers), height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
+  mypng(mfcol=c(2,length(markers.1)), width=10/4*length(markers.1), height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
         file=paste0("figures/compare_DD_CF_JM_",dist))
   
-  for (a in markers) {
+  for (a in markers.1) {
     for (tissue.type in tissue.types) { # intact, ulcerative
       # dist="dist2DEJ"; a="CD11c"; tissue.type="intact"
       
@@ -57,7 +57,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   mypng(mfcol=c(1,4), width=10, height=2.6, mar=c(4,4,2,1), oma=c(1,3,0,0),
         file=paste0("figures/compare_biopsies_intact_",dist))
   
-  for (a in markers) {
+  for (a in markers.1) {
     tissue.type = "intact"
     
     # dist="dist2skin"; a="CD15"; tissue.type="intact"
