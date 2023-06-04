@@ -6,7 +6,7 @@
 
 for (dist in dist.labels) {
 
-  mypng(mfrow=c(3,4), width=10, height=7.5, mar=c(4,4,2,1), oma=c(1,3,0,0),
+  mypng(mfrow=c(3,4), width=10, height=7, mar=c(4,4,2,1), oma=c(1,3,0,0),
         file=paste0("figures/compare_normal_lesion_"%.%dist))
   
   for (b in biopsies.1) { 

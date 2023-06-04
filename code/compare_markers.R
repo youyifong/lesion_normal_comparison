@@ -11,7 +11,7 @@ get.peak = function(density_est) {
 
 
 mypng(mfrow=c(length(biopsies),4), file="figures/compare_markers", 
-      width=10, height=5/2*length(biopsies), mar=c(4,4,2,1), oma=c(1,3,0,0))
+      width=10, height=4/2*length(biopsies), mar=c(4,4,2,1), oma=c(1,3,0,0))
       
 dist.bt.peaks = 
 lapply (biopsies, function(s) {
