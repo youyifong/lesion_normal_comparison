@@ -36,7 +36,8 @@ sapply (tissue.types, function(tissue.type) {
                                          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
                                          main=ifelse(s==biopsies[1],tissue.type,""),
                                          col=1:length(markers),
-                                         legend=markers
+                                         legend=markers,
+                                         cex.legend=0.7
     )
     
     # dividing line between epi and dermis
