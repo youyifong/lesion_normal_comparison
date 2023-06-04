@@ -90,7 +90,7 @@ for (tissue.type in tissue.types) {
   tab
   
   mytex(tab, file=glue("tables/{tissue.type}_comparison"), 
-        add.to.row=list(as.list(seq(4,by=3,length=4)),
+        add.to.row=list(as.list(seq(3,by=3,length=4)),
                         rep("\\hline\n",4)
         )
   )  
