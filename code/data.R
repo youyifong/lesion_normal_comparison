@@ -45,12 +45,12 @@ tissue.widths = lapply(biopsies, function(s) {
       intact=dat$size[dat$name=='CF_Les_length_1_normal'] + dat$size[dat$name=='CF_Les_length_3_normal'])
     
   } else if (s=="JM") {
-    c(ulcerative=dat$size[dat$name=='JM_Les_length_2_lesion'] + dat$size[dat$name=='JM_Les_length_4_lesion'], 
+    c(ulcerative=dat$size[dat$name=='JM_Les_length_4_lesion'],# + dat$size[dat$name=='JM_Les_length_2_lesion'] 
       intact=dat$size[dat$name=='JM_Les_length_1_normal'] + dat$size[dat$name=='JM_Les_length_3_normal'])
     
   } else if (s=="AS") {
     c(ulcerative=NA, 
-      intact=1000)
+      intact=dat$size[dat$name=='AS_Les_length_1_normal'])
     
   } else if (s=="CJ") {
     c(ulcerative=NA,
@@ -58,11 +58,11 @@ tissue.widths = lapply(biopsies, function(s) {
     
   } else if (s=="LG") {
     c(ulcerative=NA, 
-      intact=1000)
+      intact=dat$size[dat$name=='LG_Les_length_1_normal'])
     
   } else if (s=="LS") {
     c(ulcerative=NA, 
-      intact=1000)
+      intact=dat$size[dat$name=='LS_Les_length_1_normal'])
   } 
   
   # each pixel is 1/2 micron
@@ -96,8 +96,8 @@ get.dat=function(s, marker) {
   } else if (s=="JM") {
     dat$normal.epi =    dat$in_JM_Les_epi_region_1_normal   =="True" | dat$in_JM_Les_epi_region_3_normal      =="True"
     dat$normal.dermis = dat$in_JM_Les_dermis_region_1_normal=="True" | dat$in_JM_Les_dermis_region_3_normal   =="True"
-    dat$lesion.epi =    dat$in_JM_Les_epi_region_2_lesion   =="True" | dat$in_JM_Les_epi_region_4_lesion      =="True"
-    dat$lesion.dermis = dat$in_JM_Les_dermis_region_2_lesion=="True" | dat$in_JM_Les_dermis_region_4_lesion   =="True"
+    dat$lesion.epi =    dat$in_JM_Les_epi_region_4_lesion      =="True" # | dat$in_JM_Les_epi_region_2_lesion   =="True" 
+    dat$lesion.dermis = dat$in_JM_Les_dermis_region_4_lesion   =="True" # | dat$in_JM_Les_dermis_region_2_lesion=="True"
 
     dat$dist2skin = dat$dist2JM_Les_skin_boundary              
     dat$dist2DEJ  = dat$dist2JM_Les_DEJ_v3                     

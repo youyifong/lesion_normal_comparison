@@ -1,13 +1,11 @@
 source("data.R")
 source("smoothed.scaled.hist.R")
 
-source("compare_DD_CF_JM.R")
-source("compare_tissues.R")
-source("compare_normal_lesion.R")
+source("compare_biopsies.R")
+source("compare_intact_ulcerative.R")
 source("compare_markers.R")
+source("make_tables.R") # depends on output from compare_markers.R
 
-# depends on output from compare_markers.R
-# source("make_tables.R")
 
 
 
