@@ -81,7 +81,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   
   tmp="Intact"
   for (i in 1:length(tmp)) {
-    mtext(tmp[i], side = 2, line = 1.5, outer = T, at = (i*2-1)/(length(tmp)*2), 
+    mtext(tmp[i], side = 2, line = 1.5, outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2), 
           adj = NA, padj = NA, cex = NA, col = NA, font = NA)
   }
   
