@@ -11,7 +11,7 @@
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Sunday, June 04, 2023 12:49:18}
+%TCIDATA{LastRevised=Sunday, September 10, 2023 10:51:21}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -46,6 +46,31 @@
 \author{}
 \maketitle
 
+\section{Introduction}
+
+We compare the ulcerative and intact regions of a piece of tissue as
+follows. First, we run a custom pipeline (https://github.com/youyifong/tsp)
+on an image to produce a catalog of cells in the tissue for each marker of
+interest. The pipeline starts with image registration, which transforms
+different marker images into one coordinate system so that we can compare
+the distribution of different markers from the same piece of tissue. After
+image registration, we perform cell segmenation using a Cellpose model
+fine-tuned with a set of expert-annotated training images of immune cells in
+skin tissues. For each cell thus identified, we compute the distance from
+its center to the skin boundary and the DEJ\ line, whether it is located in
+the dermis or epidermis and whether it is in the ulcerative or intact
+region, and the intensity of staining. Given the cell catalogs, we run
+statistical analyses in R (https://cran.r-project.org/) to compare the
+distributions of immune cells between the ulcerative and intact regions
+tabularly and graphically. Graphically, we represent the distribution of a
+type of immune cells using smoothed scaled histogram
+(https://github.com/youyifong/kyotil), in which the y-axis is the density of
+immune cells, computed as the number of cells per 100x100 um2 tissue, and
+the x-axis is the depth of tissue in100um intervals, either with reference
+to the skin boundary or the DEJ\ line.
+
+\bigskip
+
 \section{Methods}
 
 \bigskip Issues
@@ -59,7 +84,7 @@
 \item DD intact, length correct? CD3 peak seems too high in Fig 1
 \end{itemize}
 
-\item For JM, region 2 is excluded from analysis. 
+\item For JM, region 2 is excluded from analysis.
 
 \item Need to review segmentation. flow .5 seems to results in many more
 cells than flow .4, e.g. for CD11c in DD

@@ -1,5 +1,5 @@
 source("data.R")
-source("smoothed.scaled.hist.R")
+
 
 source("compare_biopsies.R")
 source("compare_intact_ulcerative.R")
