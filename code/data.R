@@ -1,7 +1,7 @@
 library(kyotil)
 library(glue)
 
-data.dir = "/fh/fast/fong_y/images_from_K/ROI_lesion_vs_normal_TSP"
+data.dir = "/fh/fast/fong_y/images_from_K/Chipcytometry_images"
 
 region.labels=c(normal="intact", lesion="ulcerative")
 region.labels.title=c(normal="Intact", lesion="Ulcerative")

@@ -40,6 +40,7 @@ Special handling for segmentation:
 - CF CD279, one cell is wrongly segmented as two masks under the default setting and 
 - JM CD68: a high background makes it necessary to set a higher min_avgintensity
 
+R scripts can be run from Rstudio for the Hutch cluster (need VPN).
 
 ```bash
 # ssh volta, load the applications:
