@@ -44,6 +44,7 @@ def do_biopsy(roi_dir):
 
     # Define grid spacing
     grid_spacing = 5.0
+    depth_spacing = 200.0
 
     # Get bounds of the biopsy
     min_x, min_y, max_x, max_y = biopsy.bounds
@@ -61,7 +62,7 @@ def do_biopsy(roi_dir):
 
 
     """
-    Count the number of grid points by depth in 200 px (equivalently, 100 um) increments. 
+    Count the number of grid points by depth in depth_spacing px increments. 
     """
 
     # compute depth as measured by the shortest distance to the surface
@@ -70,9 +71,9 @@ def do_biopsy(roi_dir):
         depth.append(np.min(pnt2line(P0=surface[0:(n - 1), :], P1=surface[1:n, :], p=point)))
 
 
-    # bin the depth into 200 px increments
+    # bin the depth into depth_spacing px increments
     depth = np.array(depth)
-    depth_bins = np.arange(0, np.ceil(np.max(depth)), 200)
+    depth_bins = np.arange(0, np.ceil(np.max(depth)), depth_spacing)
 
     return np.histogram(depth, bins=depth_bins)
 
