@@ -1,118 +1,97 @@
 """
-working dir: folder containing ROI files
+Compute the size of biopsy, defined as the number of points in a 5x5 px grid, by depth in 200 px (equivalently, 100 um) increments for all biopsies.
+Save the results in Chipcytometry_images/biopsy_size_by_depth.csv.
 """
 
-from shapely.geometry import Polygon, Point
 
-import glob,argparse,os
+
+from shapely.geometry import Polygon, Point
+import glob,os
 from read_roi import read_roi_file
 import pandas as pd
 import numpy as np
-
-import argparse
-parser = argparse.ArgumentParser()
-
-parser.add_argument('--XX', type=str, default='CF_Les', help='tissue label')
-
-args = parser.parse_known_args()[0]
-print(args, '\n')
+from tsp.geom import pnt2line
 
 
-# set tissue label here if not set in command line
-if args.XX is None:
-    args.XX=os.environ.get('XX')
-print(args.XX)
+def do_biopsy(roi_dir):
+    """
+    read whole tissue boundary ROI file and surface ROI file
+    """
+
+    biopsy_roi = [f for f in glob.glob(roi_dir+'*.roi') if "whole" in f]
+    print(biopsy_roi)
+    if len(biopsy_roi)!=1:
+        raise RuntimeError("There should be one and only one whole tissue roi file.")
+
+    val = list(read_roi_file(biopsy_roi[0]).values()) [0]
+    biopsy = Polygon(list(zip(val["x"], val["y"])))
 
 
-# read whole tissue boundary ROI file
-tissue_boundary_roi = [f for f in glob.glob('*.roi') if "whole" in f]
-print(tissue_boundary_roi)
-if len(tissue_boundary_roi)!=1:
-    raise RuntimeError("STOP: there should be one and only whole tissue roi file !!!!!!!!!!!!!!!!!!!!!!!")
-tmp = read_roi_file(tissue_boundary_roi[0])
-val = list(tmp.values()) [0]
-whole_tissue = Polygon(list(zip(val["x"], val["y"])))
+    skin_roi = [f for f in glob.glob(roi_dir+'*.roi') if "skin_boundary" in f]
+    print(skin_roi)
+    if len(skin_roi)!=1:
+        raise RuntimeError("There should be one and only one skin boundary roi file.")
 
-
-###############################################################################
-# make XX_region_area_length file
-
-# compute the area of each region
-region_roi_files = [f for f in glob.glob('*.roi') if "epi_region" in f or "dermis_region" in f]
-region_roi_files.sort()
-print(region_roi_files)
-areas=[]
-for region_roi_file in region_roi_files:
-    region = read_roi_file(region_roi_file)    
-    val = list(region.values()) [0]
-    p1 = Polygon(list(zip(val["x"], val["y"])))
-    if whole_tissue is None:
-        areas.append(p1.area)
-    else:
-        areas.append(p1.intersection(whole_tissue).area)
+    val = list(read_roi_file(skin_roi[0]).values()) [0]
+    surface = np.vstack((val["x"], val["y"])).T
+    n = len(val["x"])
 
 
 
-# compute the length of the lines as measure of lesion or normal tissue size
-length_roi_files = [f for f in glob.glob('*.roi') if "length" in f]
-length_roi_files.sort()
-print(length_roi_files)
-lengths=[]
-for length_roi_file in length_roi_files:
-    tmp = read_roi_file(length_roi_file) 
-    val = list(tmp.values()) [0]
-    
-    if val["type"]=="line":
-        points = np.array(list(zip([val["x1"], val["x2"]], [val["y1"], val["y2"]])))
-    else:
-        points = np.array(list(zip(val["x"], val["y"])))
-    
-    # Calculate the length of each segment
-    segment_lengths = np.linalg.norm(points[:-1] - points[1:], axis=1)
-    
-    # Sum the lengths of all segments to get the length of the polyline
-    polyline_length = np.sum(segment_lengths)
-    lengths.append(polyline_length)
+    """
+    Create a Grid Within the Biopsy
+    """
+
+    # Define grid spacing
+    grid_spacing = 5.0
+
+    # Get bounds of the biopsy
+    min_x, min_y, max_x, max_y = biopsy.bounds
+
+    # Generate grid points
+    x_coords = np.arange(min_x, max_x, grid_spacing)
+    y_coords = np.arange(min_y, max_y, grid_spacing)
+    grid_points = [(x, y) for x in x_coords for y in y_coords]
+
+    # Filter points that are inside the biopsy
+    points_in_polygon = [list(p) for p in grid_points if biopsy.contains(Point(p))]
+
+    # Display results
+    print("Number of points inside biopsy:", len(points_in_polygon))
 
 
-# save the area and length of each region to a file
+    """
+    Count the number of grid points by depth in 200 px (equivalently, 100 um) increments. 
+    """
 
-# remove .roi from names
-region_roi_files=[f.replace(".roi","") for f in region_roi_files]
-length_roi_files=[f.replace(".roi","") for f in length_roi_files]
-
-if args.XX == 'CJ_Les':
-    # add the two line segments length to get tissue length 
-    data = pd.DataFrame({"name": region_roi_files+["CJ_Les_length_1_normal"], 'size': areas+[lengths[0]+lengths[1]]})
-else: 
-    data = pd.DataFrame({"name": region_roi_files+length_roi_files, 'size': areas+lengths})
-print(data)
-
-data.to_csv("../"+args.XX+"_region_area_length.csv", header=True, index=False, sep=',')
+    # compute depth as measured by the shortest distance to the surface
+    depth = []
+    for point in points_in_polygon:
+        depth.append(np.min(pnt2line(P0=surface[0:(n - 1), :], P1=surface[1:n, :], p=point)))
 
 
-###############################################################################
-# Create a Grid Within a Polygon
+    # bin the depth into 200 px increments
+    depth = np.array(depth)
+    depth_bins = np.arange(0, np.ceil(np.max(depth)), 200)
 
-# Define the polygon ROI (example: a triangle)
-polygon_coords = [(0, 0), (10, 0), (5, 10)]
-polygon = Polygon(polygon_coords)
+    return np.histogram(depth, bins=depth_bins)
 
-# Define grid spacing
-grid_spacing = 1.0
 
-# Get bounds of the polygon
-min_x, min_y, max_x, max_y = polygon.bounds
+# list the directories under ../Chipcytometry_images
+chipcytometry_images_dir = '../Chipcytometry_images/'
+directories = [d for d in os.listdir(chipcytometry_images_dir) if os.path.isdir(os.path.join(chipcytometry_images_dir, d))]
 
-# Generate grid points
-x_coords = np.arange(min_x, max_x, grid_spacing)
-y_coords = np.arange(min_y, max_y, grid_spacing)
-grid_points = [(x, y) for x in x_coords for y in y_coords]
+res=[]
+for folder in directories:
+    tmp = chipcytometry_images_dir + folder + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
+    if os.path.exists(tmp):
+        print(folder)
+        dist, depth_hist = do_biopsy(tmp)
 
-# Filter points that are inside the polygon
-points_in_polygon = [Point(p) for p in grid_points if polygon.contains(Point(p))]
+        # add results to the dataframe. convert dist from px to um by dividing by 2
+        for i in range(len(dist)):
+            res.append({'biopsy': folder, 'dist': dist[i]/2, 'depth_hist': depth_hist[i]})
 
-# Display results
-print("Number of points inside polygon:", len(points_in_polygon))
-for point in points_in_polygon:
-    print(point)
+# save the results to a csv file
+df = pd.DataFrame(res)
+df.to_csv(chipcytometry_images_dir+'/tissue_size_by_depth_from_skin_for_all_biopsies.csv', index=False)

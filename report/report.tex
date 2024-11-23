@@ -38,7 +38,7 @@
 \newtheorem{solution}[theorem]{Solution}
 \newtheorem{summary}[theorem]{Summary}
 \newenvironment{proof}[1][Proof]{\noindent\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
-\newcommand{\pwd}{D:/DeepLearning/images_from_K/lesion_normal_comparison/}
+\newcommand{\pwd}{D:/DeepLearning/images_from_K/lesion_normal_comparison/report/}
 \input{tcilatex}
 \begin{document}
 
@@ -156,7 +156,7 @@ curve. \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
 %\TeXButton{tab DD_counts}{\begin{center}
 %\begin{table}[h] \centering
 %
-%\input{\pwd code/tables/input/DD_counts.tex}
+%\input{\pwd tables/input/DD_counts.tex}
 %
 %\caption{DD}
 %\vspace{-5pt} 
@@ -168,7 +168,7 @@ curve. \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
 \begin{center}
 \begin{table}[h] \centering
 
-\input{\pwd code/tables/input/DD_counts.tex}
+\input{\pwd tables/input/DD_counts.tex}
 
 \caption{DD}
 \vspace{-5pt} 
@@ -182,7 +182,7 @@ curve. \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
 %\TeXButton{tab CF_counts.tex}{\begin{center}
 %\begin{table}[h] \centering
 %
-%\input{\pwd code/tables/input/CF_counts.tex}
+%\input{\pwd tables/input/CF_counts.tex}
 %
 %\caption{CF}
 %\vspace{-5pt} 
@@ -194,7 +194,7 @@ curve. \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
 \begin{center}
 \begin{table}[h] \centering
 
-\input{\pwd code/tables/input/CF_counts.tex}
+\input{\pwd tables/input/CF_counts.tex}
 
 \caption{CF}
 \vspace{-5pt} 
@@ -208,7 +208,7 @@ curve. \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
 %\TeXButton{tab ulcerative}{\begin{center}
 %\begin{table}[h] \centering
 %
-%\input{\pwd code/tables/input/ulcerative_comparison.tex}
+%\input{\pwd tables/input/ulcerative_comparison.tex}
 %
 %\caption{Ulcerative.
 %The cell counts are per mm2. The widths and seperation are measured in um.}
@@ -221,7 +221,7 @@ curve. \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
 \begin{center}
 \begin{table}[h] \centering
 
-\input{\pwd code/tables/input/ulcerative_comparison.tex}
+\input{\pwd tables/input/ulcerative_comparison.tex}
 
 \caption{Ulcerative.
 The cell counts are per mm2. The widths and seperation are measured in um.}
@@ -236,7 +236,7 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 %\TeXButton{tab intact}{\begin{center}
 %\begin{table}[h] \centering
 %
-%\input{\pwd code/tables/input/intact_comparison.tex}
+%\input{\pwd tables/input/intact_comparison.tex}
 %
 %\caption{Intact.
 %The cell counts are per mm2. The widths and seperation are measured in um.}
@@ -249,7 +249,7 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 \begin{center}
 \begin{table}[h] \centering
 
-\input{\pwd code/tables/input/intact_comparison.tex}
+\input{\pwd tables/input/intact_comparison.tex}
 
 \caption{Intact.
 The cell counts are per mm2. The widths and seperation are measured in um.}
@@ -269,9 +269,9 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 %\TeXButton{fig:compare_DD_CF_JM}{\begin{center}
 %\begin{figure}[H] \centering
 %
-%\includegraphics[width=\textwidth]{\pwd code/figures/compare_DD_CF_JM_dist2skin.png}\\
+%\includegraphics[width=\textwidth]{\pwd figures/compare_DD_CF_JM_dist2skin.png}\\
 %\vspace{30pt}
-%\includegraphics[width=\textwidth]{\pwd code/figures/compare_DD_CF_JM_dist2DEJ.png}
+%\includegraphics[width=\textwidth]{\pwd figures/compare_DD_CF_JM_dist2DEJ.png}
 %
 %\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
 %The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
@@ -287,9 +287,9 @@ The cell counts are per mm2. The widths and seperation are measured in um.}
 \begin{center}
 \begin{figure}[H] \centering
 
-\includegraphics[width=\textwidth]{\pwd code/figures/compare_DD_CF_JM_dist2skin.png}\\
+\includegraphics[width=\textwidth]{\pwd figures/compare_DD_CF_JM_dist2skin.png}\\
 \vspace{30pt}
-\includegraphics[width=\textwidth]{\pwd code/figures/compare_DD_CF_JM_dist2DEJ.png}
+\includegraphics[width=\textwidth]{\pwd figures/compare_DD_CF_JM_dist2DEJ.png}
 
 \caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
@@ -307,7 +307,7 @@ For example, CD123 epi count 1038/2862*100=36.
 %\TeXButton{fig:compare_biopsies_intact}{\begin{center}
 %
 %\begin{figure}[H] \centering
-%\includegraphics[width=\textwidth]{\pwd code/figures/compare_biopsies_intact_dist2skin.png}
+%\includegraphics[width=\textwidth]{\pwd figures/compare_biopsies_intact_dist2skin.png}
 %\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
 %The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 %Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
@@ -317,7 +317,7 @@ For example, CD123 epi count 1038/2862*100=36.
 %\vspace{30pt}
 %
 %\begin{figure}[H] \centering
-%\includegraphics[width=\textwidth]{\pwd code/figures/compare_biopsies_intact_dist2DEJ.png}
+%\includegraphics[width=\textwidth]{\pwd figures/compare_biopsies_intact_dist2DEJ.png}
 %\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
 %The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 %Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
@@ -329,7 +329,7 @@ For example, CD123 epi count 1038/2862*100=36.
 \begin{center}
 
 \begin{figure}[H] \centering
-\includegraphics[width=\textwidth]{\pwd code/figures/compare_biopsies_intact_dist2skin.png}
+\includegraphics[width=\textwidth]{\pwd figures/compare_biopsies_intact_dist2skin.png}
 \caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
@@ -339,7 +339,7 @@ Adding up the counts from all the bins gives the number of cells in tissue of 10
 \vspace{30pt}
 
 \begin{figure}[H] \centering
-\includegraphics[width=\textwidth]{\pwd code/figures/compare_biopsies_intact_dist2DEJ.png}
+\includegraphics[width=\textwidth]{\pwd figures/compare_biopsies_intact_dist2DEJ.png}
 \caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
@@ -351,9 +351,9 @@ Adding up the counts from all the bins gives the number of cells in tissue of 10
 
 %TCIMACRO{%
 %\TeXButton{fig compare_normal_lesion}{\begin{figure}[H] \centering
-%\includegraphics[width=.95\textwidth]{\pwd code/figures/compare_normal_lesion_dist2skin.png}\\
+%\includegraphics[width=.95\textwidth]{\pwd figures/compare_normal_lesion_dist2skin.png}\\
 %\vspace{0pt}
-%\includegraphics[width=.95\textwidth]{\pwd code/figures/compare_normal_lesion_dist2DEJ.png}
+%\includegraphics[width=.95\textwidth]{\pwd figures/compare_normal_lesion_dist2DEJ.png}
 %\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
 %The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 %Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
@@ -361,9 +361,9 @@ Adding up the counts from all the bins gives the number of cells in tissue of 10
 %\end{figure}}}%
 %BeginExpansion
 \begin{figure}[H] \centering
-\includegraphics[width=.95\textwidth]{\pwd code/figures/compare_normal_lesion_dist2skin.png}\\
+\includegraphics[width=.95\textwidth]{\pwd figures/compare_normal_lesion_dist2skin.png}\\
 \vspace{0pt}
-\includegraphics[width=.95\textwidth]{\pwd code/figures/compare_normal_lesion_dist2DEJ.png}
+\includegraphics[width=.95\textwidth]{\pwd figures/compare_normal_lesion_dist2DEJ.png}
 \caption{Number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
@@ -383,7 +383,7 @@ in CF than in DD. We don't see this pattern for CD3.
 %TCIMACRO{%
 %\TeXButton{fig compare_markers.png}{\begin{center}
 %\begin{figure}[H] \centering
-%\includegraphics[height=\textheight]{\pwd code/figures/compare_markers.png}
+%\includegraphics[height=\textheight]{\pwd figures/compare_markers.png}
 %
 %\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
 %The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
@@ -397,7 +397,7 @@ in CF than in DD. We don't see this pattern for CD3.
 %BeginExpansion
 \begin{center}
 \begin{figure}[H] \centering
-\includegraphics[height=\textheight]{\pwd code/figures/compare_markers.png}
+\includegraphics[height=\textheight]{\pwd figures/compare_markers.png}
 
 \caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 

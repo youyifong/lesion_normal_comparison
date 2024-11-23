@@ -1,31 +1,26 @@
-"""
-working dir: folder containing ROI files
-"""
+from shapely.geometry import Polygon
 
-from shapely.geometry import Polygon, Point
-
-import glob,argparse,os
+import glob,os
 from read_roi import read_roi_file
 import pandas as pd
 import numpy as np
 
+
+# set tissue label
 import argparse
 parser = argparse.ArgumentParser()
-
 parser.add_argument('--XX', type=str, default='CF_Les', help='tissue label')
-
 args = parser.parse_known_args()[0]
 print(args, '\n')
-
-
-# set tissue label here if not set in command line
 if args.XX is None:
     args.XX=os.environ.get('XX')
 print(args.XX)
 
 
+roi_dir = '../Chipcytometry_images/' + args.XX + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
+
 # read whole tissue boundary ROI file
-tissue_boundary_roi = [f for f in glob.glob('*.roi') if "whole" in f]
+tissue_boundary_roi = [f for f in glob.glob(roi_dir+'*.roi') if "whole" in f]
 print(tissue_boundary_roi)
 if len(tissue_boundary_roi)!=1:
     raise RuntimeError("STOP: there should be one and only whole tissue roi file !!!!!!!!!!!!!!!!!!!!!!!")
@@ -88,31 +83,6 @@ else:
     data = pd.DataFrame({"name": region_roi_files+length_roi_files, 'size': areas+lengths})
 print(data)
 
+os.makedirs('output/csv', exist_ok=True)
 data.to_csv("../"+args.XX+"_region_area_length.csv", header=True, index=False, sep=',')
 
-
-###############################################################################
-# Create a Grid Within a Polygon
-
-# Define the polygon ROI (example: a triangle)
-polygon_coords = [(0, 0), (10, 0), (5, 10)]
-polygon = Polygon(polygon_coords)
-
-# Define grid spacing
-grid_spacing = 1.0
-
-# Get bounds of the polygon
-min_x, min_y, max_x, max_y = polygon.bounds
-
-# Generate grid points
-x_coords = np.arange(min_x, max_x, grid_spacing)
-y_coords = np.arange(min_y, max_y, grid_spacing)
-grid_points = [(x, y) for x in x_coords for y in y_coords]
-
-# Filter points that are inside the polygon
-points_in_polygon = [Point(p) for p in grid_points if polygon.contains(Point(p))]
-
-# Display results
-print("Number of points inside polygon:", len(points_in_polygon))
-for point in points_in_polygon:
-    print(point)
