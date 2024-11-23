@@ -1,12 +1,10 @@
-
 .DS_Store
-R/data/
-R/.Rhistory
+code/data/
+code/.Rhistory
 *.aaa
 *.aux
 *.log
 *.swp
 *.bak
-code/.Rhistory
 report.out
 report - Copy.pdf
