@@ -83,8 +83,8 @@ get.dat=function(s, marker) {
     dat$lesion.epi =    dat$in_DD_Les_epi_region_2_lesion_alternate=="True" 
     dat$lesion.dermis = dat$in_DD_Les_dermis_region_2_lesion_alternate=="True" 
     
-    dat$dist2skin = dat$dist2DD_Les_skin_boundary/2
-    dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI.WGA_alternate/2
+    dat$dist2skin = dat$dist2DD_Les_skin_boundary
+    dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI.WGA_alternate
     
   } else if (s=="CF") {
     dat$normal.epi =    dat$in_CF_Les_epi_region_1_normal=="True" | dat$in_CF_Les_epi_region_3_normal=="True" 
@@ -92,8 +92,8 @@ get.dat=function(s, marker) {
     dat$lesion.epi =    dat$in_CF_Les_epi_region_2_lesion=="True" 
     dat$lesion.dermis = dat$in_CF_Les_dermis_region_2_lesion=="True" 
 
-    dat$dist2skin = dat$dist2CF_Les_skin_boundary/2
-    dat$dist2DEJ  = dat$dist2CF_Les_DEJ_v2/2
+    dat$dist2skin = dat$dist2CF_Les_skin_boundary
+    dat$dist2DEJ  = dat$dist2CF_Les_DEJ_v2
     
   } else if (s=="JM") {
     dat$normal.epi =    dat$in_JM_Les_epi_region_1_normal   =="True" | dat$in_JM_Les_epi_region_3_normal      =="True"
