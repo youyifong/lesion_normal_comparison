@@ -208,29 +208,53 @@ for folder in directories:
 
         count, depth = out[0]
         for i in range(len(count)):
-            res.append({'biopsy': folder, 'region': "biopsy", 'count': count[i], 'depth_skin': depth[i] / 2})
+            res.append({'biopsy': folder,
+                        'region': "biopsy",
+                        'dist': 'dist2skin',
+                        'count': count[i],
+                        'depth': depth[i] / 2})
 
         count, depth = out[1]
         for i in range(len(count)):
-            res.append({'biopsy': folder, 'region': "normal", 'count': count[i], 'depth_skin': depth[i] / 2})
+            res.append({'biopsy': folder,
+                        'region': "normal",
+                        'dist': 'dist2skin',
+                        'count': count[i],
+                        'depth_skin': depth[i] / 2})
 
         count, depth = out[2]
         for i in range(len(count)):
-            res.append({'biopsy': folder, 'region': "lesion", 'count': count[i], 'depth_skin': depth[i] / 2})
+            res.append({'biopsy': folder,
+                        'region': "lesion",
+                        'dist': 'dist2skin',
+                        'count': count[i],
+                        'depth_skin': depth[i] / 2})
 
         count, depth = out[3]
         for i in range(len(count)):
-            res.append({'biopsy': folder, 'region': "biopsy", 'count': count[i], 'depth_epi': depth[i] / 2})
+            res.append({'biopsy': folder,
+                        'region': "biopsy",
+                        'dist': 'dist2DEJ',
+                        'count': count[i],
+                        'depth_epi': depth[i] / 2})
 
         count, depth = out[4]
         for i in range(len(count)):
-            res.append({'biopsy': folder, 'region': "normal", 'count': count[i], 'depth_epi': depth[i] / 2})
+            res.append({'biopsy': folder,
+                        'region': "normal",
+                        'dist': 'dist2DEJ',
+                        'count': count[i],
+                        'depth_epi': depth[i] / 2})
 
         count, depth = out[5]
         for i in range(len(count)):
-            res.append({'biopsy': folder, 'region': "lesion", 'count': count[i], 'depth_epi': depth[i] / 2})
+            res.append({'biopsy': folder,
+                        'region': "lesion",
+                        'dist': 'dist2DEJ',
+                        'count': count[i],
+                        'depth_epi': depth[i] / 2})
 
 
 # save the results to a csv file
 df = pd.DataFrame(res)
-df.to_csv(chipcytometry_images_dir+'/tissue_size_by_depth.csv', index=False)
+df.to_csv(chipcytometry_images_dir+'/tissue_size_by_depth_and_region.csv', index=False)

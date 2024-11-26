@@ -15,7 +15,7 @@ for (dist in dist.labels) {
       
     dat.ls = lapply(tissue.types, function (t) subset(alldat[[b]][[a]], region==t)[[dist]])
     
-    scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_from_skin, biopsy==b))
+    scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b))
 
     smoothed.scaled.hist(dat.ls, scale.factors=scale.factors,
                          bin_width=100,

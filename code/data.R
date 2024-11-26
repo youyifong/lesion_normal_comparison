@@ -34,7 +34,7 @@ blue=rgb(red=0, blue=1, green=0, alpha=1)
 }
 
 
-tissue_size_by_depth_from_skin=read.csv(paste0(data.dir, "/tissue_size_by_depth_from_skin_for_all_biopsies.csv"))
+tissue_size_by_depth_and_region=read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region.csv"))
 
 
 

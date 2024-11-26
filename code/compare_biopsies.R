@@ -20,7 +20,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
       
       dat.ls = lapply(biopsies.1, function (b) subset(alldat[[b]][[a]], region==tissue.type)[[dist]])
       
-      scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_from_skin, biopsy==b))
+      scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b))
 
       out = scaled.hist(dat.ls, scale.factors,
                            bin_width=100, patch_size=5,
@@ -65,7 +65,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
     
     dat.ls = lapply(biopsies, function (b) subset(alldat[[b]][[a]], region=="intact")[[dist]])
     
-    scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_from_skin, biopsy==b))
+    scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_and_region, biopsy==b))
 
     scaled.hist(dat.ls, scale.factors,
                  bin_width=100,

@@ -26,16 +26,12 @@ A biopsy is divided into contiguous regions. A region is either lesion (ulcerati
 - region length. Type: line or polyline. File name example: AS_Les_**length**_1_normal.roi. Note that **region** is not part of the file name, which allows us to pick up all region roi (both epi and dermis) files by matching with 'region'.
 
 
-## Report
-
-[Report](report/report.pdf).
-
 
 ## Methods 
 
-Generate tissue_size_by_depth_from_skin_for_all_biopsies.csv
+Generate tissue size data.
 ```{bash}
-python code/get_biopsy_size_by_depth.py
+python code/get_biopsy_size_by_depth_and_region.py
 ```
 
 
@@ -197,4 +193,8 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 ```
 
 
+
+## Report
+
+[Report](report/report.pdf).
 
