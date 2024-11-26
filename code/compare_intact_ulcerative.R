@@ -15,9 +15,10 @@ for (dist in dist.labels) {
       
     dat.ls = lapply(tissue.types, function (t) subset(alldat[[b]][[a]], region==t)[[dist]])
     
-    scale.factors=sapply(tissue.types, function(t) unname(100/tissue.widths[[b]][t]))
+    scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_from_skin, biopsy==b))
 
-    smoothed.scaled.hist(dat.ls, bin_width=100, scale.factors=scale.factors,
+    smoothed.scaled.hist(dat.ls, scale.factors=scale.factors,
+                         bin_width=100,
                          xlim=xlim.ls[[dist]], ylim=ylim,
                          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
                          main=ifelse(b==biopsies.1[1],a,""),

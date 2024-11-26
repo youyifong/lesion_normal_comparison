@@ -33,6 +33,11 @@ A biopsy is divided into contiguous regions. A region is either lesion (ulcerati
 
 ## Methods 
 
+Generate tissue_size_by_depth_from_skin_for_all_biopsies.csv
+```{bash}
+python code/get_biopsy_size_by_depth.py
+```
+
 
 The default command for cell segmentation is:
 >python -m tsp runcellpose --f "*_Les_CD*.png" --l [3,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
@@ -68,7 +73,7 @@ do_segmentation=1
 
 
 export XX=AS_Les
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/${XX}/ZKWstitched_alignedtoCD45_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/${XX}/ZKWstitched_alignedtoCD45_cropped
 
 cd ROI_regions
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
@@ -84,7 +89,7 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 
 
 export XX=CF_Les
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/${XX}/ZKWstitched_alignedtoCD45_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/${XX}/ZKWstitched_alignedtoCD45_cropped
 cd ROI_regions
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
@@ -99,7 +104,7 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 
 
 export XX=JM_Les
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/${XX}/ZKWstitched_alignedtoCD45_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/${XX}/ZKWstitched_alignedtoCD45_cropped
 cd ROI_regions
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
@@ -113,7 +118,7 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 
 
 export XX=CJ_Les
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/${XX}/ZKWstitched_alignedtoCD45_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/${XX}/ZKWstitched_alignedtoCD45_cropped
 cd ROI_regions
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
@@ -126,7 +131,7 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 
 
 export XX=AS_Les
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/${XX}/ZKWstitched_alignedtoCD45_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/${XX}/ZKWstitched_alignedtoCD45_cropped
 cd ROI_regions
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
@@ -139,7 +144,7 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 
 
 export XX=LG_Les
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/${XX}/ZKWstitched_alignedtoCD45_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/${XX}/ZKWstitched_alignedtoCD45_cropped
 cd ROI_regions
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
@@ -152,7 +157,7 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 
 
 export XX=LS_Les
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/${XX}/ZKWstitched_alignedtoCD45_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/${XX}/ZKWstitched_alignedtoCD45_cropped
 cd ROI_regions
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
@@ -165,7 +170,7 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 
 
 export XX=CF_1Heal
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/CF_post_heal/${XX}_alignedtoCD45_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/CF_post_heal/${XX}_alignedtoCD45_cropped
 cd ROI_regions
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
@@ -178,7 +183,7 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 
 
 export XX=CF_2w
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images/CF_post_heal/${XX}_alignedtoCD279_cropped
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit/CF_post_heal/${XX}_alignedtoCD279_cropped
 cd ${XX}_ROI
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py

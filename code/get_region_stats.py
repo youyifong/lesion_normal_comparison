@@ -17,7 +17,7 @@ if args.XX is None:
 print(args.XX)
 
 
-roi_dir = '../Chipcytometry_images/' + args.XX + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
+roi_dir = '../Chipcytometry_images_from8bit/' + args.XX + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
 
 # read whole tissue boundary ROI file
 tissue_boundary_roi = [f for f in glob.glob(roi_dir+'*.roi') if "whole" in f]
@@ -77,7 +77,8 @@ region_roi_files=[f.replace(".roi","") for f in region_roi_files]
 length_roi_files=[f.replace(".roi","") for f in length_roi_files]
 
 if args.XX == 'CJ_Les':
-    # add the two line segments length to get tissue length 
+    # CJ is a special case. It only has normal tissue and the shape of the biopsy is irregular and
+    # two line segments are needed to get tissue length
     data = pd.DataFrame({"name": region_roi_files+["CJ_Les_length_1_normal"], 'size': areas+[lengths[0]+lengths[1]]})
 else: 
     data = pd.DataFrame({"name": region_roi_files+length_roi_files, 'size': areas+lengths})

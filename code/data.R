@@ -1,7 +1,7 @@
 library(kyotil)
 library(glue)
 
-data.dir = "/fh/fast/fong_y/images_from_K/Chipcytometry_images"
+data.dir = "/fh/fast/fong_y/images_from_K/Chipcytometry_images_from8bit"
 
 {
 region.labels=c(normal="intact", lesion="ulcerative")
@@ -34,39 +34,45 @@ blue=rgb(red=0, blue=1, green=0, alpha=1)
 }
 
 
+tissue_size_by_depth_from_skin=read.csv(paste0(data.dir, "/tissue_size_by_depth_from_skin_for_all_biopsies.csv"))
+
+
+
+# tissue.widths is not used for normalzing cell density because we are now using depth-level biopsy size data.
+# it is used to give a rough indication of the size of the tissue in the biopsy
 tissue.widths = lapply(biopsies, function(s) {
 # s="DD"
   dat=read.csv(glue("{data.dir}/{s}_Les/ZKWstitched_alignedtoCD45_cropped/{s}_Les_region_area_length.csv"))
-  
+
   out = if (s=="DD") {
-    c(ulcerative=dat$size[dat$name=='DD_Les_length_2_lesion'], 
+    c(ulcerative=dat$size[dat$name=='DD_Les_length_2_lesion'],
       intact=dat$size[dat$name=='DD_Les_length_1_normal'])
-    
+
   } else if (s=="CF") {
-    c(ulcerative=dat$size[dat$name=='CF_Les_length_2_lesion'], 
+    c(ulcerative=dat$size[dat$name=='CF_Les_length_2_lesion'],
       intact=dat$size[dat$name=='CF_Les_length_1_normal'] + dat$size[dat$name=='CF_Les_length_3_normal'])
-    
+
   } else if (s=="JM") {
-    c(ulcerative=dat$size[dat$name=='JM_Les_length_4_lesion'],# + dat$size[dat$name=='JM_Les_length_2_lesion'] 
+    c(ulcerative=dat$size[dat$name=='JM_Les_length_4_lesion'],# + dat$size[dat$name=='JM_Les_length_2_lesion']
       intact=dat$size[dat$name=='JM_Les_length_1_normal'] + dat$size[dat$name=='JM_Les_length_3_normal'])
-    
+
   } else if (s=="AS") {
-    c(ulcerative=NA, 
+    c(ulcerative=NA,
       intact=dat$size[dat$name=='AS_Les_length_1_normal'])
-    
+
   } else if (s=="CJ") {
     c(ulcerative=NA,
       intact=dat$size[dat$name=='CJ_Les_length_1_normal'])
-    
+
   } else if (s=="LG") {
-    c(ulcerative=NA, 
+    c(ulcerative=NA,
       intact=dat$size[dat$name=='LG_Les_length_1_normal'])
-    
+
   } else if (s=="LS") {
-    c(ulcerative=NA, 
+    c(ulcerative=NA,
       intact=dat$size[dat$name=='LS_Les_length_1_normal'])
-  } 
-  
+  }
+
   # each pixel is 1/2 micron
   out/2
 })

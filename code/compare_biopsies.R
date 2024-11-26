@@ -20,16 +20,17 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
       
       dat.ls = lapply(biopsies.1, function (b) subset(alldat[[b]][[a]], region==tissue.type)[[dist]])
       
-      scale.factors=sapply(biopsies.1, function(b) unname(100/tissue.widths[[b]][[tissue.type]]))
-      
-      smoothed.scaled.hist(dat.ls, bin_width=100, scale.factors=scale.factors,
+      scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_from_skin, biopsy==b))
+
+      out = scaled.hist(dat.ls, scale.factors,
+                           bin_width=100, patch_size=5,
                            xlim=xlim.ls[[dist]], ylim=ylim,
-                           xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
-                           main=ifelse(tissue.type==tissue.types[1],a,""),
-                           col=1:length(biopsies.1),
-                           legend=biopsies.1
+                           xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
+                           col=seq_along(biopsies.1),
+                           legend=biopsies.1,
+                           main=ifelse(tissue.type==tissue.types[1],a,"")
       )
-      
+
       # dividing line between epi and dermis
       if (dist == "dist2DEJ") abline(v=0, lty=2)
       
@@ -64,14 +65,15 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
     
     dat.ls = lapply(biopsies, function (b) subset(alldat[[b]][[a]], region=="intact")[[dist]])
     
-    scale.factors=sapply(biopsies, function(b) unname(100/tissue.widths[[b]][tissue.type]))
+    scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_from_skin, biopsy==b))
 
-    smoothed.scaled.hist(dat.ls, bin_width=100, scale.factors=scale.factors,
-                         xlim=xlim.ls[[dist]], ylim=ylim,
-                         xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
-                         main=a,
-                         col=1:length(biopsies),
-                         legend=biopsies
+    scaled.hist(dat.ls, scale.factors,
+                 bin_width=100,
+                 xlim=xlim.ls[[dist]], ylim=ylim,
+                 xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
+                 main=a,
+                 col=seq_along(biopsies),
+                 legend=biopsies
     )
     
     # to divide between epi and dermis

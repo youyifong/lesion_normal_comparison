@@ -29,13 +29,14 @@ sapply (tissue.types, function(tissue.type) {
     
     dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
     
-    scale.factors=sapply(markers, function(a) unname(100/tissue.widths[[s]][tissue.type]))
-    
-    all.densities = smoothed.scaled.hist(dat.ls, bin_width=100, scale.factors=scale.factors,
+    scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_from_skin, biopsy==b))
+
+    all.densities = smoothed.scaled.hist(dat.ls, scale.factors=scale.factors,
+                                         bin_width=100,
                                          xlim=xlim.ls[[dist]], ylim=ylim,
                                          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2", 
                                          main=ifelse(s==biopsies[1],tissue.type,""),
-                                         col=1:length(markers),
+                                         col=seq_along(markers),
                                          legend=markers,
                                          cex.legend=0.7
     )
