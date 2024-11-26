@@ -210,7 +210,7 @@ for folder in directories:
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "biopsy",
-                        'dist': 'dist2skin',
+                        'dist_type': 'dist2skin',
                         'count': count[i],
                         'depth': depth[i] / 2})
 
@@ -218,7 +218,7 @@ for folder in directories:
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "normal",
-                        'dist': 'dist2skin',
+                        'dist_type': 'dist2skin',
                         'count': count[i],
                         'depth_skin': depth[i] / 2})
 
@@ -226,7 +226,7 @@ for folder in directories:
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "lesion",
-                        'dist': 'dist2skin',
+                        'dist_type': 'dist2skin',
                         'count': count[i],
                         'depth_skin': depth[i] / 2})
 
@@ -234,7 +234,7 @@ for folder in directories:
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "biopsy",
-                        'dist': 'dist2DEJ',
+                        'dist_type': 'dist2DEJ',
                         'count': count[i],
                         'depth_epi': depth[i] / 2})
 
@@ -242,7 +242,7 @@ for folder in directories:
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "normal",
-                        'dist': 'dist2DEJ',
+                        'dist_type': 'dist2DEJ',
                         'count': count[i],
                         'depth_epi': depth[i] / 2})
 
@@ -250,7 +250,7 @@ for folder in directories:
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "lesion",
-                        'dist': 'dist2DEJ',
+                        'dist_type': 'dist2DEJ',
                         'count': count[i],
                         'depth_epi': depth[i] / 2})
 
