@@ -5,10 +5,8 @@
 
 dir.exists("report/figures") || dir.create("report/figures", recursive = TRUE)
 
-get.peak = function(density_est) {
-  max_density_index <- which.max(density_est$y)
-  peak_location <- density_est$x[max_density_index]
-  return (peak_location)
+get.peak = function(x_start, freq) {
+  x_start[which.max(freq)] + (x_start[2]-x_start[1])/2
 }
 
 
@@ -19,7 +17,7 @@ dist.bt.peaks =
 lapply (biopsies, function(s) {
 sapply (dist.labels, simplify="array", function(dist) {
 sapply (tissue.types, function(tissue.type) { 
-  # tissue.type="ulcerative"; dist="dist2skin"; s="AS"; 
+  # tissue.type="ulcerative"; dist="dist2skin"; s="DD_Les"; 
   myprint(tissue.type, dist, s)
 
   if (!s %in% biopsies.1 & tissue.type=="ulcerative") {
@@ -31,7 +29,7 @@ sapply (tissue.types, function(tissue.type) {
     
     dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
     
-    all.densities = scaled.hist(dat.ls,
+    all.freq = scaled.hist(dat.ls,
          scale.factors=lapply(markers, function(a) subset(tissue_size_by_depth_and_region, biopsy==s & dist_type==dist & region==tissue.type)),
          xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
@@ -45,7 +43,7 @@ sapply (tissue.types, function(tissue.type) {
     if (dist == "dist2DEJ") abline(v=0, lty=2)
     
     # return distance between CD3 and CD15 peaks
-    get.peak(all.densities$CD3) - get.peak(all.densities$CD15)
+    get.peak(all.freq[,"depth_start"], all.freq[,"CD3"]) - get.peak(all.freq[,"depth_start"], all.freq[,"CD15"])
   }
 }) 
 })

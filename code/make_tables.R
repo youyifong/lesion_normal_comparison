@@ -17,7 +17,7 @@ count.tables = lapply (biopsies, function(s) {
       nrow(subset(alldat[[s]][[a]], dermis & region=="ulcerative")))
   )
   
-  dat=read.csv(glue("{data.dir}/{s}_stitched_alignedtoCD45_cropped/{s}_region_area_length.csv"))
+  dat=read.csv(glue("{data.dir}/{s}/ZKWstitched_alignedtoCD45_cropped/{s}_region_area_length.csv"))
   
   # remove rows that are lengths
   dat = dat[!contain(dat$name, "length"), ]
@@ -44,7 +44,7 @@ count.tables = lapply (biopsies, function(s) {
   tab=rbind(tab, area=formatDouble(c(sizes/4/1e6, rep(NA,4)), digits = 2, remove.leading0=F))
   print(tab)
   
-  mytex(data.frame(tab), file.name="tables/"%.%s%.%"_counts", digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r"),
+  mytex(data.frame(tab), file.name="report/tables/"%.%s%.%"_counts", digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r"),
         col.headers="\\hline\n 
          \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Counts} & \\multicolumn{4}{c}{Counts/mm2} \\\\ 
          \\multicolumn{1}{c}{} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c|}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c}{lesion}  \\\\ 
