@@ -12,8 +12,12 @@ import pandas as pd
 import numpy as np
 from tsp.geom import pnt2line
 
+grid_spacing = 5.0 # size of patches in px
+depth_spacing = 200.0 # px
+
 
 def do_biopsy(roi_dir):
+
     """
     read whole tissue boundary ROI file and skin ROI file
     """
@@ -77,10 +81,6 @@ def do_biopsy(roi_dir):
     """
     Create a grid of points and classify each point as normal or lesion based on the region it is in.
     """
-
-    # Define grid spacing
-    grid_spacing = 5.0
-    depth_spacing = 200.0
 
     # Get bounds of the biopsy
     min_x, min_y, max_x, max_y = biopsy.bounds
@@ -198,20 +198,23 @@ chipcytometry_images_dir = '../Chipcytometry_images_from8bit/'
 directories = [d for d in os.listdir(chipcytometry_images_dir) if os.path.isdir(os.path.join(chipcytometry_images_dir, d))]
 
 res=[]
+
 for folder in directories:
     roi_dir = chipcytometry_images_dir + folder + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
     if os.path.exists(roi_dir):
         print(folder)
+
         out = do_biopsy(roi_dir)
 
-        # add results to the dataframe, convert depth from px to um by dividing by 2
+        # convert count from number of 5x5 px patches to number of 100x100 um by dividing by 40**2 because each px is 1/2 um
+        # convert depth from px to um by dividing by 2
 
         count, depth = out[0]
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "biopsy",
                         'dist_type': 'dist2skin',
-                        'count': count[i],
+                        'count': count[i] / (depth_spacing / grid_spacing)**2,
                         'depth': depth[i] / 2})
 
         count, depth = out[1]
@@ -219,42 +222,41 @@ for folder in directories:
             res.append({'biopsy': folder,
                         'region': "normal",
                         'dist_type': 'dist2skin',
-                        'count': count[i],
-                        'depth_skin': depth[i] / 2})
+                        'area': count[i] / (depth_spacing / grid_spacing)**2,
+                        'depth': depth[i] / 2})
 
         count, depth = out[2]
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "lesion",
                         'dist_type': 'dist2skin',
-                        'count': count[i],
-                        'depth_skin': depth[i] / 2})
+                        'area': count[i] / (depth_spacing / grid_spacing)**2,
+                        'depth': depth[i] / 2})
 
         count, depth = out[3]
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "biopsy",
                         'dist_type': 'dist2DEJ',
-                        'count': count[i],
-                        'depth_epi': depth[i] / 2})
+                        'area': count[i] / (depth_spacing / grid_spacing)**2,
+                        'depth': depth[i] / 2})
 
         count, depth = out[4]
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "normal",
                         'dist_type': 'dist2DEJ',
-                        'count': count[i],
-                        'depth_epi': depth[i] / 2})
+                        'area': count[i] / (depth_spacing / grid_spacing)**2,
+                        'depth': depth[i] / 2})
 
         count, depth = out[5]
         for i in range(len(count)):
             res.append({'biopsy': folder,
                         'region': "lesion",
                         'dist_type': 'dist2DEJ',
-                        'count': count[i],
-                        'depth_epi': depth[i] / 2})
+                        'area': count[i] / (depth_spacing / grid_spacing)**2,
+                        'depth': depth[i] / 2})
 
 
-# save the results to a csv file
 df = pd.DataFrame(res)
 df.to_csv(chipcytometry_images_dir+'/tissue_size_by_depth_and_region.csv', index=False)
