@@ -19,7 +19,7 @@ for (dist in dist.labels) {
     
     scaled.hist(dat.ls,
          scale.factors=lapply(tissue.types, function(t) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==t)$area),
-         xlim=xlim.ls[[dist]], ylim=ylim,
+         xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          main=ifelse(b==biopsies.1[1],a,""),
          col=c("red","blue"),

@@ -24,11 +24,11 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
       # dist="dist2skin"; a="CD3"; tissue.type="intact"
       
       dat.ls = lapply(biopsies.1, function (b) subset(alldat[[b]][[a]], region==tissue.type)[[dist]])
-      scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type)$area)
+      scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type))
       
       out = scaled.hist(dat.ls,
          scale.factors,   
-         xlim=xlim.ls[[dist]], ylim=ylim,
+         xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          col=seq_along(biopsies.1),
          legend=biopsies.1,
@@ -72,7 +72,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
     
     scaled.hist(dat.ls,
          scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type)$area),
-         xlim=xlim.ls[[dist]], ylim=ylim,
+         xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          main=a,
          col=seq_along(biopsies),
