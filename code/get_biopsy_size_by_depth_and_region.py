@@ -220,7 +220,7 @@ for folder in directories:
         count, depth = out[1]
         for i in range(len(count)):
             res.append({'biopsy': folder,
-                        'region': "normal",
+                        'region': "intact",
                         'dist_type': 'dist2skin',
                         'area': count[i] / (depth_spacing / grid_spacing)**2,
                         'depth': depth[i] / 2})
@@ -228,7 +228,7 @@ for folder in directories:
         count, depth = out[2]
         for i in range(len(count)):
             res.append({'biopsy': folder,
-                        'region': "lesion",
+                        'region': "ulcerative",
                         'dist_type': 'dist2skin',
                         'area': count[i] / (depth_spacing / grid_spacing)**2,
                         'depth': depth[i] / 2})
@@ -244,7 +244,7 @@ for folder in directories:
         count, depth = out[4]
         for i in range(len(count)):
             res.append({'biopsy': folder,
-                        'region': "normal",
+                        'region': "intact",
                         'dist_type': 'dist2DEJ',
                         'area': count[i] / (depth_spacing / grid_spacing)**2,
                         'depth': depth[i] / 2})
@@ -252,7 +252,7 @@ for folder in directories:
         count, depth = out[5]
         for i in range(len(count)):
             res.append({'biopsy': folder,
-                        'region': "lesion",
+                        'region': "ulcerative",
                         'dist_type': 'dist2DEJ',
                         'area': count[i] / (depth_spacing / grid_spacing)**2,
                         'depth': depth[i] / 2})

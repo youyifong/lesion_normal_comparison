@@ -20,15 +20,14 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
       
       dat.ls = lapply(biopsies.1, function (b) subset(alldat[[b]][[a]], region==tissue.type)[[dist]])
 
-      scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist))
-
-      out = scaled.hist(dat.ls, scale.factors,
-                           bin_width=100, patch_size=5,
-                           xlim=xlim.ls[[dist]], ylim=ylim,
-                           xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
-                           col=seq_along(biopsies.1),
-                           legend=biopsies.1,
-                           main=ifelse(tissue.type==tissue.types[1],a,"")
+      out = scaled.hist(dat.ls,
+         scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==)),
+         bin_width=100,
+         xlim=xlim.ls[[dist]], ylim=ylim,
+         xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
+         col=seq_along(biopsies.1),
+         legend=biopsies.1,
+         main=ifelse(tissue.type==tissue.types[1],a,"")
       )
 
       # dividing line between epi and dermis
