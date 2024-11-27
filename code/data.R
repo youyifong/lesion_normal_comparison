@@ -15,7 +15,7 @@ biopsies=c("DD_Les","CF_Les","JM_Les","AS_Les","CJ_Les","LG_Les","LS_Les"); name
 biopsies.1=c("DD_Les","CF_Les","JM_Les"); names(biopsies.1)=biopsies.1
 
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
-ylim=c(0,175)
+ylim=c(0,100)
 
 markers.1=c("CD3","CD15","CD123","CD11c"); names(markers.1)=markers.1
 # CD68 did not pass QC for CF

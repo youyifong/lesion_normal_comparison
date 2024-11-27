@@ -7,6 +7,9 @@
 
 library(kyotil)
 
+dir.exists("report/figures") || dir.create("report/figures", recursive = TRUE)
+
+
 # CF, DD and JM only
 
 for (dist in dist.labels) { # dist2skin, dist2DEJ
@@ -14,21 +17,23 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   myprint(dist)
   
   mypng(mfcol=c(2,length(markers.1)), width=10/4*length(markers.1), height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
-        file=paste0("figures/compare_DD_CF_JM_",dist))
+        file=paste0("report/figures/compare_DD_CF_JM_",dist))
   
   for (a in markers.1) {
     for (tissue.type in tissue.types) { # intact, ulcerative
-      # dist="dist2DEJ"; a="CD11c"; tissue.type="intact"
+      # dist="dist2skin"; a="CD3"; tissue.type="intact"
       
       dat.ls = lapply(biopsies.1, function (b) subset(alldat[[b]][[a]], region==tissue.type)[[dist]])
-
+      scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type)$area)
+      
       out = scaled.hist(dat.ls,
-         scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type)),
+         scale.factors,   
          xlim=xlim.ls[[dist]], ylim=ylim,
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          col=seq_along(biopsies.1),
          legend=biopsies.1,
-         main=ifelse(tissue.type==tissue.types[1],a,"")
+         main=ifelse(tissue.type==tissue.types[1],a,""),
+         cex.axis=0.8
       )
 
       # dividing line between epi and dermis
@@ -56,7 +61,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   myprint(dist)
 
   mypng(mfcol=c(1,4), width=10, height=2.6, mar=c(4,4,2,1), oma=c(1,3,0,0),
-        file=paste0("figures/compare_biopsies_intact_",dist))
+        file=paste0("report/figures/compare_biopsies_intact_",dist))
   
   for (a in markers.1) {
     tissue.type = "intact"
@@ -66,7 +71,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
     dat.ls = lapply(biopsies, function (b) subset(alldat[[b]][[a]], region=="intact")[[dist]])
     
     scaled.hist(dat.ls,
-         scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type)),
+         scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type)$area),
          xlim=xlim.ls[[dist]], ylim=ylim,
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          main=a,

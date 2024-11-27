@@ -4,10 +4,12 @@
 # 4 markers in lesion 
 # 4 markers in intact
 
+dir.exists("report/figures") || dir.create("report/figures", recursive = TRUE)
+
 for (dist in dist.labels) {
 
   mypng(mfrow=c(3,4), width=10, height=7, mar=c(4,4,2,1), oma=c(1,3,0,0),
-        file=paste0("figures/compare_normal_lesion_"%.%dist))
+        file=paste0("report/figures/compare_normal_lesion_"%.%dist))
   
   for (b in biopsies.1) { 
   for (a in markers.1) {
@@ -16,7 +18,7 @@ for (dist in dist.labels) {
     dat.ls = lapply(tissue.types, function (t) subset(alldat[[b]][[a]], region==t)[[dist]])
     
     scaled.hist(dat.ls,
-         scale.factors=lapply(tissue.types, function(t) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==t)),
+         scale.factors=lapply(tissue.types, function(t) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==t)$area),
          xlim=xlim.ls[[dist]], ylim=ylim,
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          main=ifelse(b==biopsies.1[1],a,""),

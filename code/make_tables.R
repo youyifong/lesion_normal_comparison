@@ -1,6 +1,8 @@
 ################################################################################
 ## tabulate cell counts in epi/dermis x normal/lesion
 
+dir.exists("report/tables") || dir.create("report/tables", recursive = TRUE)
+
 count.tables = lapply (biopsies, function(s) {
   # s="DD"
   
@@ -15,7 +17,7 @@ count.tables = lapply (biopsies, function(s) {
       nrow(subset(alldat[[s]][[a]], dermis & region=="ulcerative")))
   )
   
-  dat=read.csv(glue("{data.dir}/{s}_Les_stitched_alignedtoCD45_cropped/{s}_Les_region_area_length.csv"))
+  dat=read.csv(glue("{data.dir}/{s}_stitched_alignedtoCD45_cropped/{s}_region_area_length.csv"))
   
   # remove rows that are lengths
   dat = dat[!contain(dat$name, "length"), ]

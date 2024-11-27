@@ -3,6 +3,8 @@
 # 4 plots for each of dist2skin and dist2DEJ:
 # ulcerative/intact x DD/CF
 
+dir.exists("report/figures") || dir.create("report/figures", recursive = TRUE)
+
 get.peak = function(density_est) {
   max_density_index <- which.max(density_est$y)
   peak_location <- density_est$x[max_density_index]
@@ -10,7 +12,7 @@ get.peak = function(density_est) {
 }
 
 
-mypng(mfrow=c(length(biopsies),4), file="figures/compare_markers", 
+mypng(mfrow=c(length(biopsies),4), file="report/figures/compare_markers", 
       width=10, height=4/2*length(biopsies), mar=c(4,4,2,1), oma=c(1,3,0,0))
       
 dist.bt.peaks = 
@@ -30,7 +32,7 @@ sapply (tissue.types, function(tissue.type) {
     dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
     
     all.densities = scaled.hist(dat.ls,
-         scale.factors=lapply(markers, function(a) subset(tissue_size_by_depth_and_region, biopsy==s & dist_type==dist & region==tissue.type)),
+         scale.factors=lapply(markers, function(a) subset(tissue_size_by_depth_and_region, biopsy==s & dist_type==dist & region==tissue.type)$area),
          xlim=xlim.ls[[dist]], ylim=ylim,
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          main=ifelse(s==biopsies[1],tissue.type,""),
