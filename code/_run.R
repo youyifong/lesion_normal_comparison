@@ -1,10 +1,10 @@
-source("data.R")
+source("code/data.R")
 
 
-source("compare_biopsies.R")
-source("compare_intact_ulcerative.R")
-source("compare_markers.R")
-source("make_tables.R") # depends on output from compare_markers.R
+source("code/compare_biopsies.R")
+source("code/compare_intact_ulcerative.R")
+source("code/compare_markers.R")
+source("code/make_tables.R") # depends on output from compare_markers.R
 
 
 

@@ -5,6 +5,8 @@
 # separately for ulcerative and intact
 
 
+library(kyotil)
+
 # CF, DD and JM only
 
 for (dist in dist.labels) { # dist2skin, dist2DEJ
@@ -21,8 +23,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
       dat.ls = lapply(biopsies.1, function (b) subset(alldat[[b]][[a]], region==tissue.type)[[dist]])
 
       out = scaled.hist(dat.ls,
-         scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==)),
-         bin_width=100,
+         scale.factors=lapply(biopsies.1, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type)),
          xlim=xlim.ls[[dist]], ylim=ylim,
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          col=seq_along(biopsies.1),
@@ -64,15 +65,13 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
     
     dat.ls = lapply(biopsies, function (b) subset(alldat[[b]][[a]], region=="intact")[[dist]])
     
-    scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_and_region, biopsy==b))
-
-    scaled.hist(dat.ls, scale.factors,
-                 bin_width=100,
-                 xlim=xlim.ls[[dist]], ylim=ylim,
-                 xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
-                 main=a,
-                 col=seq_along(biopsies),
-                 legend=biopsies
+    scaled.hist(dat.ls,
+         scale.factors=lapply(biopsies, function(b) subset(tissue_size_by_depth_and_region, biopsy==b & dist_type==dist & region==tissue.type)),
+         xlim=xlim.ls[[dist]], ylim=ylim,
+         xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
+         main=a,
+         col=seq_along(biopsies),
+         legend=biopsies
     )
     
     # to divide between epi and dermis

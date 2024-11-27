@@ -214,7 +214,7 @@ for folder in directories:
             res.append({'biopsy': folder,
                         'region': "biopsy",
                         'dist_type': 'dist2skin',
-                        'count': count[i] / (depth_spacing / grid_spacing)**2,
+                        'area': count[i] / (depth_spacing / grid_spacing)**2,
                         'depth': depth[i] / 2})
 
         count, depth = out[1]
