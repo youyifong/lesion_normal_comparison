@@ -6,6 +6,7 @@ code/.Rhistory
 *.log
 *.swp
 *.bak
+Rplots.pdf
 report.out
 report - Copy.pdf
 report/figures/*

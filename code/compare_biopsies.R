@@ -21,7 +21,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   
   for (a in markers.1) {
     for (tissue.type in tissue.types) { # intact, ulcerative
-      # dist="dist2skin"; a="CD3"; tissue.type="intact"
+      # dist="dist2DEJ"; a="CD3"; tissue.type="ulcerative"
       
       dat.ls = lapply(biopsies.1, function (b) subset(alldat[[b]][[a]], region==tissue.type)[[dist]])
       
