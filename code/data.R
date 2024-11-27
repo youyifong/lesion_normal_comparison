@@ -81,7 +81,7 @@ tissue.widths = lapply(biopsies, function(s) {
 # load mask-level data
 get.dat=function(s, marker) {
 # s="JM"; dist="dist2skin"; marker="CD3"
-  dat=read.csv(glue("{data.dir}/{s}_Les/ZKWstitched_alignedtoCD45_cropped/{s}_Les_{marker}_masks_d2b_regmem.csv"))
+  dat=read.csv(glue("{data.dir}/{s}/ZKWstitched_alignedtoCD45_cropped/{s}_Les_{marker}_masks_d2b_regmem.csv"))
   
   if (s=="DD") {
     dat$normal.epi =    dat$in_DD_Les_epi_region_1_normal=="True" 
