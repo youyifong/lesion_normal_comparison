@@ -8,3 +8,5 @@ code/.Rhistory
 *.bak
 report.out
 report - Copy.pdf
+report/figures/*
+report/tables/*
