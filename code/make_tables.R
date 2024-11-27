@@ -91,7 +91,7 @@ for (tissue.type in tissue.types) {
             "JM/DD" = formatDouble(as.numeric(tab[,3])/as.numeric(tab[,1]),2,remove.leading0 = F))
   tab
   
-  mytex(tab, file=glue("tables/{tissue.type}_comparison"), 
+  mytex(tab, file=glue("report/tables/{tissue.type}_comparison"), 
         add.to.row=list(as.list(seq(3,by=3,length=4)),
                         rep("\\hline\n",4)
         )
