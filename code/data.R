@@ -11,8 +11,8 @@ dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 
 tissue.types=c("ulcerative","intact"); names(tissue.types)=tissue.types
 
-biopsies=c("DD","CF","JM","AS","CJ","LG","LS"); names(biopsies)=biopsies
-biopsies.1=c("DD","CF","JM"); names(biopsies.1)=biopsies.1
+biopsies=c("DD_Les","CF_Les","JM_Les","AS_Les","CJ_Les","LG_Les","LS_Les"); names(biopsies)=biopsies
+biopsies.1=c("DD_Les","CF_Les","JM_Les"); names(biopsies.1)=biopsies.1
 
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 ylim=c(0,175)
@@ -22,8 +22,8 @@ markers.1=c("CD3","CD15","CD123","CD11c"); names(markers.1)=markers.1
 
 markers.ls = lapply(biopsies, function(s) {
   files <- list.files(path = data.dir)
-  tmp = list.files(data.dir%.%"/"%.%files[startsWith(files, s%.%"_Les_")], pattern=".*_Les_CD.*.masks.png")
-  out = sapply(tmp, function(n) sub("_masks.png", "", sub(s%.%"_Les_","",n)))
+  tmp = list.files(data.dir%.%"/"%.%files[startsWith(files, s)]%.%"/ZKWstitched_alignedtoCD45_cropped", pattern=".*_CD.*.masks.png")
+  out = sapply(tmp, function(n) sub("_masks.png", "", sub(s%.%"_","",n)))
   names(out)=out
   out
 })
@@ -42,33 +42,33 @@ tissue_size_by_depth_and_region=read.csv(paste0(data.dir, "/tissue_size_by_depth
 # it is used to give a rough indication of the size of the tissue in the biopsy
 tissue.widths = lapply(biopsies, function(s) {
 # s="DD"
-  dat=read.csv(glue("{data.dir}/{s}_Les/ZKWstitched_alignedtoCD45_cropped/{s}_Les_region_area_length.csv"))
+  dat=read.csv(glue("{data.dir}/{s}/ZKWstitched_alignedtoCD45_cropped/{s}_region_area_length.csv"))
 
-  out = if (s=="DD") {
+  out = if (s=="DD_Les") {
     c(ulcerative=dat$size[dat$name=='DD_Les_length_2_lesion'],
       intact=dat$size[dat$name=='DD_Les_length_1_normal'])
 
-  } else if (s=="CF") {
+  } else if (s=="CF_Les") {
     c(ulcerative=dat$size[dat$name=='CF_Les_length_2_lesion'],
       intact=dat$size[dat$name=='CF_Les_length_1_normal'] + dat$size[dat$name=='CF_Les_length_3_normal'])
 
-  } else if (s=="JM") {
+  } else if (s=="JM_Les") {
     c(ulcerative=dat$size[dat$name=='JM_Les_length_4_lesion'],# + dat$size[dat$name=='JM_Les_length_2_lesion']
       intact=dat$size[dat$name=='JM_Les_length_1_normal'] + dat$size[dat$name=='JM_Les_length_3_normal'])
 
-  } else if (s=="AS") {
+  } else if (s=="AS_Les") {
     c(ulcerative=NA,
       intact=dat$size[dat$name=='AS_Les_length_1_normal'])
 
-  } else if (s=="CJ") {
+  } else if (s=="CJ_Les") {
     c(ulcerative=NA,
       intact=dat$size[dat$name=='CJ_Les_length_1_normal'])
 
-  } else if (s=="LG") {
+  } else if (s=="LG_Les") {
     c(ulcerative=NA,
       intact=dat$size[dat$name=='LG_Les_length_1_normal'])
 
-  } else if (s=="LS") {
+  } else if (s=="LS_Les") {
     c(ulcerative=NA,
       intact=dat$size[dat$name=='LS_Les_length_1_normal'])
   }
