@@ -83,7 +83,7 @@ get.dat=function(s, marker) {
 # s="JM"; dist="dist2skin"; marker="CD3"
   dat=read.csv(glue("{data.dir}/{s}/ZKWstitched_alignedtoCD45_cropped/{s}_{marker}_masks_d2b_regmem.csv"))
   
-  if (s=="DD") {
+  if (s=="DD_Les") {
     dat$normal.epi =    dat$in_DD_Les_epi_region_1_normal=="True" 
     dat$normal.dermis = dat$in_DD_Les_dermis_region_1_normal=="True" 
     dat$lesion.epi =    dat$in_DD_Les_epi_region_2_lesion_alternate=="True" 
@@ -92,7 +92,7 @@ get.dat=function(s, marker) {
     dat$dist2skin = dat$dist2DD_Les_skin_boundary
     dat$dist2DEJ  = dat$dist2DD_Les_DEJviaDAPI.WGA_alternate
     
-  } else if (s=="CF") {
+  } else if (s=="CF_Les") {
     dat$normal.epi =    dat$in_CF_Les_epi_region_1_normal=="True" | dat$in_CF_Les_epi_region_3_normal=="True" 
     dat$normal.dermis = dat$in_CF_Les_dermis_region_1_normal=="True" | dat$in_CF_Les_dermis_region_3_normal=="True" 
     dat$lesion.epi =    dat$in_CF_Les_epi_region_2_lesion=="True" 
@@ -101,7 +101,7 @@ get.dat=function(s, marker) {
     dat$dist2skin = dat$dist2CF_Les_skin_boundary
     dat$dist2DEJ  = dat$dist2CF_Les_DEJ_v2
     
-  } else if (s=="JM") {
+  } else if (s=="JM_Les") {
     dat$normal.epi =    dat$in_JM_Les_epi_region_1_normal   =="True" | dat$in_JM_Les_epi_region_3_normal      =="True"
     dat$normal.dermis = dat$in_JM_Les_dermis_region_1_normal=="True" | dat$in_JM_Les_dermis_region_3_normal   =="True"
     dat$lesion.epi =    dat$in_JM_Les_epi_region_4_lesion      =="True" # | dat$in_JM_Les_epi_region_2_lesion   =="True" 
@@ -110,7 +110,7 @@ get.dat=function(s, marker) {
     dat$dist2skin = dat$dist2JM_Les_skin_boundary              
     dat$dist2DEJ  = dat$dist2JM_Les_DEJ_v3                     
     
-  } else if (s=="AS") {
+  } else if (s=="AS_Les") {
     dat$normal.epi =    dat$in_AS_Les_epi_region_1_normal   =="True" 
     dat$normal.dermis = dat$in_AS_Les_dermis_region_1_normal=="True" 
     dat$lesion.epi =    FALSE
@@ -119,7 +119,7 @@ get.dat=function(s, marker) {
     dat$dist2skin = dat$dist2AS_Les_skin_boundary_v2    
     dat$dist2DEJ  = dat$dist2AS_Les_DEJ_v2              
     
-  } else if (s=="CJ") {
+  } else if (s=="CJ_Les") {
     dat$normal.epi =    dat$in_CJ_Les_epi_region_1_normal_v3   =="True" 
     dat$normal.dermis = dat$in_CJ_Les_dermis_region_1_normal_v3=="True"
     dat$lesion.epi =    FALSE
@@ -128,7 +128,7 @@ get.dat=function(s, marker) {
     dat$dist2skin = dat$dist2CJ_Les_skin_boundary_v3       
     dat$dist2DEJ  = dat$dist2CJ_Les_DEJ_v3                 
     
-  } else if (s=="LG") {
+  } else if (s=="LG_Les") {
     dat$normal.epi =    dat$in_LG_Les_epi_region_1_normal   =="True" 
     dat$normal.dermis = dat$in_LG_Les_dermis_region_1_normal=="True" & dat$in_LG_Les_dermis_region_1_void  !="True" 
     dat$lesion.epi =    FALSE
@@ -137,7 +137,7 @@ get.dat=function(s, marker) {
     dat$dist2skin = dat$dist2LG_Les_skin_boundary       
     dat$dist2DEJ  = dat$dist2LG_Les_DEJ                 
     
-  } else if (s=="LS") {
+  } else if (s=="LS_Les") {
     dat$normal.epi =    dat$in_LS_Les_epi_region_1_normal   =="True" 
     dat$normal.dermis = dat$in_LS_Les_dermis_region_1_normal=="True" 
     dat$lesion.epi =    FALSE
