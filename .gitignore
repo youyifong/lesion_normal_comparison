@@ -1,13 +1,8 @@
 .DS_Store
-code/data/
 code/.Rhistory
+report/report.out
 *.aaa
 *.aux
 *.log
 *.swp
 *.bak
-Rplots.pdf
-report.out
-report - Copy.pdf
-report/figures/*
-report/tables/*
