@@ -96,7 +96,7 @@ if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f 'CF_Les_CD279.png' --l [3,0] --model cytotrain7 --cellprob -5
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/CF_Les_skin_boundary.roi,ROI_regions/CF_Les_DEJ_v2.roi] 
-python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
+python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
 
 
 export XX=JM_Les
@@ -110,7 +110,7 @@ if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f 'JM_Les_CD68.png' --l [0,0] --model cytotrain7 --normalize100 --min_size 100 --min_avgintensity 30 --flow 0.5
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/JM_Les_skin_boundary.roi,ROI_regions/JM_Les_DEJ_v3.roi] 
-python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
+python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
 
 
 export XX=CJ_Les
@@ -123,7 +123,7 @@ if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/AS_Les_skin_boundary_v2.roi,ROI_regions/AS_Les_DEJ_v2.roi] 
-python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
+python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
 
 
 export XX=AS_Les
@@ -136,7 +136,7 @@ if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/CJ_Les_skin_boundary_v3.roi,ROI_regions/CJ_Les_DEJ_v3.roi] 
-python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
+python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
 
 
 export XX=LG_Les
@@ -149,7 +149,7 @@ if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/LG_Les_skin_boundary.roi,ROI_regions/LG_Les_DEJ.roi] 
-python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
+python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
 
 
 export XX=LS_Les
@@ -162,7 +162,7 @@ if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/LS_Les_skin_boundary.roi,ROI_regions/LS_Les_DEJ_v2.roi] 
-python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
+python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
 
 
 export XX=CF_1Heal
@@ -175,7 +175,7 @@ if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/LS_Les_skin_boundary.roi,ROI_regions/LS_Les_DEJ_v2.roi] 
-python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
+python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
 
 
 export XX=CF_2w
@@ -188,7 +188,7 @@ if [ $do_segmentation -eq 1 ]; then
     python -m tsp runcellpose --f "*_Les_CD*.png" --l [0,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/LS_Les_skin_boundary.roi,ROI_regions/LS_Les_DEJ_v2.roi] 
-python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
+python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
 
 ```
 

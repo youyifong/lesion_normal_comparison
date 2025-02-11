@@ -11,7 +11,7 @@
 %TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
 %TCIDATA{BibliographyScheme=Manual}
 %TCIDATA{Created=Tuesday, April 11, 2023 10:06:45}
-%TCIDATA{LastRevised=Wednesday, November 27, 2024 00:10:21}
+%TCIDATA{LastRevised=Friday, January 24, 2025 17:25:22}
 %TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
 %TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
 %TCIDATA{CSTFile=40 LaTeX article.cst}
@@ -67,7 +67,7 @@ type of immune cells using smoothed scaled histogram
 (https://github.com/youyifong/kyotil), in which the y-axis is the density of
 immune cells, computed as the number of cells per 100x100 um2 tissue, and
 the x-axis is the depth of tissue in100um intervals, either with reference
-to the skin boundary or the DEJ\ line. 
+to the skin boundary or the DEJ\ line.
 
 \bigskip
 
@@ -109,10 +109,13 @@ the debris field in the lesion area.
 
 \bigskip
 
-The size of the skin tissue lesion area is determined by morphology using
-wheat germ agglutinin (WGA) flourescent stain. ImageJ is used to demarcate
-the lesion area, then a straight line ROI is drawn to span from one side of
-the lesion to the other side of the lesion, with the endpoints of the line
+To compute cell density, we use the size of biopsy at each depth.
+
+We also use a rough, single number meaurement of the size of the skin tissue
+lesion area in some tables, which is determined by morphology using wheat
+germ agglutinin (WGA) flourescent stain. ImageJ is used to demarcate the
+lesion area, then a straight line ROI is drawn to span from one side of the
+lesion to the other side of the lesion, with the endpoints of the line
 positioned at the outermost skin boundary. \ \ \ \ 
 
 \bigskip
@@ -143,7 +146,7 @@ These two questions are also intertwined. If we use WGA only to draw
 boundaries, we can only use straight line boundaries because the difference
 between normal and lesion is only visible in epidermis in WGA staining. A
 straight line can be drawn in epidermis and extend to dermis, but not a
-curve. \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+curve. \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
 
 %TCIMACRO{\TeXButton{clearpage}{\clearpage}}%
 %BeginExpansion
