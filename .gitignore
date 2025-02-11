@@ -7,12 +7,5 @@ report/report.out
 *.swp
 *.bak
 .Rhistory
-<<<<<<< HEAD
 report/tables/*.tex
 report/figures/*.png
-=======
-report/tables/*
-report/figures/*
-report/figures
-report/figures/compare_markers.png
->>>>>>> 2499a979594e9038bf9006d19ce8b93f34582182
