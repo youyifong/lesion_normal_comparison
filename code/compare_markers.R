@@ -28,7 +28,7 @@ sapply (tissue.types, function(tissue.type) {
     # use all markers
     # markers=markers.ls[[s]]; names(markers)=markers
     # use a subset of mostly shared markers
-    markers = c("CD15", "CD11c", "CD123", "CD3", "CD4", "CD8a", if(s!="CF_Les") "CD68"); names(markers)=markers
+    markers = c("CD3", "CD15", "CD11c", "CD123", "CD4", "CD8a", if(s!="CF_Les") "CD68"); names(markers)=markers
     
     dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
     
