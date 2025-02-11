@@ -17,7 +17,7 @@ dist.bt.peaks =
 lapply (biopsies, function(s) {
 sapply (dist.labels, simplify="array", function(dist) {
 sapply (tissue.types, function(tissue.type) { 
-  # tissue.type="ulcerative"; dist="dist2skin"; s="DD_Les"; 
+  # tissue.type="ulcerative"; dist="dist2skin"; s="CF_Les"; 
   myprint(tissue.type, dist, s)
 
   if (!s %in% biopsies.1 & tissue.type=="ulcerative") {
@@ -25,7 +25,10 @@ sapply (tissue.types, function(tissue.type) {
     NA
     
   } else {
-    markers=markers.ls[[s]]; names(markers)=markers
+    # use all markers
+    # markers=markers.ls[[s]]; names(markers)=markers
+    # use a subset of mostly shared markers
+    markers = c("CD15", "CD11c", "CD123", "CD3", "CD4", "CD8a", if(s!="CF_Les") "CD68"); names(markers)=markers
     
     dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
     
