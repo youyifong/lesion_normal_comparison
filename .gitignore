@@ -7,5 +7,5 @@ report/report.out
 *.swp
 *.bak
 .Rhistory
-report/tables/*
-report/figures/*
+report/tables/*.tex
+report/figures/*.png
