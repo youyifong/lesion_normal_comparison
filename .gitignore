@@ -9,3 +9,5 @@ report/report.out
 .Rhistory
 report/tables/*
 report/figures/*
+report/figures
+report/figures/compare_markers.png
