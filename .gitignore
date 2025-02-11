@@ -6,3 +6,4 @@ report/report.out
 *.log
 *.swp
 *.bak
+.Rhistory

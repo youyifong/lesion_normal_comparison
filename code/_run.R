@@ -1,3 +1,5 @@
+# run from Rstudio on the Hutch server
+
 source("code/data.R")
 
 source("code/compare_biopsies.R")
