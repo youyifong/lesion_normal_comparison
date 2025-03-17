@@ -31,7 +31,7 @@ A biopsy is divided into contiguous regions. A region is either lesion (ulcerati
 
 Generate tissue size data.
 ```{bash}
-python code/get_biopsy_size_by_depth_and_region.py
+python code/get_biopsy_size_by_depth_and_region_32bit.py
 ```
 
 

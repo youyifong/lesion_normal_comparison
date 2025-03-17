@@ -6,7 +6,7 @@ The Chipcytometry_images_from8bit folder should be on the same level as the clon
 
 - tissue_size_by_depth_from_skin_for_all_biopsies.csv. This file is created by 
 ```{bash}
-python code/get_biopsy_size_by_depth.py
+python code/get_biopsy_size_by_depth_and_region_8bit.py
 ```
 
 - Each folder under Chipcytometry_images_from8bit contains ZellKraftWerk tiff images of biopsy samples at one of the five timepoints of HSV infection and healing: Lesion, Healed, 2 weeks post heal (wph), 4wph, 8wph, and 8wph control. In addition, 8wph control is a contralateral biopsy of 8wph, so it is biopsied at the same time as 8wph.

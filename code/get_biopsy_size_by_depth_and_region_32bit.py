@@ -3,8 +3,6 @@ Compute the size of biopsy, defined as the number of points in a 5x5 px grid, by
 Save the results in Chipcytometry_images_from32bit/biopsy_size_by_depth_and_region.csv.
 """
 
-
-
 from shapely.geometry import Polygon, Point
 import glob,os
 from read_roi import read_roi_file
@@ -12,11 +10,9 @@ import pandas as pd
 import numpy as np
 from tsp.geom import pnt2line
 
-
-# set tissue label
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--grid', type=, default=5.0, help='size of patches in px')
+parser.add_argument('--grid', type=float, default=5.0, help='size of patches in px')
 args = parser.parse_known_args()[0]
 grid_spacing = args.grid
 
@@ -195,7 +191,6 @@ def do_biopsy(roi_dir):
     DEJ_hist2 = np.histogram(np.array(depth2), bins=depth_bins)
     DEJ_hist0 = np.histogram(depths, bins=depth_bins)
         
-
     return [skin_hist0, skin_hist1, skin_hist2, DEJ_hist0, DEJ_hist1, DEJ_hist2]
 
 
@@ -214,9 +209,13 @@ res=[]
 for folder in directories:
     roi_dir = chipcytometry_images_dir + folder + '/TSP_stitched/ROI_regions/'
     if os.path.exists(roi_dir):
-        print(folder)
+        print(roi_dir)
 
-        out = do_biopsy(roi_dir)
+        try:
+            out = do_biopsy(roi_dir)
+        except Exception as e:
+            print(f"Error processing {folder}: {e}")
+            continue
 
         # convert count from number of 5x5 px patches to number of 100x100 um by dividing by 40**2 because each px is 1/2 um
         # convert depth from px to um by dividing by 2
