@@ -12,7 +12,14 @@ import pandas as pd
 import numpy as np
 from tsp.geom import pnt2line
 
-grid_spacing = 5.0 # size of patches in px
+
+# set tissue label
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--grid', type=, default=5.0, help='size of patches in px')
+args = parser.parse_known_args()[0]
+grid_spacing = args.grid
+
 depth_spacing = 200.0 # px
 
 
@@ -33,7 +40,7 @@ def do_biopsy(roi_dir):
     DEJ_roi = glob.glob(roi_dir+'*DEJ*.roi')
     print(DEJ_roi)
     if len(DEJ_roi)!=1:
-        raise RuntimeError("There should be one and only one skin boundary roi file.")
+        raise RuntimeError("There should be one and only one DEJ boundary roi file.")
     val = list(read_roi_file(DEJ_roi[0]).values()) [0]
     DEJ = np.vstack((val["x"], val["y"])).T
     n_DEJ = len(val["x"])
@@ -194,12 +201,18 @@ def do_biopsy(roi_dir):
 
 
 chipcytometry_images_dir = '../Chipcytometry_images_from32bit/'
-directories = [d for d in os.listdir(chipcytometry_images_dir) if os.path.isdir(os.path.join(chipcytometry_images_dir, d))]
+children_dirs = [d for d in os.listdir(chipcytometry_images_dir) if os.path.isdir(os.path.join(chipcytometry_images_dir, d))]
+directories = []
+for child in children_dirs:
+    child_path = os.path.join(chipcytometry_images_dir, child)
+    directories.extend(
+        [os.path.join(child, g) for g in os.listdir(child_path) if os.path.isdir(os.path.join(child_path, g))]
+    )
 
 res=[]
 
 for folder in directories:
-    roi_dir = chipcytometry_images_dir + folder + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
+    roi_dir = chipcytometry_images_dir + folder + '/TSP_stitched/ROI_regions/'
     if os.path.exists(roi_dir):
         print(folder)
 
