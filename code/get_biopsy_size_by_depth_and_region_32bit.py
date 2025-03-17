@@ -49,15 +49,15 @@ def do_biopsy(roi_dir):
     biopsy = Polygon(list(zip(val["x"], val["y"])))
 
     normal_dermis_regions_roi = glob.glob(roi_dir+'*_dermis_region_*normal*.roi')
-    print("normal_dermis_regions_rois")
     print(normal_dermis_regions_roi)
+    if len(normal_dermis_regions_roi)==0:
+        raise RuntimeError("There are no normal dermis regions.")
     normal_dermis_regions = []
     for x in normal_dermis_regions_roi:
         val = list(read_roi_file(x).values()) [0]
         normal_dermis_regions.append (Polygon(list(zip(val["x"], val["y"]))))
 
     normal_epi_regions_roi = glob.glob(roi_dir+'*_epi_region_*normal*.roi')
-    print("normal_epi_regions_rois")
     print(normal_epi_regions_roi)
     normal_epi_regions = []
     for x in normal_epi_regions_roi:
@@ -65,7 +65,6 @@ def do_biopsy(roi_dir):
         normal_epi_regions.append (Polygon(list(zip(val["x"], val["y"]))))
 
     lesion_dermis_regions_roi = glob.glob(roi_dir+'*_dermis_region_*lesion*.roi')
-    print("lesion_dermis_regions_rois")
     print(lesion_dermis_regions_roi)
     lesion_dermis_regions = []
     for x in lesion_dermis_regions_roi:
@@ -73,7 +72,6 @@ def do_biopsy(roi_dir):
         lesion_dermis_regions.append (Polygon(list(zip(val["x"], val["y"]))))
 
     lesion_epi_regions_roi = glob.glob(roi_dir+'*_epi_region_*lesion*.roi')
-    print("lesion_epi_regions_rois")
     print(lesion_epi_regions_roi)
     lesion_epi_regions = []
     for x in lesion_epi_regions_roi:
