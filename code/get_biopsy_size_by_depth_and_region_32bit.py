@@ -213,7 +213,7 @@ for folder in directories:
 
         try:
             out = do_biopsy(roi_dir)
-        except Exception as e:
+        except RuntimeError as e:
             print(f"Error processing {folder}: {e}")
             continue
 
