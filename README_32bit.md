@@ -68,12 +68,11 @@ R scripts can be run from Rstudio for the Hutch cluster (need VPN).
 do_segmentation=1
 
 
-export XX=AS/AS1_Les
-cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from32bit/${XX}/TSP_stitched
-
-cd ROI_regions
+export YY=AS
+export XX=AS1_Les
+cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from32bit/${YY}/${XX}/TSP_stitched/ROI_regions
 python /fh/fast/fong_y/images_from_K/lesion_normal_comparison/code/get_region_stats.py
-python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --savemasksonly --saveas "../${XX}_region_boundary" 
+python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --saveas "../${XX}_region_boundary.png" 
 
 cd ..
 if [ $do_segmentation -eq 1 ]; then

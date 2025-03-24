@@ -7,21 +7,7 @@ import numpy as np
 
 
 # set tissue label
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('--XX', type=str, default='CF_Les', help='tissue label')
-parser.add_argument('--bit', type=str, default='32', help='image type')
-args = parser.parse_known_args()[0]
-print(args, '\n')
-if args.XX is None:
-    args.XX=os.environ.get('XX')
-print(args.XX)
-
-
-# if args.bit=='32':
-#     roi_dir = '../Chipcytometry_images_from32bit/' + args.XX + '/TSP_stitched/ROI_regions/'
-# else:
-#     roi_dir = '../Chipcytometry_images_from8bit/' + args.XX + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
+XX=os.environ.get('XX')
 
 
 # read whole tissue boundary ROI file
@@ -90,5 +76,5 @@ else:
 print(data)
 
 os.makedirs('output/csv', exist_ok=True)
-data.to_csv("../"+args.XX+"_region_area_length.csv", header=True, index=False, sep=',')
+data.to_csv("../"+XX+"_region_area_length.csv", header=True, index=False, sep=',')
 
