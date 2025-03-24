@@ -17,13 +17,14 @@ if args.XX is None:
     args.XX=os.environ.get('XX')
 print(args.XX)
 
+print(os.getcwd())
 
 # if args.bit=='32':
 #     roi_dir = '../Chipcytometry_images_from32bit/' + args.XX + '/TSP_stitched/ROI_regions/'
 # else:
 #     roi_dir = '../Chipcytometry_images_from8bit/' + args.XX + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
 
-roi_dir = './'
+roi_dir = './ROI_regions/'
 
 # read whole tissue boundary ROI file
 tissue_boundary_roi = [f for f in glob.glob(roi_dir+'*.roi') if "whole" in f]
