@@ -75,6 +75,5 @@ else:
     data = pd.DataFrame({"name": region_roi_files+length_roi_files, 'size': areas+lengths})
 print(data)
 
-os.makedirs('output/csv', exist_ok=True)
 data.to_csv("../"+XX+"_region_area_length.csv", header=True, index=False, sep=',')
 
