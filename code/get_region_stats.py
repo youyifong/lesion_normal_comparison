@@ -10,6 +10,7 @@ import numpy as np
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--XX', type=str, default='CF_Les', help='tissue label')
+parser.add_argument('--bit', type=str, default='32', help='image type')
 args = parser.parse_known_args()[0]
 print(args, '\n')
 if args.XX is None:
@@ -17,7 +18,10 @@ if args.XX is None:
 print(args.XX)
 
 
-roi_dir = '../Chipcytometry_images_from8bit/' + args.XX + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
+if args.bit=='32':
+    roi_dir = '../Chipcytometry_images_from32bit/' + args.XX + '/TSP_stitched/ROI_regions/'
+else:
+    roi_dir = '../Chipcytometry_images_from8bit/' + args.XX + '/ZKWstitched_alignedtoCD45_cropped/ROI_regions/'
 
 # read whole tissue boundary ROI file
 tissue_boundary_roi = [f for f in glob.glob(roi_dir+'*.roi') if "whole" in f]

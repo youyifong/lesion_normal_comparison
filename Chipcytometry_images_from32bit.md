@@ -1,4 +1,4 @@
-# Chipcytometry_images_from8bit
+# Chipcytometry_images_from23bit
 
 This folder contains images that are processed through a 8-bit import from the instrument.
 
