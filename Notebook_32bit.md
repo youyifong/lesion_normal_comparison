@@ -1,4 +1,7 @@
-# Lesion vs Normal Comparison
+# Lesion vs Normal Comparison - 32-bit images
+
+Using images that are processed through a 32-bit import from the instrument.
+
 
 ## Setup
 Load modules on Volta or the Hutch cluster.
@@ -18,14 +21,24 @@ export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
 
 ## Data
 
-Images are described in Chipcytometry_images_from32bit.md
+The Chipcytometry_images_from32bit folder should be on the same level as the clone of lesion_normal_comparison repo.
 
-A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files under the ROI_regions folder:
-- epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
-- dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
-- region length. Type: line or polyline. File name example: AS_Les_**length**_1_normal.roi. Note that **region** is not part of the file name, which allows us to pick up all region roi (both epi and dermis) files by matching with 'region'.
+- Each folder under Chipcytometry_images_from32bit contains ZellKraftWerk tiff images of biopsy samples at one of the five timepoints of HSV infection and healing: Lesion, Healed, 2 weeks post heal (wph), 4wph, 8wph, and 8wph control. In addition, 8wph control is a contralateral biopsy of 8wph, so it is biopsied at the same time as 8wph.
 
+- Under each folder, e.g. AS/AS1_Les, the content is organized as follows:
 
+  - TSP_stitched
+    - stitched full-size images of the sample 
+    - aligned to CD45 if CD45 is available, if not, I just align CD3 to CD8.  They are not cropped, just stitched the active positions, or positions with images
+
+    - ROI_regions folder. A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files under the ROI_regions folder:
+       - skin boundary. Type: line or polyline. File name example: AS_Les_**skin_boundary**.roi
+       - DEJ. Type: line or polyline. File name example: AS_Les_**DEJ**_v2.roi
+       - whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi. Note that this file is not needed if the regions have tight boundaries.
+       - epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
+       - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
+
+  
 
 ## Methods 
 

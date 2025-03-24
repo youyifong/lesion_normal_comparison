@@ -1,4 +1,7 @@
-# Lesion vs Normal Comparison
+# Lesion vs Normal Comparison - 8-bit images
+
+Using images that are processed through a 8-bit import from the instrument.
+
 
 ## Setup
 Load modules on Volta or the Hutch cluster.
@@ -18,20 +21,36 @@ export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
 
 ## Data
 
-Images are described in Chipcytometry_images_from8bit.md
+The Chipcytometry_images_from8bit folder should be on the same level as the clone of lesion_normal_comparison repo.
 
-A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files under the ROI_regions folder:
-- epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
-- dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
-- region length. Type: line or polyline. File name example: AS_Les_**length**_1_normal.roi. Note that **region** is not part of the file name, which allows us to pick up all region roi (both epi and dermis) files by matching with 'region'.
+- Each folder under Chipcytometry_images_from8bit contains ZellKraftWerk tiff images of biopsy samples at one of the five timepoints of HSV infection and healing: Lesion, Healed, 2 weeks post heal (wph), 4wph, 8wph, and 8wph control. In addition, 8wph control is a contralateral biopsy of 8wph, so it is biopsied at the same time as 8wph.
 
+- Under each folder, e.g. CF_Les, the content is organized as follows:
 
+  - Individual_positions_preprocessed
+    - AS15065_Les_BG_4x4.png
+    - CD1a, CD3, CD4, etc. folders
+      - Images from individual positions (position1_CD1a, position2_CD1a, etc.) of that marker. These positions can be arranged according to their respective reference images to create a stitched image, or full-size image, of each marker for each sample.
+
+  - ZKWstitched_alignedtoCD45_cropped
+    - stitched full-size images of the sample (stitching class https://github.com/OpenStitching/stitching)
+    - stitching command: python -m tsp alignimages --ref_image ../Chipcytometry_images_from8bit/CF_Les/2_individual_positions_PE/CD45/M926910_Position1_CD45  --image2  ../Chipcytometry_images_from8bit/CF_Les/1_individual_positions_AF488/CD8/M926910_Position1_CD8a-AF488 
+
+    - ROI_regions folder. A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files under the ROI_regions folder:
+       - skin boundary. Type: line or polyline. File name example: AS_Les_**skin_boundary**.roi
+       - DEJ. Type: line or polyline. File name example: AS_Les_**DEJ**_v2.roi
+       - whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi. Note that this file is not needed if the regions have tight boundaries.
+       - epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
+       - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
+       - region length. Type: line or polyline. File name example: AS_Les_**length**_1_normal.roi. Note that **region** is not part of the file name, which allows us to pick up all region roi (both epi and dermis) files by matching with 'region'.
+
+  
 
 ## Methods 
 
 Generate tissue size data.
 ```{bash}
-python code/get_biopsy_size_by_depth_and_region_32bit.py
+python code/get_biopsy_size_by_depth_and_region_8bit.py
 ```
 
 

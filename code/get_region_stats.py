@@ -68,8 +68,7 @@ region_roi_files=[f.replace(".roi","") for f in region_roi_files]
 length_roi_files=[f.replace(".roi","") for f in length_roi_files]
 
 if XX == 'CJ_Les':
-    # CJ is a special case. It only has normal tissue and the shape of the biopsy is irregular and
-    # two line segments are needed to get tissue length
+    # CJ is a special case as it has two line segments, whose lengths are needed to be summed
     data = pd.DataFrame({"name": region_roi_files+["CJ_Les_length_1_normal"], 'size': areas+[lengths[0]+lengths[1]]})
 else: 
     data = pd.DataFrame({"name": region_roi_files+length_roi_files, 'size': areas+lengths})
