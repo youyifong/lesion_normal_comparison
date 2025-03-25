@@ -1,3 +1,6 @@
+# table 1 500um and 1000 um from DEJ in dermis
+# add a third group with normalized density which is the average of area under density curve
+
 # run from Rstudio on the Hutch server
 
 source("code/data.R")
