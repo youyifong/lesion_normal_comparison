@@ -1,8 +1,8 @@
-# Lesion vs Normal Comparison - 32-bit images
+# Analysis of 32-bit images
 
 Analysis of images that are processed through a 32-bit import from the instrument. Older analysis files using 8-bit import are saved under the folder 8bit.
 
-## Setup
+### Setup
 Load modules on Volta or the Hutch cluster.
 ```{bash}
 ml cuDNN/8.2.2.26-CUDA-11.4.1
@@ -14,7 +14,7 @@ export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
 ```
 
 
-## Directory structure
+### Directory structure
 
 - ../Chipcytometry_images_from32bit contains the ZellKraftWerk tiff images of biopsy samples
   - Each subfolder contains images from one subject, e.g., CF
@@ -34,9 +34,8 @@ export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
            - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
 
   
-## Methods 
+### Tissue size
 
-Generate tissue size data.
 ```{bash}
 python code/get_biopsy_size_by_depth_and_region_32bit.py --grid 5
 ```
@@ -49,7 +48,9 @@ This is done by K. From K:
 
 
 
-### Spatial analysis
+### Extraction of spatial features
+
+This is done by K.
 
 Steps:
 - Define an environment variable XX. In shell commands, ${XX} can be used to represent a generic biopsy, e.g., CF, DD, AS. Note that it needs to be enclosed within double quotes not single quotes for it to work.
