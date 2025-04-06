@@ -10,3 +10,5 @@ report/report.out
 .Rhistory
 report/tables/*.tex
 report/figures/*.png
+.git
+.idea

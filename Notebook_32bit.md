@@ -1,7 +1,6 @@
 # Lesion vs Normal Comparison - 32-bit images
 
-Using images that are processed through a 32-bit import from the instrument.
-
+Analysis of images that are processed through a 32-bit import from the instrument. Older analysis files using 8-bit import are saved under the folder 8bit.
 
 ## Setup
 Load modules on Volta or the Hutch cluster.
@@ -9,37 +8,32 @@ Load modules on Volta or the Hutch cluster.
 ml cuDNN/8.2.2.26-CUDA-11.4.1
 ml Python/3.9.6-GCCcore-11.2.0
 ml IPython/7.26.0-GCCcore-11.2.0
-```
-
-Load python virtual environment. 
-```{bash}
 source ~/envs/tspenv/bin/activate
 cd /fh/fast/fong_y/images_from_K/lesion_normal_comparison
 export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
 ```
 
 
-## Data
+## Directory structure
 
-The Chipcytometry_images_from32bit folder should be on the same level as the clone of lesion_normal_comparison repo.
+- ../Chipcytometry_images_from32bit contains the ZellKraftWerk tiff images of biopsy samples
+  - Each subfolder contains images from one subject, e.g., CF
+    - Each subfolder contains one slide, representing one slice of a biopsy at one of the five timepoints of HSV infection and healing: Lesion, Healed, 2 weeks post heal (wph), 4wph, 8wph, and 8wph control. In addition, 8wph control is a contralateral biopsy of 8wph, so it is biopsied at the same time as 8wph.
 
-- Each folder under Chipcytometry_images_from32bit contains ZellKraftWerk tiff images of biopsy samples at one of the five timepoints of HSV infection and healing: Lesion, Healed, 2 weeks post heal (wph), 4wph, 8wph, and 8wph control. In addition, 8wph control is a contralateral biopsy of 8wph, so it is biopsied at the same time as 8wph.
+    - For each slide folder, e.g. AS/AS1_Les, the content is organized as follows:
 
-- Under each folder, e.g. AS/AS1_Les, the content is organized as follows:
+      - TSP_stitched
+        - stitched full-size images of the sample 
+        - aligned to CD45 if CD45 is available, if not, I just align CD3 to CD8.  They are not cropped, just stitched the active positions, or positions with images
 
-  - TSP_stitched
-    - stitched full-size images of the sample 
-    - aligned to CD45 if CD45 is available, if not, I just align CD3 to CD8.  They are not cropped, just stitched the active positions, or positions with images
-
-    - ROI_regions folder. A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files under the ROI_regions folder:
-       - skin boundary. Type: line or polyline. File name example: AS_Les_**skin_boundary**.roi
-       - DEJ. Type: line or polyline. File name example: AS_Les_**DEJ**_v2.roi
-       - whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi. Note that this file is not needed if the regions have tight boundaries.
-       - epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
-       - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
+        - ROI_regions folder. A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files under the ROI_regions folder:
+           - skin boundary. Type: line or polyline. File name example: AS_Les_**skin_boundary**.roi
+           - DEJ. Type: line or polyline. File name example: AS_Les_**DEJ**_v2.roi
+           - whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi. Note that this file is not needed if the regions have tight boundaries.
+           - epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
+           - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
 
   
-
 ## Methods 
 
 Generate tissue size data.
@@ -48,15 +42,14 @@ python code/get_biopsy_size_by_depth_and_region_32bit.py --grid 5
 ```
 
 
-The default command for cell segmentation is:
->python -m tsp runcellpose --f "*_Les_CD*.png" --l [3,0] --model cytotrain7 --s --normalize100  --min_size 100 --flow 0.5 
-- use [3,0] for RGB images (CF and DD) and [0,0] for grayscale images (all others)
-- normalize100 is set because 1) it avoids errors when the number of cells in the image is small, 2) it leads to more specific results, e.g. some fibers will not be predicted masks. The downside is that it can be less sensitive to dim signals
-- need to remove *masks* files before running
-- \*_Les_CD*.png is interpreted by glob, which does not support regular expressions and only supports Unix shell-style wildcards
+### Segmentation
+
+This is done by K. From K:
+- There are problems with some CD68 segmentation because the antibody also stained the epidermis of some tissues. I tried to reduce the epidermis brightness with some success. Thus, some samples will have *CD68.png (original) and *CD68_2.png (my attempt to adjust epidermis).
 
 
-Since special care are needed for some markers and file names do not always follow the same naming convention, we list the commands for each tissue separately.
+
+### Spatial analysis
 
 Steps:
 - Define an environment variable XX. In shell commands, ${XX} can be used to represent a generic biopsy, e.g., CF, DD, AS. Note that it needs to be enclosed within double quotes not single quotes for it to work.
@@ -68,15 +61,11 @@ Steps:
 - Compute distance to skin and to DEJ for each mask by running python -m tsp dist2boundary
 - Compute region membership by running python -m tsp regionmembership
 
-Special handling for segmentation:
-- DD CD123: increase flow to allow more masks in high density regions and set a min total intensity threshold to remove masks in the debris field in the lesion area
-- CF CD123: increase flow to allow more masks in high density regions and set a min total intensity threshold to remove masks in the debris field in the lesion area
-- CF CD279, one cell is wrongly segmented as two masks under the default setting and 
-- JM CD68: a high background makes it necessary to set a higher min_avgintensity
+Since special care are needed for some markers and file names do not always follow the same naming convention, we list the commands for each tissue separately.
 
 R scripts can be run from Rstudio for the Hutch cluster (need VPN).
 
-```bash
+```{bash}
 # determines whether to run segmentation
 do_segmentation=1
 
@@ -201,12 +190,5 @@ if [ $do_segmentation -eq 1 ]; then
 fi
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/LS_Les_skin_boundary.roi,ROI_regions/LS_Les_DEJ_v2.roi] 
 python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region*.roi"
-
 ```
-
-
-
-## Report
-
-[Report](report/report.pdf).
 

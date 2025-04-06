@@ -9,10 +9,6 @@ Load modules on Volta or the Hutch cluster.
 ml cuDNN/8.2.2.26-CUDA-11.4.1
 ml Python/3.9.6-GCCcore-11.2.0
 ml IPython/7.26.0-GCCcore-11.2.0
-```
-
-Load python virtual environment. 
-```{bash}
 source ~/envs/tspenv/bin/activate
 cd /fh/fast/fong_y/images_from_K/lesion_normal_comparison
 export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
