@@ -1,0 +1,18 @@
+---
+title: "report_32bit"
+output: pdf_document
+date: `r Sys.Date()`
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Count tables
+
+\newpage
+
+```{r results='asis', echo=FALSE}
+table_files <- list.files("report/tables/input/", pattern = ".*_counts+.*\\.tex$", full.names = TRUE)
+for (f in table_files) cat(paste0("\\input{", f, "}\n\\newpage"))
+```
