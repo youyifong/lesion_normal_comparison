@@ -11,11 +11,11 @@ Analysis of images that are processed through a 32-bit import from the instrumen
 ### Setup
 Load modules on Volta or the Hutch cluster.
 ```{bash}
+cd /fh/fast/fong_y/images_from_K/lesion_normal_comparison
 ml cuDNN/8.2.2.26-CUDA-11.4.1
 ml Python/3.9.6-GCCcore-11.2.0
 ml IPython/7.26.0-GCCcore-11.2.0
 source ~/envs/tspenv/bin/activate
-cd /fh/fast/fong_y/images_from_K/lesion_normal_comparison
 export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
 ```
 
@@ -43,7 +43,7 @@ export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
 ### Tissue stats
 
 ```{bash}
-python code/get_biopsy_size_by_depth_and_region_32bit.py --grid 5
+python py/get_biopsy_size_by_depth_and_region_32bit.py --grid 5
 ```
 
 
