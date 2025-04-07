@@ -72,7 +72,7 @@ count.tables = lapply (biopsies, function(s) {
       count_by_depth = mytable(epi_normal$depth)
       # add count_by_depth column to size_epi_normal by match the depth in size_epi_normal and count_by_depth
       size_epi_normal$count_by_depth = count_by_depth[size_epi_normal$depth%.%""]
-      epi_normal_density = sum(size_epi_normal$count_by_depth/size_epi_normal$area, na.rm=TRUE)
+      epi_normal_density = mean(size_epi_normal$count_by_depth/size_epi_normal$area, na.rm=TRUE)
       
       # dermis normal
       dermis_normal = subset(alldat[[s]][[a]], dist2DEJ<max_depth & dermis & region=="intact")
@@ -81,7 +81,7 @@ count.tables = lapply (biopsies, function(s) {
       count_by_depth = mytable(dermis_normal$depth)
       # add count_by_depth column to size_dermis_normal by match the depth in size_dermis_normal and count_by_depth
       size_dermis_normal$count_by_depth = count_by_depth[size_dermis_normal$depth%.%""]
-      dermis_normal_density = sum(size_dermis_normal$count_by_depth/size_dermis_normal$area, na.rm=TRUE)
+      dermis_normal_density = mean(size_dermis_normal$count_by_depth/size_dermis_normal$area, na.rm=TRUE)
       
       # epi lesion
       epi_lesion = subset(alldat[[s]][[a]], dist2DEJ<max_depth & epi &    region=="ulcerative")
@@ -90,7 +90,7 @@ count.tables = lapply (biopsies, function(s) {
       count_by_depth = mytable(epi_lesion$depth)
       # add count_by_depth column to size_epi_lesion by match the depth in size_epi_lesion and count_by_depth
       size_epi_lesion$count_by_depth = count_by_depth[size_epi_lesion$depth%.%""]
-      epi_lesion_density = sum(size_epi_lesion$count_by_depth/size_epi_lesion$area, na.rm=TRUE)
+      epi_lesion_density = mean(size_epi_lesion$count_by_depth/size_epi_lesion$area, na.rm=TRUE)
       
       # dermis lesion
       dermis_lesion = subset(alldat[[s]][[a]], dist2DEJ<max_depth & dermis & region=="ulcerative")
@@ -117,7 +117,7 @@ count.tables = lapply (biopsies, function(s) {
     mytex(data.frame(tab), file.name="report/tables/"%.%s1%.%"_counts_"%.%max_depth, digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r|","r","r","r","r"),
           floating=T, caption=escapeUnderline(s1)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. Area is measured in mm2. Density in count per mm2. Regularized density refers to the average of density measurements taken at 100um DEJ depth intervals.",
           col.headers="\\hline\n 
-           \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Counts} & \\multicolumn{4}{c|}{Density} & \\multicolumn{4}{c}{Reg Density} \\\\ 
+           \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Counts} & \\multicolumn{4}{c|}{Density} & \\multicolumn{4}{c}{Regularized Density} \\\\ 
            \\multicolumn{1}{c}{} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c|}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c|}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c}{lesion}  \\\\ 
            \\multicolumn{1}{c}{} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & \\multicolumn{1}{c|}{dermis} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & \\multicolumn{1}{c|}{dermis} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & dermis  \\\\ 
            \\hline
