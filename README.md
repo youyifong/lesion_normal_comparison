@@ -1,5 +1,11 @@
 # Analysis of 32-bit images
 
+Todo:
+- remove HSV_severity_correlates github repo
+
+Use Rstudio on laptop and Hutch server to work on the files on the Hutch server.
+
+
 Analysis of images that are processed through a 32-bit import from the instrument. Older analysis files using 8-bit import are saved under the folder 8bit.
 
 ### Setup
