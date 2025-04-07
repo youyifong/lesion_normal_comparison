@@ -7,7 +7,7 @@
 
 library(kyotil)
 
-dir.exists("report/figures") || dir.create("report/figures", recursive = TRUE)
+dir.exists("output/figures") || dir.create("output/figures", recursive = TRUE)
 
 
 # CF, DD and JM only
@@ -17,7 +17,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   myprint(dist)
   
   mypng(mfcol=c(2,length(markers.1)), width=10/4*length(markers.1), height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
-        file=paste0("report/figures/compare_DD_CF_JM_",dist))
+        file=paste0("output/figures/compare_DD_CF_JM_",dist))
   
   for (a in markers.1) {
     for (tissue.type in tissue.types) { # intact, ulcerative
@@ -60,9 +60,9 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   myprint(dist)
 
   mypng(mfcol=c(1,4), width=10, height=2.6, mar=c(4,4,2,1), oma=c(1,3,0,0),
-        file=paste0("report/figures/compare_biopsies_intact_",dist))
+        file=paste0("output/figures/compare_biopsies_intact_",dist))
   
-  for (a in markers.1) {
+  for (a in "CD3") {
     tissue.type = "intact"
     
     # dist="dist2skin"; a="CD15"; tissue.type="intact"

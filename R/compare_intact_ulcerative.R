@@ -4,12 +4,12 @@
 # 4 markers in lesion 
 # 4 markers in intact
 
-dir.exists("report/figures") || dir.create("report/figures", recursive = TRUE)
+dir.exists("output/figures") || dir.create("output/figures", recursive = TRUE)
 
 for (dist in dist.labels) {
 
   mypng(mfrow=c(3,4), width=10, height=7, mar=c(4,0,2,0), oma=c(1,5,0,0),
-        file=paste0("report/figures/compare_normal_lesion_"%.%dist))
+        file=paste0("output/figures/compare_normal_lesion_"%.%dist))
   
   for (b in biopsies.1) { 
   for (a in markers.1) {

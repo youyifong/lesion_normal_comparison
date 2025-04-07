@@ -1,7 +1,7 @@
 ################################################################################
 ## tabulate cell counts in epi/dermis x normal/lesion
 
-dir.exists("report/tables") || dir.create("report/tables", recursive = TRUE)
+dir.exists("output/tables") || dir.create("output/tables", recursive = TRUE)
 
 tissue_size = read.csv(glue("{data.dir}/tissue_size_by_depth_and_region.csv"))
 
@@ -114,8 +114,8 @@ count.tables = lapply (biopsies, function(s) {
     tab=rbind(tab, area=formatDouble(c(sizes, rep(NA,8)), digits = 2, remove.leading0=F))
     print(tab)
     
-    mytex(data.frame(tab), file.name="report/tables/"%.%s1%.%"_counts_"%.%max_depth, digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r|","r","r","r","r"),
-          floating=T, caption=escapeUnderline(s1)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. Area is measured in mm2. Density in count per mm2. Regularized density refers to the average of density measurements taken at 100um DEJ depth intervals.",
+    mytex(data.frame(tab), file.name="output/tables/"%.%s1%.%"_counts_"%.%max_depth, digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r|","r","r","r","r"),
+          floating=T, caption=escapeUnderline(s1)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. Area is measured in mm2. Density in count per mm2. Regularized density refers to the average of positive density measurements taken at 100um DEJ depth intervals, i.e. each depth is weighted equally instead of based on tissue shape.",
           col.headers="\\hline\n 
            \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Counts} & \\multicolumn{4}{c|}{Density} & \\multicolumn{4}{c}{Regularized Density} \\\\ 
            \\multicolumn{1}{c}{} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c|}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c|}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c}{lesion}  \\\\ 
@@ -123,15 +123,15 @@ count.tables = lapply (biopsies, function(s) {
            \\hline
       ")
     
-    ret = counts3[,markers.1]
-    mode(ret) = "character"
-    list(ulcerative=cbind(t(ret[3:4,]), 
-                          formatDouble(counts2[3,1:4]/counts2[4,1:4],2, remove.leading0 = F)
-          ),
-         intact=cbind(t(ret[1:2,]), 
-                      formatDouble(counts2[1,1:4]/counts2[2,1:4],2, remove.leading0 = F) 
-         )
-    )
+    # ret = counts3[,markers.1]
+    # mode(ret) = "character"
+    # list(ulcerative=cbind(t(ret[3:4,]), 
+    #                       formatDouble(counts2[3,1:4]/counts2[4,1:4],2, remove.leading0 = F)
+    #       ),
+    #      intact=cbind(t(ret[1:2,]), 
+    #                   formatDouble(counts2[1,1:4]/counts2[2,1:4],2, remove.leading0 = F) 
+    #      )
+    # )
   }
 }) 
 

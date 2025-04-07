@@ -3,21 +3,21 @@
 # 4 plots for each of dist2skin and dist2DEJ:
 # ulcerative/intact x DD/CF
 
-dir.exists("report/figures") || dir.create("report/figures", recursive = TRUE)
+dir.exists("output/figures") || dir.create("output/figures", recursive = TRUE)
 
 get.peak = function(x_start, freq) {
   x_start[which.max(freq)] + (x_start[2]-x_start[1])/2
 }
 
 
-mypng(mfrow=c(length(biopsies),4), file="report/figures/compare_markers", 
+mypng(mfrow=c(length(biopsies),4), file="output/figures/compare_markers", 
       width=10, height=4/2*length(biopsies), mar=c(4,0,2,0), oma=c(1,5,0,0))
       
 dist.bt.peaks = 
 lapply (biopsies, function(s) {
 sapply (tissue.types, function(tissue.type) { 
 sapply (dist.labels, simplify="array", function(dist) {
-# tissue.type="ulcerative"; dist="dist2skin"; s="CF_Les"; 
+# tissue.type="intact"; dist="dist2skin"; s="AS/AS1_Les"; 
   myprint(tissue.type, dist, s)
 
   if (!s %in% biopsies.1 & tissue.type=="ulcerative") {
@@ -28,7 +28,9 @@ sapply (dist.labels, simplify="array", function(dist) {
     # use all markers
     # markers=markers.ls[[s]]; names(markers)=markers
     # use a subset of mostly shared markers
-    markers = c("CD3", "CD15", "CD11c", "CD123", "CD4", "CD8a", if(s!="CF_Les") "CD68"); names(markers)=markers
+    # markers = c("CD3", "CD15", "CD11c", "CD123", "CD4", "CD8", if(!s%in%c("LG/LG1_Les","SK/SK1_Les")) "CD68")
+    markers = c("CD3")
+    names(markers)=markers
     
     dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
     
@@ -47,7 +49,7 @@ sapply (dist.labels, simplify="array", function(dist) {
     if (dist == "dist2DEJ") abline(v=0, lty=2)
     
     # return distance between CD3 and CD15 peaks
-    get.peak(all.freq[,"depth_start"], all.freq[,"CD3"]) - get.peak(all.freq[,"depth_start"], all.freq[,"CD15"])
+    # get.peak(all.freq[,"depth_start"], all.freq[,"CD3"]) - get.peak(all.freq[,"depth_start"], all.freq[,"CD15"])
   }
 }) 
 })
@@ -71,35 +73,35 @@ dev.off()
 
 ################################################################################
 # table combining biopsies
-
-for (tissue.type in tissue.types) {
-  tab=rbind(
-    round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]][tissue.type,"dist2skin"])),
-    round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]][tissue.type,"dist2DEJ"])),
-    cbind(c(t(count.tables$DD[[tissue.type]])), 
-          c(t(count.tables$CF[[tissue.type]])),
-          c(t(count.tables$JM[[tissue.type]])))
-  )
-  
-  rownames(tab)=c(
-    "CD3 to CD15 (dist2skin)",
-    "CD3 to CD15 (dist2DEJ)",
-    c(t(outer(markers.1, c("epi","dermis","e/d"), paste)))
-  )
-  tab
-  
-  # add ratio cols
-  tab=cbind(tab, 
-            "CF/DD" = formatDouble(as.numeric(tab[,2])/as.numeric(tab[,1]),2,remove.leading0 = F),
-            "JM/DD" = formatDouble(as.numeric(tab[,3])/as.numeric(tab[,1]),2,remove.leading0 = F))
-  tab
-  
-  mytex(tab, file=glue("report/tables/{tissue.type}_comparison"), 
-        add.to.row=list(as.list(seq(3,by=3,length=4)),
-                        rep("\\hline\n",4)
-        )
-  )  
-}
+# 
+# for (tissue.type in tissue.types) {
+#   tab=rbind(
+#     round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]]["dist2skin",tissue.type])),
+#     round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]]["dist2DEJ",tissue.type])),
+#     cbind(c(t(count.tables$DD[[tissue.type]])), 
+#           c(t(count.tables$CF[[tissue.type]])),
+#           c(t(count.tables$JM[[tissue.type]])))
+#   )
+#   
+#   rownames(tab)=c(
+#     "CD3 to CD15 (dist2skin)",
+#     "CD3 to CD15 (dist2DEJ)",
+#     c(t(outer(markers.1, c("epi","dermis","e/d"), paste)))
+#   )
+#   tab
+#   
+#   # add ratio cols
+#   tab=cbind(tab, 
+#             "CF/DD" = formatDouble(as.numeric(tab[,2])/as.numeric(tab[,1]),2,remove.leading0 = F),
+#             "JM/DD" = formatDouble(as.numeric(tab[,3])/as.numeric(tab[,1]),2,remove.leading0 = F))
+#   tab
+#   
+#   mytex(tab, file=glue("output/tables/{tissue.type}_comparison"), 
+#         add.to.row=list(as.list(seq(3,by=3,length=4)),
+#                         rep("\\hline\n",4)
+#         )
+#   )  
+# }
 
 
 

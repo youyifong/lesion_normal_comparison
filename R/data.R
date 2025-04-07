@@ -113,10 +113,10 @@ get.dat=function(s, marker) {
 }
 
 
-# skip a biopsy if markers.1 are not all present
+# skip a biopsy if CD3 are not all present
 biopsies.tmp = sapply (biopsies, function(s) {
   markers=markers.ls[[s]]
-  if (any(!markers.1 %in% markers)) {
+  if (any(!c("CD3") %in% markers)) {
     return("")
   } else {
     return(s)

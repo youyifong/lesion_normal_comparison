@@ -1,3 +1,4 @@
+output/
 Rplots.pdf
 .DS_Store
 R/.Rhistory
@@ -8,6 +9,4 @@ report/report.out
 *.swp
 *.bak
 .Rhistory
-report/tables
-report/figures
 .idea
