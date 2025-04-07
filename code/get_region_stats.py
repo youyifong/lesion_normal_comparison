@@ -1,3 +1,5 @@
+# this file is deprecated, use get_biopsy_size_by_depth_and_region.py instead
+
 from shapely.geometry import Polygon
 
 import glob,os
@@ -19,9 +21,6 @@ tmp = read_roi_file(tissue_boundary_roi[0])
 val = list(tmp.values()) [0]
 whole_tissue = Polygon(list(zip(val["x"], val["y"])))
 
-
-###############################################################################
-# make XX_region_area_length file
 
 # compute the area of each region
 region_roi_files = [f for f in glob.glob('*.roi') if "epi_region" in f or "dermis_region" in f]

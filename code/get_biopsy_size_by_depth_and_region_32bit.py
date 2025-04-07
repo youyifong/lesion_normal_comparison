@@ -1,6 +1,7 @@
 """
-Compute the size of biopsy, defined as the number of points in a 5x5 px grid, by depth in 200 px (equivalently, 100 um) increments for all biopsies.
-Save the results in Chipcytometry_images_from32bit/biopsy_size_by_depth_and_region.csv.
+Compute the size of biopsy in the unit of 100um x 100um by depth in 200 px (equivalently, 100 um) increments for all biopsies.
+Save the results in Chipcytometry_images_from32bit/biopsy_size_by_depth_and_region.csv. The depth column is the starting point of the bin.
+It takes a long time to run at the default grid size of 5 px, so you can change it to 10 px or 20 px to speed up the process.
 """
 
 from shapely.geometry import Polygon, Point
