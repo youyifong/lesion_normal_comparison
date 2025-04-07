@@ -1,9 +1,6 @@
 library(kyotil)
 library(glue)
 
-# to run this on laptop
-setwd("H:\\images_from_K\\lesion_normal_comparison")
-
 {
 data.dir = "../Chipcytometry_images_from32bit"
 tissue_size_by_depth_and_region=read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region.csv"))

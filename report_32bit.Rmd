@@ -4,6 +4,8 @@ output: pdf_document
 date: `r Sys.Date()`
 ---
 
+<!-- can be rendered in Rstudio on Windows -->
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```

@@ -1,7 +1,12 @@
-# table 1 500um and 1000 um from DEJ in dermis
-# add a third group with normalized density which is the average of area under density curve
+# can be run from either laptop or Rstudio on the Hutch server
+# it runs faster on the Hutch server
+# check if os is windows or linux
+if (Sys.info()[["sysname"]] == "Windows") {
+  # set working directory to the parent of the location of this file
+  setwd(paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/.."))
+} else {
+}
 
-# run from Rstudio on the Hutch server
 
 source("code/data.R")
 
