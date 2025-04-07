@@ -11,10 +11,15 @@ biopsies = sort(biopsies)
 names(biopsies)=biopsies
 
 # a select subset
-biopsies.1=c("DD/DD_Les","CF_Les","JM_Les")
-; names(biopsies.1)=biopsies.1
-}
+biopsies.1=c("DD/DD1_Les","CF/CF1_Les","JM/JM1_Les")
+names(biopsies.1)=biopsies.1
 
+# define a function that returns c("DD1_Les") from c("DD/DD1_Les")
+biopsy.name=function(ss) {
+  # s="DD/DD1_Les"
+  sapply(ss, function (s) sub(".*?/(.*)", "\\1", s))
+}
+}
 
 {
 region.labels=c(normal="intact", lesion="ulcerative")

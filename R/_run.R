@@ -5,12 +5,16 @@ if (Sys.info()[["sysname"]] == "Windows") {
   # set working directory to the parent of the location of this file
   setwd(paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/.."))
 } else {
+  # automatically set working directory to the parent of the location of this file
 }
 
 
-source("code/data.R")
+source("R/data.R")
 
-source("code/compare_biopsies.R")
-source("code/compare_intact_ulcerative.R")
-source("code/compare_markers.R")
-source("code/make_tables.R") # dist.bt.peaks is computed in compare_markers.R
+source("R/make_tables.R") 
+
+source("R/compare_biopsies.R")
+
+source("R/compare_intact_ulcerative.R")
+
+source("R/compare_markers.R")

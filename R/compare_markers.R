@@ -66,3 +66,41 @@ for (i in 1:length(tmp)) {
 dev.off()
 
 
+
+
+
+################################################################################
+# table combining biopsies
+
+for (tissue.type in tissue.types) {
+  tab=rbind(
+    round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]][tissue.type,"dist2skin"])),
+    round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]][tissue.type,"dist2DEJ"])),
+    cbind(c(t(count.tables$DD[[tissue.type]])), 
+          c(t(count.tables$CF[[tissue.type]])),
+          c(t(count.tables$JM[[tissue.type]])))
+  )
+  
+  rownames(tab)=c(
+    "CD3 to CD15 (dist2skin)",
+    "CD3 to CD15 (dist2DEJ)",
+    c(t(outer(markers.1, c("epi","dermis","e/d"), paste)))
+  )
+  tab
+  
+  # add ratio cols
+  tab=cbind(tab, 
+            "CF/DD" = formatDouble(as.numeric(tab[,2])/as.numeric(tab[,1]),2,remove.leading0 = F),
+            "JM/DD" = formatDouble(as.numeric(tab[,3])/as.numeric(tab[,1]),2,remove.leading0 = F))
+  tab
+  
+  mytex(tab, file=glue("report/tables/{tissue.type}_comparison"), 
+        add.to.row=list(as.list(seq(3,by=3,length=4)),
+                        rep("\\hline\n",4)
+        )
+  )  
+}
+
+
+
+

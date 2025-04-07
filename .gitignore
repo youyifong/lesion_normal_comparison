@@ -1,6 +1,6 @@
 Rplots.pdf
 .DS_Store
-code/.Rhistory
+R/.Rhistory
 report/report.out
 *.aaa
 *.aux
@@ -10,5 +10,4 @@ report/report.out
 .Rhistory
 report/tables
 report/figures
-.git
 .idea

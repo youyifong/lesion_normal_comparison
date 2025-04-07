@@ -21,7 +21,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   
   for (a in markers.1) {
     for (tissue.type in tissue.types) { # intact, ulcerative
-      # dist="dist2DEJ"; a="CD3"; tissue.type="ulcerative"
+    # dist="dist2DEJ"; a="CD3"; tissue.type="ulcerative"
       
       dat.ls = lapply(biopsies.1, function (b) subset(alldat[[b]][[a]], region==tissue.type)[[dist]])
       
@@ -30,7 +30,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
          xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          col=seq_along(biopsies.1),
-         legend=biopsies.1,
+         legend=biopsy.name(biopsies.1),
          main=ifelse(tissue.type==tissue.types[1],a,""),
          cex.axis=0.8
       )
@@ -75,7 +75,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          main=a,
          col=seq_along(biopsies),
-         legend=biopsies
+         legend=biopsy.name(biopsies)
     )
     
     # to divide between epi and dermis
