@@ -8,7 +8,7 @@ report/report.out
 *.swp
 *.bak
 .Rhistory
-report/tables/*.tex
-report/figures/*.png
+report/tables
+report/figures
 .git
 .idea
