@@ -16,10 +16,10 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
   xlim=xlim.ls[[dist]]
   myprint(dist)
   
-  mypng(mfcol=c(2,length(markers.1)), width=10/4*length(markers.1), height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
+  mypng(mfcol=c(2,length(key.markers)), width=10/4*length(markers.1), height=5, mar=c(4,4,2,1), oma=c(1,3,0,0),
         file=paste0("output/figures/compare_DD_CF_JM_",dist))
   
-  for (a in markers.1) {
+  for (a in key.markers) {
     for (tissue.type in tissue.types) { # intact, ulcerative
     # dist="dist2DEJ"; a="CD3"; tissue.type="ulcerative"
       
@@ -30,7 +30,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
          xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          col=seq_along(biopsies.1),
-         legend=biopsy.name(biopsies.1),
+         legend=get.slide.name(biopsies.1),
          main=ifelse(tissue.type==tissue.types[1],a,""),
          cex.axis=0.8
       )
@@ -75,7 +75,7 @@ for (dist in dist.labels) { # dist2skin, dist2DEJ
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          main=a,
          col=seq_along(biopsies),
-         legend=biopsy.name(biopsies)
+         legend=get.slide.name(biopsies)
     )
     
     # to divide between epi and dermis

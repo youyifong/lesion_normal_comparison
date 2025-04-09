@@ -44,56 +44,71 @@ print(markers.ls[biopsies], quote=F)
 
 \bigskip
 
-## Count tables
+Marker groups
 
-For each slide, there are two tables, one for up to 500 um below DEJ and one for up to 1000 um below DEJ.
+- T cell: CD3 CD4 CD8 CD69 CD279 Foxp3
+- Neutrophil: CD15
+- Dendritic cells: CD11c CD123 
+- Macrophage: CD68
+- NK cells: CD56. This marker is expressed on both NK and nerve fibers, need to check if the staining on the latter affects the NK cell count.
 
-\newpage
+
+The key markers are: CD11c CD123 CD3 CD15 CD56 CD68. There are 13 lesion biopsies in total. We will focus on lesion biopsies with the key markers data.
+
+Some lesion biopsies have multiple sections. The following choices of slides are made: AS/AS1_Les, CF/CF1_Les, CJ/CJ1_Les, DD/DD1_Les,  EB/EB_Les, JK/JK1_Les, JM/JM1_Les, JT/JT_Les,LD/LD_Les, LG/LG2_Les,  LM/LM_Les, LS/LS2_Les, SK/SK2_Les. The only exceptions are
+
+- For CF CD68, CF5 is used instead of CF1 for better quality.
+
 
 ```{r results='asis', echo=FALSE}
-table_files <- list.files("output/tables/input/", pattern = ".*_counts+.*\\.tex$", full.names = TRUE)
-for (f in table_files) cat(paste0("\\input{", f, "}\n\\newpage"))
+# list biopsies with key markers
+
+tp = sapply(biopsies, function(b) length(intersect(markers.ls[[b]], c("CD11c", "CD123", "CD3", "CD15", "CD56", "CD68"))))==6
+biopsies = names(biopsies[tp])
+
 ```
+
+
 
 ## Figures
 
-```{r results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n
-\\includegraphics[width=\\textwidth]{output/figures/compare_DD_CF_JM_dist2skin.png}\n
-\\vspace{15pt}\n
-\\includegraphics[width=\\textwidth]{output/figures/compare_DD_CF_JM_dist2DEJ.png}\n
-
-\\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
+Number of cells per 100x100 um2 tissue as a function of distance to skin.
 The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
 Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
-For example, CD123 epi count 1038/2862*100=36.
-}\\end{figure}\n")
-```
+
 \newpage
 
+<!-- ```{r 3 biopsies on same plot, results='asis', echo=FALSE} -->
+<!-- cat("\\begin{figure}[H]\n\\centering\n -->
+<!-- \\includegraphics[width=\\textwidth]{output/figures/compare_DD_CF_JM_dist2skin.png}\n -->
+<!-- \\vspace{15pt}\n -->
+<!-- \\includegraphics[width=\\textwidth]{output/figures/compare_DD_CF_JM_dist2DEJ.png}\n -->
+
+<!-- \\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin. -->
+<!-- The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval.  -->
+<!-- Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width. -->
+<!-- For example, CD123 epi count 1038/2862*100=36. -->
+<!-- }\\end{figure}\n") -->
+<!-- ``` -->
+<!-- \newpage -->
+
+<!-- ```{r multi biopsies on same plot, results='asis', echo=FALSE} -->
+<!-- cat("\\begin{figure}[H]\n\\centering\n -->
+<!-- \\includegraphics[width=\\textwidth]{output/figures/compare_biopsies_intact_dist2skin.png}\n -->
+<!-- \\vspace{15pt}\n -->
+<!-- \\includegraphics[width=\\textwidth]{output/figures/compare_biopsies_intact_dist2DEJ.png}\n -->
+
+<!-- \\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin. -->
+<!-- The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval.  -->
+<!-- Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.}\\end{figure}\n") -->
+<!-- ``` -->
+<!-- \newpage -->
+
 ```{r results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n
-\\includegraphics[width=\\textwidth]{output/figures/compare_biopsies_intact_dist2skin.png}\n
-\\vspace{15pt}\n
-\\includegraphics[width=\\textwidth]{output/figures/compare_biopsies_intact_dist2DEJ.png}\n
-
-\\caption{Number of cells per 100x100 um2 tissue as a function of distance to DEJ or skin.
-The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
-Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ.png}\\end{figure}\n")
 ```
-\newpage
 
-```{r results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n
-\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin.png}\n
-\\vspace{15pt}\n
-\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ.png}\n
-
-\\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
-The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
-Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
-}\\end{figure}\n")
-```
 
 
 Comparing the first two rows in the first column, we see that the ratio of the area under the curve across both epi and dermis between red and blue(ulcerative and intact) is about 1 for CD3/CF and 1/3 for CD3/DD. This suggests that CD3 is depleted in lesion in DD, but not in CF.
@@ -103,15 +118,30 @@ Compare lesion with normal in CD15/CF, we see that the lesion peak is shifted to
 \newpage
 
 ```{r results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n
-\\includegraphics[width=\\textwidth]{output/figures/compare_markers.png}\n
-
-\\caption{Number of cells per 100x100 um2 tissue as a function of distance to skin.
-The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
-Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
-}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers.png}\\end{figure}\n")
 ```
 
 That the CD15 dist2skin peak in DD/lesion is near skin while the corresponding dist2DEJ peak is near DEJ is due to the fact that the DEJ line is very curvy.
         
 \newpage
+
+## Correlation studies
+
+Correlate shedding rate of 13 biopies with CD3. Explore different features:
+
+- epi, dermis up to 500, demis up to 1000, total
+- count, density, regularized density
+
+
+## Count tables
+
+For each slide, there are two tables, one for up to 500 um below DEJ and one for up to 1000 um below DEJ.
+
+\newpage
+
+```{r count and density tables, results='asis', echo=FALSE}
+table_files <- list.files("output/tables/input/", pattern = ".*_counts+.*\\.tex$", full.names = TRUE)
+for (f in table_files) cat(paste0("\\input{", f, "}\n\\newpage"))
+```
+
+

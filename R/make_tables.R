@@ -6,7 +6,7 @@ dir.exists("output/tables") || dir.create("output/tables", recursive = TRUE)
 tissue_size = read.csv(glue("{data.dir}/tissue_size_by_depth_and_region.csv"))
 
 # count cells to different depths
-count.tables = lapply (biopsies, function(s) {
+count.tables = lapply (all.slides, function(s) {
 # s="DD/DD1_Les"
   
   s1 = sub(".*?/(.*)", "\\1", s)
@@ -123,7 +123,7 @@ count.tables = lapply (biopsies, function(s) {
            \\hline
       ")
     
-    # ret = counts3[,markers.1]
+    # ret = counts3[,key.markers]
     # mode(ret) = "character"
     # list(ulcerative=cbind(t(ret[3:4,]), 
     #                       formatDouble(counts2[3,1:4]/counts2[4,1:4],2, remove.leading0 = F)
