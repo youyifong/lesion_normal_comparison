@@ -10,11 +10,11 @@ get.peak = function(x_start, freq) {
 }
 
 
-mypng(mfrow=c(length(biopsies),4), file="output/figures/compare_markers", 
-      width=10, height=4/2*length(biopsies), mar=c(4,0,2,0), oma=c(1,5,0,0))
+mypng(mfrow=c(length(select.slides),4), file="output/figures/compare_markers", 
+      width=10, height=4/2*length(select.slides), mar=c(4,0,2,0), oma=c(1,5,0,0))
       
 dist.bt.peaks = 
-lapply (biopsies, function(s) {
+lapply (select.slides, function(s) {
 sapply (tissue.types, function(tissue.type) { 
 sapply (dist.labels, simplify="array", function(dist) {
 # tissue.type="intact"; dist="dist2skin"; s="AS/AS1_Les"; 
@@ -30,10 +30,10 @@ sapply (dist.labels, simplify="array", function(dist) {
   dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
   
   all.freq = scaled.hist(dat.ls,
-       scale.factors=lapply(markers, function(a) subset(tissue_size_by_depth_and_region, biopsy==s & dist_type==dist & region==tissue.type)),
+       scale.factors=lapply(markers, function(a) subset(tissue_size_by_depth_and_region, biopsy==get.initial(s)%.%"/"%.%s & dist_type==dist & region==tissue.type)),
        xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
        xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
-       main=ifelse(s==biopsies[1],tissue.type,""),
+       main=ifelse(s==select.slides[1],tissue.type,""),
        col=seq_along(markers),
        legend=markers,
        cex.legend=0.7,
@@ -52,7 +52,7 @@ sapply (dist.labels, simplify="array", function(dist) {
 
 
 # leftmost labeling
-tmp=get.slide.name(biopsies)
+tmp=get.slide.name(select.slides)
 for (i in 1:length(tmp)) {
   # ylab
   mtext("Cells/100x100 um2", side = 2, line = 2., outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2)+0., 
@@ -68,12 +68,12 @@ dev.off()
 
 
 ################################################################################
-# table combining biopsies
+# table combining select.slides
 # 
 # for (tissue.type in tissue.types) {
 #   tab=rbind(
-#     round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]]["dist2skin",tissue.type])),
-#     round(sapply(biopsies.1, function(b) dist.bt.peaks[[b]]["dist2DEJ",tissue.type])),
+#     round(sapply(select.slides.1, function(b) dist.bt.peaks[[b]]["dist2skin",tissue.type])),
+#     round(sapply(select.slides.1, function(b) dist.bt.peaks[[b]]["dist2DEJ",tissue.type])),
 #     cbind(c(t(count.tables$DD[[tissue.type]])), 
 #           c(t(count.tables$CF[[tissue.type]])),
 #           c(t(count.tables$JM[[tissue.type]])))
