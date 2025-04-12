@@ -33,6 +33,10 @@ select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les",  "EB_Les", "JK1_Le
           "LS2_Les", "SK2_Les")
 names(select.slides)=get.slide.name(select.slides)
 
+biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biopsies
+
+slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
+
 key.markers=c("CD3", "CD11c", "CD123", "CD15", "CD56", "CD68")
 
 # make sure all select.slides have all key markers

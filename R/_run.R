@@ -9,13 +9,14 @@ if (Sys.info()[["sysname"]] == "Windows") {
   # automatically set working directory to the parent of the location of this file
 }
 
-
+# this write a Rdata file with the data
 source("R/data.R")
 
 source("R/make_counts_tables.R") 
 
-#source("R/compare_biopsies.R")
-
 source("R/compare_intact_ulcerative.R")
 
 source("R/compare_markers.R")
+
+#source("R/compare_biopsies.R")
+

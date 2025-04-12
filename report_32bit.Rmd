@@ -6,7 +6,6 @@ output:
       in_header: header.tex
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 ---
-
 <!-- can be rendered in Rstudio on Windows using files from the remote drive or from command line on the Hutch server -->
 
 ```{r setup, include=FALSE}
@@ -20,54 +19,287 @@ load("R/forRmd.RData")# load the objects from a file
 ## Slides and markers
 
 ```{r results='asis', echo=FALSE}
-print(markers.ls[select.slides], quote=F)
+print(lapply(markers.ls, function(x) names(x)), quote=F)
 ```
 
 \bigskip
 
-Marker groups
+There are 13 lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion.
 
-- T cell: CD3 CD4 CD8 CD69 CD279 Foxp3
-- Neutrophil: CD15
-- Dendritic cells: CD11c CD123 
-- Macrophage: CD68
-- NK cells: CD56. This marker is expressed on both NK and nerve fibers, need to check if the staining on the latter affects the NK cell count.
+The key markers are: CD CD11c CD123 CD15 CD56 CD68. Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. Furthermore, for CF lesion CD68 staining, CF5_Les instead of CF1_Les is used due to quality reasons.
 
+Many lesion biopsies have multiple sections. The following choices of representative slides are made: 
 
-The key markers are: CD11c CD123 CD3 CD15 CD56 CD68. There are 13 lesion biopsies in total. We will focus on lesion biopsies with the key markers data.
-
-The CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. 
-
-Some lesion biopsies have multiple sections. The following choices of slides are made: 
-
-- AS/AS1_Les
-- CF/CF1_Les
-- CJ/CJ1_Les
-- DD/DD1_Les
-- EB/EB_Les
-- JK/JK1_Les
-- JM/JM1_Les
-- JT/JT_Les
-- LD/LD_Les
-- LG/LG2_Les
-- LM/LM_Les
-- LS/LS2_Les
-- SK/SK2_Les 
-
-The only exceptions are
-
-- For CF CD68, CF5 is used instead of CF1 for better quality.
+- AS1_Les
+- CF1_Les
+- CJ1_Les
+- DD1_Les
+- EB_Les
+- JK1_Les
+- JM1_Les
+- JT_Les
+- LD_Les
+- LG2_Les
+- LM_Les
+- LS2_Les
+- SK2_Les 
 
 
+\newpage
+## Scatterplots 
+
+In all plots, R2* is computed without slides from AS_Les. Two versions of the plots are shown: one with all slides and one with only the selected slides. 
+
+First, we count cells in regions regularized by distance from DEJ
+
+- DEJ500: dermis up to 500 um below DEJ
+- DEJ1000: dermis up to 1000 um below DEJ
+- DEJInf: all dermis
+
+
+
+```{r DEJ depth controlledscatterplot of shedding_rate vs cnt_total, results='asis', echo=FALSE, fig.height=9, fig.width=7, fig.align='center'}
+
+# count.tables is a list. each element is named after a slide name, e.g. AS1_Les
+# count.tables$AS1_Les is a list of 3 elements: DEJ500, DEJ1000, DEJInf
+# count.tables$AS1_Les[['DEJ500']] is a list with 4 columns: sizes, counts, densities, reg.densities
+a="CD3"
+xx=c("DEJ500", "DEJ1000", "DEJInf"); names(xx)=xx
+
+for (kp in 1:2) {
+  # first do select.slides, second do all.slides
+  if(kp==1) {
+    slides=select.slides
+  } else {
+    slides=all.slides
+  }
+  
+  counts=lapply(xx, function (x) {
+    out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$counts[,a]))
+    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+          out,
+          initial = get.initial(rownames(out)),
+          total=rowSums(out))
+  })
+  
+  densities=lapply(xx, function (x) {
+    out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$densities[,a]))
+    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+          out,
+          initial = get.initial(rownames(out)),
+          total=rowSums(out))
+  })
+  
+  reg.densities=lapply(xx, function (x) {
+    out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$reg.densities[,a]))
+    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+          out,
+          initial = get.initial(rownames(out)),
+          total=rowSums(out))
+  })
+  
+  if(kp==1) {
+      cat("The following tables show the regularized densities by regions. DI: dermis intact; DU: dermis ulcerative; EI: epidermis intact; EU: epidermis ulcerative. SR: shedding rate. \n\n")  
+    for (x in xx) {
+      print(kable(reg.densities[[x]], caption=x))
+    }
+  }
+  
+  
+  par(mfrow=c(4,3))
+  reduce_margin()
+  
+  # plot total cell count of dermis/epidermis intact and ulcerative
+  ylim=c(0,max(counts$DEJInf$total))
+  for (x in rev(xx)) {
+    with(counts[[x]], {
+      plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+      legend("topright", legend=paste("R2*=", round(summary(lm(total[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    })
+  }
+  
+  # plot densities for dermis intact, because not all tissues have ulcerative
+  ylim=NULL
+  for (x in rev(xx)) {
+    with(densities[[x]], {
+      plot(SR, DI, xlab="Shedding rate", main=glue("Densities ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+      legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    })
+  }
+  
+  # plot regularized densities for dermis intact, because not all tissues have ulcerative
+  ylim=NULL
+  for (x in rev(xx)) {
+    with(reg.densities[[x]], {
+      plot(SR, DI, xlab="Shedding rate", main=glue("Reg Densities ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+      legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    })
+  }
+  
+  # plot densities for epidermis intact, this does not depend on the DEJ500/DEJ1000/DEJInf
+  ylim=NULL
+  with(densities[[1]], {
+    plot(SR, EI, xlab="Shedding rate", main=glue("Densities DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+    legend("topright", legend=paste("R2*=", round(summary(lm(EI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+  })
+  
+  ylim=NULL
+  with(reg.densities[[1]], {
+    plot(SR, EI, xlab="Shedding rate", main=glue("Reg Densities EI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+    legend("topright", legend=paste("R2*=", round(summary(lm(EI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+  })
+
+}
+```
+
+
+\newpage
+
+Next, we count cells in regions regularized by distance from skin
+
+- Skin1000: up to 1000 um below skin
+- SkinInf: all depth
+
+```{r skin depth controlled scatterplot of shedding_rate vs cnt_total, results='asis', echo=FALSE, fig.height=4.5, fig.width=4.7, fig.align='center'}
+# count.tables.2 is a list. each element is named after a slide name, e.g. AS1_Les
+# count.tables.2$AS1_Les is a list of 3 elements: Skin1000, SkinInf
+# count.tables.2$AS1_Les[['skin1000']] is a list with 4 columns: sizes, counts, densities, reg.densities
+a="CD3"
+xx=c("Skin1000", "SkinInf"); names(xx)=xx
+
+for (kp in 1:2) {
+  # first do select.slides, second do all.slides
+  if(kp==1) {
+    slides=select.slides
+  } else {
+    slides=all.slides
+  }
+  
+  counts=lapply(xx, function (x) {
+    out = as.data.frame(mysapply(slides, function (s) count.tables.2[[s]][[x]]$counts[,a]))
+    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+          out,
+          initial = get.initial(rownames(out)),
+          total=rowSums(out))
+  })
+  
+  densities=lapply(xx, function (x) {
+    out = as.data.frame(mysapply(slides, function (s) count.tables.2[[s]][[x]]$densities[,a]))
+    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+          out,
+          initial = get.initial(rownames(out)),
+          total=rowSums(out))
+  })
+  
+  reg.densities=lapply(xx, function (x) {
+    out = as.data.frame(mysapply(slides, function (s) count.tables.2[[s]][[x]]$reg.densities[,a]))
+    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+          out,
+          initial = get.initial(rownames(out)),
+          total=rowSums(out))
+  })
+  
+  if(kp==1) {
+      cat("The following tables show the regularized densities by regions. I: intact; U: ulcerative. SR: shedding rate.\n\n")  # Print as a level 3 header (Markdown-style)
+    for (x in xx) {
+      print(kable(reg.densities[[x]], caption=x))
+    }  
+    cat("\\newpage\n")
+  }
+  
+  
+  par(mfrow=c(2,2))
+  reduce_margin()
+  
+  # plot total cell count of dermis/epidermis intact and ulcerative
+  ylim=c(0,max(counts$SkinInf$total))
+  for (x in rev(xx)) {
+    with(counts[[x]], {
+      plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+      legend("topright", legend=paste("R2*=", round(summary(lm(total[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    })
+  }
+  
+  # plot regularized densities for dermis intact, because not all tissues have ulcerative
+  ylim=NULL
+  for (x in rev(xx)) {
+    with(reg.densities[[x]], {
+      plot(SR, I, xlab="Shedding rate", main=glue("Reg Densities ({x}) I"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+      legend("topright", legend=paste("R2*=", round(summary(lm(I[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    })
+  }
+
+  cat("\\newpage\n")
+}
+```
 
 
 ## Density curves
 
-Number of cells per 100x100 um2 tissue as a function of distance to skin.
-The curves are smoothed over histograms and each bin in the histogram represents a 100 um interval. 
-Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.
+In this section we plot the number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
+Each bin in the histogram represents the count in a 100x100 um2 area. Regularized density used in the correlates study is computed as the area under the curve with cutoff at a given depth.
+
+
+### Intact vs. ulcerrative - representative slides
+
+In this subsection, there are two figures, one for dist2skin and one for dist2DEJ. Each figure shows 13 representative slides. Some observations:
+
+- Comparing the CD3 cell distribution between CF and DD, we see that the ratio of the area under the curve across both epi and dermis between red and blue(ulcerative and intact) is about 1 for CD3/CF and 1/3 for CD3/DD. This suggests that CD3 is depleted in lesion in DD, but not in CF.
+
+- Comparing the CD15 cell distribution in CF between intact and ulcerative, we see that the lesion peak is shifted to the left compared to the normal peak. This pattern is more clear in CF than in DD. We don't see this pattern for CD3.
 
 \newpage
+```{r intact+ulcer select, results='asis', echo=FALSE}
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ.png}\\end{figure}\n")
+```
+
+### Intact vs. ulcerrative - all slides
+
+In this subsection, each figure shows all slides from a single biopsy. 
+
+\newpage
+```{r intact+ulcer all, results='asis', echo=FALSE}
+for (b in biopsies) {
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%".png}\\end{figure}\n\\newpage")
+}
+```
+
+### Markers comparison - select slides   
+
+In this subsection, there is one figure showing 13 representative slides. Some observations:
+
+- The CD15 dist2skin peak in DD/lesion is near skin while the corresponding dist2DEJ peak is near DEJ is due to the fact that the DEJ line is very curvy.
+
+```{r results='asis', echo=FALSE}
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers.png}\\end{figure}\n")
+```
+
+### Markers comparison - all slides
+
+In this subsection, each figure shows all slides from a single biopsy. 
+
+\newpage
+```{r, results='asis', echo=FALSE}
+for (b in biopsies) {
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%".png}\\end{figure}\n\\newpage")
+}
+```
+        
+
+## Count tables
+
+For each slide, there are two tables, one for up to 500 um below DEJ and one for up to 1000 um below DEJ.
+
+\newpage
+
+```{r count and density tables, results='asis', echo=FALSE}
+table_files <- list.files("output/tables/input/", pattern = ".*_counts+.*\\.tex$", full.names = TRUE)
+for (f in table_files) cat(paste0("\\input{", f, "}\n\\newpage"))
+```
+
 
 <!-- ```{r 3 biopsies on same plot, results='asis', echo=FALSE} -->
 <!-- cat("\\begin{figure}[H]\n\\centering\n -->
@@ -94,190 +326,3 @@ Adding up the counts from all the bins gives the number of cells in tissue of 10
 <!-- Adding up the counts from all the bins gives the number of cells in tissue of 100 um in width.}\\end{figure}\n") -->
 <!-- ``` -->
 <!-- \newpage -->
-
-```{r results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ.png}\\end{figure}\n")
-```
-
-
-
-Comparing the first two rows in the first column, we see that the ratio of the area under the curve across both epi and dermis between red and blue(ulcerative and intact) is about 1 for CD3/CF and 1/3 for CD3/DD. This suggests that CD3 is depleted in lesion in DD, but not in CF.
-
-Compare lesion with normal in CD15/CF, we see that the lesion peak is shifted to the left compared to the normal peak. This pattern is more clear in CF than in DD. We don't see this pattern for CD3.
-    
-\newpage
-
-```{r results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers.png}\\end{figure}\n")
-```
-
-That the CD15 dist2skin peak in DD/lesion is near skin while the corresponding dist2DEJ peak is near DEJ is due to the fact that the DEJ line is very curvy.
-        
-\newpage
-
-## Scatterplots of Shedding rate and counts and densities
-
-Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion.
-
-
-
-```{r, echo=FALSE}
-# count.tables is a list. each element is named after a slide name, e.g. AS1_Les
-# count.tables$AS1_Les is a list of 3 elements: DEJ500, DEJ1000, DEJInf
-# count.tables$AS1_Les[['DEJ500']] is a list with 4 columns: sizes, counts, densities, reg.densities
-a="CD3"
-xx=c("DEJ500", "DEJ1000", "DEJInf"); names(xx)=xx
-
-counts=lapply(xx, function (x) {
-  out = as.data.frame(mysapply(select.slides, function (s) count.tables[[s]][[x]]$counts[,a]))
-  cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-        out,
-        total=rowSums(out))
-})
-
-densities=lapply(xx, function (x) {
-  out = as.data.frame(mysapply(select.slides, function (s) count.tables[[s]][[x]]$densities[,a]))
-  cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-        out,
-        total=rowSums(out))
-})
-
-reg.densities=lapply(xx, function (x) {
-  out = as.data.frame(mysapply(select.slides, function (s) count.tables[[s]][[x]]$reg.densities[,a]))
-  cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-        out,
-        total=rowSums(out))
-})
-
-# kable(countsDEJ500, caption="Counts and shedding rate (SR). DI: dermis intact; DU: dermis ulcerative; EI: epidermis intact; EU: epidermis ulcerative.")
-```
-
-```{r results='asis', echo=FALSE, fig.height=9, fig.width=7}
-# scatterplot of shedding_rate vs cnt_total
-
-par(mfrow=c(4,3))
-reduce_margin()
-
-# plot total cell count of dermis/epidermis intact and ulcerative
-ylim=c(0,max(counts$DEJInf$total))
-for (x in rev(xx)) {
-  with(counts[[x]], {
-    plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim)
-    legend("topright", legend=paste("R2*=", round(summary(lm(total[-1] ~ SR[-1]))$r.squared, 3)), bty="n")
-  })
-}
-
-# plot densities for dermis intact, because not all tissues have ulcerative
-ylim=NULL
-for (x in rev(xx)) {
-  with(densities[[x]], {
-    plot(SR, DI, xlab="Shedding rate", main=glue("Densities ({x}) DI"), ylab=a, ylim=ylim)
-    legend("topright", legend=paste("R2*=", round(summary(lm(DI[-1] ~ SR[-1]))$r.squared, 3)), bty="n")
-  })
-}
-
-# plot regularized densities for dermis intact, because not all tissues have ulcerative
-ylim=NULL
-for (x in rev(xx)) {
-  with(reg.densities[[x]], {
-    plot(SR, DI, xlab="Shedding rate", main=glue("Reg Densities ({x}) DI"), ylab=a, ylim=ylim)
-    legend("topright", legend=paste("R2*=", round(summary(lm(DI[-1] ~ SR[-1]))$r.squared, 3)), bty="n")
-  })
-}
-
-# plot densities for epidermis intact, this does not depend on the DEJ500/DEJ1000/DEJInf
-ylim=NULL
-with(densities[[1]], {
-  plot(SR, EI, xlab="Shedding rate", main=glue("Densities DI"), ylab=a, ylim=ylim)
-  legend("topright", legend=paste("R2*=", round(summary(lm(EI[-1] ~ SR[-1]))$r.squared, 3)), bty="n")
-})
-
-ylim=NULL
-with(reg.densities[[1]], {
-  plot(SR, EI, xlab="Shedding rate", main=glue("Reg Densities EI"), ylab=a, ylim=ylim)
-  legend("topright", legend=paste("R2*=", round(summary(lm(EI[-1] ~ SR[-1]))$r.squared, 3)), bty="n")
-})
-
-
-```
-
-DI: dermis intact; EI: epidermis intact; DEJ500: dermis up to 500 um below DEJ; DEJ1000: dermis up to 1000 um below DEJ; DEJInf: all dermis.
-R2* is computed without AS1_Les, which has the highest shedding rate.
-
-
-```{r, echo=FALSE}
-# count.tables.2 is a list. each element is named after a slide name, e.g. AS1_Les
-# count.tables.2$AS1_Les is a list of 3 elements: Skin1000, SkinInf
-# count.tables.2$AS1_Les[['skin1000']] is a list with 4 columns: sizes, counts, densities, reg.densities
-a="CD3"
-xx=c("Skin1000", "SkinInf"); names(xx)=xx
-
-counts=lapply(xx, function (x) {
-  out = as.data.frame(mysapply(select.slides, function (s) count.tables.2[[s]][[x]]$counts[,a]))
-  cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-        out,
-        total=rowSums(out))
-})
-
-densities=lapply(xx, function (x) {
-  out = as.data.frame(mysapply(select.slides, function (s) count.tables.2[[s]][[x]]$densities[,a]))
-  cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-        out,
-        total=rowSums(out))
-})
-
-reg.densities=lapply(xx, function (x) {
-  out = as.data.frame(mysapply(select.slides, function (s) count.tables.2[[s]][[x]]$reg.densities[,a]))
-  cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-        out,
-        total=rowSums(out))
-})
-
-# kable(countsskin500, caption="Counts and shedding rate (SR). DI: dermis intact; DU: dermis ulcerative; EI: epidermis intact; EU: epidermis ulcerative.")
-```
-
-```{r results='asis', echo=FALSE, fig.height=4.5, fig.width=4.7}
-# scatterplot of shedding_rate vs cnt_total
-
-par(mfrow=c(2,2))
-reduce_margin()
-
-# plot total cell count of dermis/epidermis intact and ulcerative
-ylim=c(0,max(counts$SkinInf$total))
-for (x in rev(xx)) {
-  with(counts[[x]], {
-    plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim)
-    legend("topright", legend=paste("R2*=", round(summary(lm(total[-1] ~ SR[-1]))$r.squared, 3)), bty="n")
-  })
-}
-
-# plot regularized densities for dermis intact, because not all tissues have ulcerative
-ylim=NULL
-for (x in rev(xx)) {
-  with(reg.densities[[x]], {
-    plot(SR, I, xlab="Shedding rate", main=glue("Reg Densities ({x}) I"), ylab=a, ylim=ylim)
-    legend("topright", legend=paste("R2*=", round(summary(lm(I[-1] ~ SR[-1]))$r.squared, 3)), bty="n")
-  })
-}
-
-
-```
-
-I: intact; Skin1000: up to 1000 um below skin; SkinInf: all depth.
-R2* is computed without AS1_Les, which has the highest shedding rate.
-
-
-
-## Count tables
-
-For each slide, there are two tables, one for up to 500 um below DEJ and one for up to 1000 um below DEJ.
-
-\newpage
-
-```{r count and density tables, results='asis', echo=FALSE}
-table_files <- list.files("output/tables/input/", pattern = ".*_counts+.*\\.tex$", full.names = TRUE)
-for (f in table_files) cat(paste0("\\input{", f, "}\n\\newpage"))
-```
-
-

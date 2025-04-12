@@ -1,12 +1,11 @@
 # Analysis of 32-bit images
 
-Todo:
-- remove HSV_severity_correlates github repo
-
-Use Rstudio on laptop and Hutch server to work on the files on the Hutch server.
-
-
 Analysis of images that are processed through a 32-bit import from the instrument. Older analysis files using 8-bit import are saved under the folder 8bit.
+
+Workflow: 
+- For image processing and cell segmentation, use python
+- For making report, work with files on the cluster. Use Rstudio online to run the R scripts, which generate a Rdata file. Use Rstudio on laptop to write R scripts and run Rmd. 
+
 
 ### Setup
 Load modules on Volta or the Hutch cluster.
@@ -39,7 +38,19 @@ export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
            - epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
            - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
 
-  
+
+### Background
+
+Marker groups
+
+- T cell: CD3 CD4 CD8 CD69 CD279 Foxp3
+- Neutrophil: CD15
+- Dendritic cells: CD11c CD123 
+- Macrophage: CD68
+- NK cells: CD56. This marker is expressed on both NK and nerve fibers, need to check if the staining on the latter affects the NK cell count.
+
+
+
 ### Tissue stats
 
 ```{bash}
