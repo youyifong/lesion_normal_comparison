@@ -48,14 +48,17 @@ Many lesion biopsies have multiple sections. The following choices of representa
 \newpage
 ## Scatterplots 
 
-In all plots, R2* is computed without slides from AS_Les. Two versions of the plots are shown: one with all slides and one with only the selected slides. 
+In all plots, R2* is computed without slides from AS_Les. 
 
-First, we count cells in regions regularized by distance from DEJ
+Three versions of the plots are shown:  
+• one with all slides  
+• one with average of all slides  
+• one with only the selected slides  
 
-- DEJ500: dermis up to 500 um below DEJ
-- DEJ1000: dermis up to 1000 um below DEJ
-- DEJInf: all dermis
-
+First, we restrict the analyses to the regions defined by distance from DEJ  
+• DEJ500: dermis up to 500 um below DEJ  
+• DEJ1000: dermis up to 1000 um below DEJ  
+• DEJInf: all dermis  
 
 
 ```{r DEJ depth controlledscatterplot of shedding_rate vs cnt_total, results='asis', echo=FALSE, fig.height=9, fig.width=7, fig.align='center'}
@@ -66,40 +69,44 @@ First, we count cells in regions regularized by distance from DEJ
 a="CD3"
 xx=c("DEJ500", "DEJ1000", "DEJInf"); names(xx)=xx
 
-for (kp in 1:2) {
-  # first do select.slides, second do all.slides
+for (kp in c(1,3,2)) {
   if(kp==1) {
     slides=select.slides
-  } else {
+  } else if (kp==2) {
     slides=all.slides
+  } else {
+    slides=avg_slides
   }
   
-  counts=lapply(xx, function (x) {
-    out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$counts[,a]))
-    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-          out,
-          initial = get.initial(rownames(out)),
-          total=rowSums(out))
-  })
-  
-  densities=lapply(xx, function (x) {
-    out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$densities[,a]))
-    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-          out,
-          initial = get.initial(rownames(out)),
-          total=rowSums(out))
-  })
+  if(kp == 1 | kp==2) { # avg_slides has no counts or densities
+    counts=lapply(xx, function (x) {
+      out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$counts[,a]))
+      
+      cbind(SR = severity$Shedding.rate[match(get.initial(slides), severity$initial)], 
+            out,
+            initial = get.initial(slides),
+            total=rowSums(out))
+    })
+    
+    densities=lapply(xx, function (x) {
+      out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$densities[,a]))
+      cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+            out,
+            initial = get.initial(rownames(out)),
+            total=rowSums(out))
+    })
+  }
   
   reg.densities=lapply(xx, function (x) {
-    out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$reg.densities[,a]))
+    out = as.data.frame(mysapply(slides, function (s) count.tables[[s]][[x]]$reg.densities[,a])) 
     cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
           out,
           initial = get.initial(rownames(out)),
           total=rowSums(out))
   })
   
-  if(kp==1) {
-      cat("The following tables show the regularized densities by regions. DI: dermis intact; DU: dermis ulcerative; EI: epidermis intact; EU: epidermis ulcerative. SR: shedding rate. \n\n")  
+  if(kp==1) { # only print for select.slides
+      cat("The following tables show the regularized densities of select slides in different regions: dermis intact (DI), dermis ulcerative (DU), epidermis intact (EI); epidermis ulcerative (EU). SR: shedding rate. \n\n")  
     for (x in xx) {
       print(kable(reg.densities[[x]], caption=x))
     }
@@ -109,43 +116,52 @@ for (kp in 1:2) {
   par(mfrow=c(4,3))
   reduce_margin()
   
-  # plot total cell count of dermis/epidermis intact and ulcerative
+  # row 1. plot total cell count of dermis/epidermis intact and ulcerative
   ylim=c(0,max(counts$DEJInf$total))
   for (x in rev(xx)) {
     with(counts[[x]], {
-      plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
-      legend("topright", legend=paste("R2*=", round(summary(lm(total[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      if(kp == 1 | kp==2) { # avg_slides has no counts or densities
+        plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+        legend("topright", legend=paste("R2*=", round(summary(lm(total[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      } else empty.plot()
     })
   }
   
-  # plot densities for dermis intact, because not all tissues have ulcerative
+  # row 2. plot densities for dermis intact, because not all tissues have ulcerative
   ylim=NULL
   for (x in rev(xx)) {
     with(densities[[x]], {
-      plot(SR, DI, xlab="Shedding rate", main=glue("Densities ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
-      legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      if(kp == 1 | kp==2) { # avg_slides has no counts or densities
+        plot(SR, DI, xlab="Shedding rate", main=glue("Densities ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+        legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      } else empty.plot()
     })
   }
   
-  # plot regularized densities for dermis intact, because not all tissues have ulcerative
+  # row 3. plot regularized densities for dermis intact, because not all tissues have ulcerative
   ylim=NULL
   for (x in rev(xx)) {
     with(reg.densities[[x]], {
-      plot(SR, DI, xlab="Shedding rate", main=glue("Reg Densities ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+      plot(SR, DI, xlab="Shedding rate", main=glue("Reg Densities ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
       legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
     })
   }
   
-  # plot densities for epidermis intact, this does not depend on the DEJ500/DEJ1000/DEJInf
+  # row 4, epidermis. does not depend on the DEJ500/DEJ1000/DEJInf
+  
+  # plot densities for epidermis intact
   ylim=NULL
   with(densities[[1]], {
-    plot(SR, EI, xlab="Shedding rate", main=glue("Densities DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
-    legend("topright", legend=paste("R2*=", round(summary(lm(EI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    if(kp == 1 | kp==2) { # avg_slides has no counts or densities
+      plot(SR, EI, xlab="Shedding rate", main=glue("Densities DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+      legend("topright", legend=paste("R2*=", round(summary(lm(EI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    } else empty.plot()
   })
   
+  # plot reg. densities for epidermis intact
   ylim=NULL
   with(reg.densities[[1]], {
-    plot(SR, EI, xlab="Shedding rate", main=glue("Reg Densities EI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+    plot(SR, EI, xlab="Shedding rate", main=glue("Reg Densities EI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
     legend("topright", legend=paste("R2*=", round(summary(lm(EI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
   })
 
@@ -155,7 +171,7 @@ for (kp in 1:2) {
 
 \newpage
 
-Next, we count cells in regions regularized by distance from skin
+Next, we restrict the analyses to the regions defined by distance from skin
 
 - Skin1000: up to 1000 um below skin
 - SkinInf: all depth
@@ -167,29 +183,33 @@ Next, we count cells in regions regularized by distance from skin
 a="CD3"
 xx=c("Skin1000", "SkinInf"); names(xx)=xx
 
-for (kp in 1:2) {
+for (kp in c(1,3,2)) {
   # first do select.slides, second do all.slides
   if(kp==1) {
     slides=select.slides
-  } else {
+  } else if (kp==2) {
     slides=all.slides
+  } else {
+    slides=avg_slides
   }
   
-  counts=lapply(xx, function (x) {
-    out = as.data.frame(mysapply(slides, function (s) count.tables.2[[s]][[x]]$counts[,a]))
-    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-          out,
-          initial = get.initial(rownames(out)),
-          total=rowSums(out))
-  })
-  
-  densities=lapply(xx, function (x) {
-    out = as.data.frame(mysapply(slides, function (s) count.tables.2[[s]][[x]]$densities[,a]))
-    cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-          out,
-          initial = get.initial(rownames(out)),
-          total=rowSums(out))
-  })
+  if(kp == 1 | kp==2) { # avg_slides has no counts or densities
+    counts=lapply(xx, function (x) {
+      out = as.data.frame(mysapply(slides, function (s) count.tables.2[[s]][[x]]$counts[,a]))
+      cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+            out,
+            initial = get.initial(rownames(out)),
+            total=rowSums(out))
+    })
+    
+    densities=lapply(xx, function (x) {
+      out = as.data.frame(mysapply(slides, function (s) count.tables.2[[s]][[x]]$densities[,a]))
+      cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+            out,
+            initial = get.initial(rownames(out)),
+            total=rowSums(out))
+    })
+  }
   
   reg.densities=lapply(xx, function (x) {
     out = as.data.frame(mysapply(slides, function (s) count.tables.2[[s]][[x]]$reg.densities[,a]))
@@ -200,7 +220,7 @@ for (kp in 1:2) {
   })
   
   if(kp==1) {
-      cat("The following tables show the regularized densities by regions. I: intact; U: ulcerative. SR: shedding rate.\n\n")  # Print as a level 3 header (Markdown-style)
+      cat("The following tables show the regularized densities of select slides by regions: intact (I); ulcerative (U). SR: shedding rate.\n\n")  # Print as a level 3 header (Markdown-style)
     for (x in xx) {
       print(kable(reg.densities[[x]], caption=x))
     }  
@@ -215,8 +235,10 @@ for (kp in 1:2) {
   ylim=c(0,max(counts$SkinInf$total))
   for (x in rev(xx)) {
     with(counts[[x]], {
-      plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
-      legend("topright", legend=paste("R2*=", round(summary(lm(total[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      if(kp == 1 | kp==2) { # avg_slides has no counts or densities
+        plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+        legend("topright", legend=paste("R2*=", round(summary(lm(total[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      } else empty.plot()
     })
   }
   
@@ -224,7 +246,7 @@ for (kp in 1:2) {
   ylim=NULL
   for (x in rev(xx)) {
     with(reg.densities[[x]], {
-      plot(SR, I, xlab="Shedding rate", main=glue("Reg Densities ({x}) I"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=16)
+      plot(SR, I, xlab="Shedding rate", main=glue("Reg Densities ({x}) I"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
       legend("topright", legend=paste("R2*=", round(summary(lm(I[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
     })
   }

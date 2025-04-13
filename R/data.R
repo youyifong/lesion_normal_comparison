@@ -33,6 +33,9 @@ select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les",  "EB_Les", "JK1_Le
           "LS2_Les", "SK2_Les")
 names(select.slides)=get.slide.name(select.slides)
 
+# average reg.densities of all slides from a single biopsy
+avg_slides = glue("{biopsies}_Les_avg")
+
 biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biopsies
 
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
@@ -315,6 +318,43 @@ count.tables.2 = lapply (all.slides, function(s) {
     
   })
 }) 
+
+
+# create avg.slides that average regularized densities across slides for a biopsy
+out = lapply(biopsies, function(b){
+  
+  depths=c(500, 1000, Inf)
+  depths=paste0("DEJ", depths)
+  names(depths)=depths
+  out=lapply (depths, function(max_depth) { # um
+    tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
+      count.tables[[s]][[max_depth]]$reg.densities[,"CD3",drop=F]
+    })
+    out=apply(tab,c(1,2), mean)
+    list(reg.densities=out, sizes=NA, counts=NA, densities=NA)
+  })
+  
+})
+names(out) = glue("{biopsies}_Les_avg")
+count.tables = c(count.tables, out)
+
+# repeat for count.tables.2
+out = lapply(biopsies, function(b){
+  
+  depths=c(1000, Inf)
+  depths=paste0("Skin", depths)
+  names(depths)=depths
+  out=lapply (depths, function(max_depth) { # um
+    tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
+      count.tables.2[[s]][[max_depth]]$reg.densities[,"CD3",drop=F]
+    })
+    out=apply(tab,c(1,2), mean)
+    list(reg.densities=out, sizes=NA, counts=NA, densities=NA)
+  })
+  
+})
+names(out) = glue("{biopsies}_Les_avg")
+count.tables.2 = c(count.tables.2, out)
 
 
 # save the objects except alldat to a file
