@@ -14,7 +14,7 @@ for (s in all.slides) {
   for (max_depth in c(500, 1000)) { # um 
     myprint(s, max_depth)
 
-    tab=with (count.tables[[s]][["DEJ"%.%max_depth]], t(rbind(counts, densities, reg.densities)))
+    tab=with (count.tables[[s]][["DEJ"%.%max_depth]], t(rbind(counts, densities, norm.densities)))
     mode(tab) <- "character" # convert to string
     tab=data.frame(tab)
     # add area
@@ -22,9 +22,9 @@ for (s in all.slides) {
     print(tab)
     
     mytex(data.frame(tab), file.name="output/tables/"%.%s1%.%"_counts_"%.%max_depth, digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r|","r","r","r","r"),
-          floating=T, caption=escapeUnderline(s1)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. Area is measured in mm2. Density in count per mm2. Regularized density refers to the average of positive density measurements taken at 100um DEJ depth intervals, i.e. each depth is weighted equally instead of based on tissue shape.",
+          floating=T, caption=escapeUnderline(s1)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. Area is measured in mm2. Density in count per mm2. normalized density refers to the average of positive density measurements taken at 100um DEJ depth intervals, i.e. each depth is weighted equally instead of based on tissue shape.",
           col.headers="\\hline\n 
-           \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Counts} & \\multicolumn{4}{c|}{Density} & \\multicolumn{4}{c}{Regularized Density} \\\\ 
+           \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Counts} & \\multicolumn{4}{c|}{Density} & \\multicolumn{4}{c}{normalized Density} \\\\ 
            \\multicolumn{1}{c}{} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c|}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c|}{lesion} & \\multicolumn{2}{c}{normal} & \\multicolumn{2}{c}{lesion}  \\\\ 
            \\multicolumn{1}{c}{} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & \\multicolumn{1}{c|}{dermis} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & \\multicolumn{1}{c|}{dermis} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & dermis  \\\\ 
            \\hline
@@ -34,6 +34,3 @@ for (s in all.slides) {
 
 }
 
-
-# save the objects to a file
-save.image("R/alldat.RData")

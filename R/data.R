@@ -33,10 +33,10 @@ select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les",  "EB_Les", "JK1_Le
           "LS2_Les", "SK2_Les")
 names(select.slides)=get.slide.name(select.slides)
 
-# average reg.densities of all slides from a single biopsy
-avg_slides = glue("{biopsies}_Les_avg")
-
 biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biopsies
+
+# average norm.densities of all slides from a single biopsy
+avg_slides = glue("{biopsies}_Les_avg")
 
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
 
@@ -238,7 +238,7 @@ count.tables = lapply (all.slides, function(s) {
     mode(counts3) <- "integer"
     
     
-    list(sizes=sizes, counts=counts, densities=counts2, reg.densities=counts3)
+    list(sizes=sizes, counts=counts, densities=counts2, norm.densities=counts3)
     
   })
 }) 
@@ -314,13 +314,13 @@ count.tables.2 = lapply (all.slides, function(s) {
     mode(counts3) <- "integer"
     
     
-    list(sizes=sizes, counts=counts, densities=counts2, reg.densities=counts3)
+    list(sizes=sizes, counts=counts, densities=counts2, norm.densities=counts3)
     
   })
 }) 
 
 
-# create avg.slides that average regularized densities across slides for a biopsy
+# create avg.slides that average normalized densities across slides for a biopsy
 out = lapply(biopsies, function(b){
   
   depths=c(500, 1000, Inf)
@@ -328,10 +328,10 @@ out = lapply(biopsies, function(b){
   names(depths)=depths
   out=lapply (depths, function(max_depth) { # um
     tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
-      count.tables[[s]][[max_depth]]$reg.densities[,"CD3",drop=F]
+      count.tables[[s]][[max_depth]]$norm.densities[,"CD3",drop=F]
     })
     out=apply(tab,c(1,2), mean)
-    list(reg.densities=out, sizes=NA, counts=NA, densities=NA)
+    list(norm.densities=out, sizes=NA, counts=NA, densities=NA)
   })
   
 })
@@ -346,10 +346,10 @@ out = lapply(biopsies, function(b){
   names(depths)=depths
   out=lapply (depths, function(max_depth) { # um
     tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
-      count.tables.2[[s]][[max_depth]]$reg.densities[,"CD3",drop=F]
+      count.tables.2[[s]][[max_depth]]$norm.densities[,"CD3",drop=F]
     })
     out=apply(tab,c(1,2), mean)
-    list(reg.densities=out, sizes=NA, counts=NA, densities=NA)
+    list(norm.densities=out, sizes=NA, counts=NA, densities=NA)
   })
   
 })
