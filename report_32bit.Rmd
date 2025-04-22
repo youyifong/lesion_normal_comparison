@@ -26,7 +26,7 @@ print(lapply(markers.ls, function(x) names(x)), quote=F)
 
 There are 13 lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion.
 
-The key markers are: CD CD11c CD123 CD15 CD56 CD68. Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. Furthermore, for CF lesion CD68 staining, CF5_Les instead of CF1_Les is used due to quality reasons.
+The key markers are: CD3 CD11c CD123 CD15 CD56 CD68. Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. Furthermore, for CF lesion CD68 staining, CF5_Les instead of CF1_Les is used due to quality reasons.
 
 Many lesion biopsies have multiple sections. The following choices of representative slides are made: 
 
@@ -46,13 +46,13 @@ Many lesion biopsies have multiple sections. The following choices of representa
 
 
 \newpage
-## Scatterplots 
+## Association studies and scatterplots 
 
 In all plots, R2* is computed without slides from AS_Les. 
 
 Three versions of the plots are shown:  
 • one with all slides  
-• one with average of all slides  
+• one with average of all slides. Only normalized densities are shown because averaging non-normalized stats is not meaningful.
 • one with only the selected slides  
 
 First, we restrict the analyses to the regions defined by distance from DEJ  
@@ -106,9 +106,8 @@ for (kp in c(1,3,2)) {
   })
   
   if(kp==1) { # only print for select.slides
-      cat("The following tables show the normalized densities of select slides in different regions: dermis intact (DI), dermis ulcerative (DU), epidermis intact (EI); epidermis ulcerative (EU). SR: shedding rate. \n\n")  
     for (x in xx) {
-      print(kable(norm.densities[[x]], caption=x))
+      print(kable(norm.densities[[x]], caption=x%.% ". Normalized densities of select slides in different regions: dermis intact (DI), dermis ulcerative (DU), epidermis intact (EI); epidermis ulcerative (EU). SR: shedding rate. Total is the row sum."))
     }
   }
   
@@ -121,7 +120,7 @@ for (kp in c(1,3,2)) {
   for (x in rev(xx)) {
     with(counts[[x]], {
       if(kp == 1 | kp==2) { # avg_slides has no counts or densities
-        plot(SR, total, xlab="Shedding rate", main=glue("Total cells ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+        plot(SR, total, xlab="Shedding rate", main=glue("Cell count ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
         legend("topright", legend=paste("R2*=", round(summary(lm(total[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
       } else empty.plot()
     })
@@ -132,7 +131,7 @@ for (kp in c(1,3,2)) {
   for (x in rev(xx)) {
     with(densities[[x]], {
       if(kp == 1 | kp==2) { # avg_slides has no counts or densities
-        plot(SR, DI, xlab="Shedding rate", main=glue("Densities ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+        plot(SR, DI, xlab="Shedding rate", main=glue("Cell Density ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
         legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
       } else empty.plot()
     })
@@ -142,7 +141,7 @@ for (kp in c(1,3,2)) {
   ylim=NULL
   for (x in rev(xx)) {
     with(norm.densities[[x]], {
-      plot(SR, DI, xlab="Shedding rate", main=glue("Norm Densities ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+      plot(SR, DI, xlab="Shedding rate", main=glue("Normalized Density ({x}) DI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
       legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
     })
   }
@@ -220,9 +219,8 @@ for (kp in c(1,3,2)) {
   })
   
   if(kp==1) {
-      cat("The following tables show the normalized densities of select slides by regions: intact (I); ulcerative (U). SR: shedding rate.\n\n")  # Print as a level 3 header (Markdown-style)
     for (x in xx) {
-      print(kable(norm.densities[[x]], caption=x))
+      print(kable(norm.densities[[x]], caption=x%.%". Normalized densities of select slides by regions: intact (I); ulcerative (U). SR: shedding rate. Total is row sum.\n\n"))
     }  
     cat("\\newpage\n")
   }

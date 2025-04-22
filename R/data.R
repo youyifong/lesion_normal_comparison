@@ -27,7 +27,7 @@ markers.ls = lapply(all.slides, function(s) {
 
 all.slides = all.slides[sapply(markers.ls, function(x) length(x)>0)]
 
-# choose one slide for each biopsie
+# choose one slide for each biopsy
 select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les",  "EB_Les", "JK1_Les", 
           "JM1_Les", "JT_Les",  "LD_Les", "LG2_Les",  "LM_Les", 
           "LS2_Les", "SK2_Les")
