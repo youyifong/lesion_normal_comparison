@@ -304,7 +304,6 @@ In this subsection, each figure shows all slides from a single biopsy.
 ```{r, results='asis', echo=FALSE}
 for (b in biopsies) {
   cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%".png}\\end{figure}\n\\newpage")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%".png}\\end{figure}\n\\newpage")
 }
 ```
         

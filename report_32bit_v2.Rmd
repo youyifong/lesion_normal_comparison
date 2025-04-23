@@ -1,0 +1,212 @@
+---
+title: "report_32bit"
+output: 
+  pdf_document:
+    includes:
+      in_header: header.tex
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+---
+<!-- can be rendered in Rstudio on Windows using files from the remote drive or from command line on the Hutch server -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kyotil)
+library(knitr)
+# library(kableExtra)
+library(glue)
+load("R/forRmd.RData")# load the objects from a file
+```
+
+## Introduction
+
+There are 13 lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion. List of available markers per slide: 
+\bigskip
+
+```{r results='asis', echo=FALSE}
+print(lapply(markers.ls, function(x) names(x)), quote=F)
+```
+
+\bigskip
+
+The key markers are: CD3 CD11c CD123 CD15 CD56 CD68. Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. Furthermore, for CF lesion CD68 staining, CF5_Les instead of CF1_Les is used due to quality reasons.
+
+Many lesion biopsies have multiple sections. The following choices of representative slides are made: 
+
+- AS1_Les
+- CF1_Les
+- CJ1_Les
+- DD1_Les
+- EB_Les
+- JK1_Les
+- JM1_Les
+- JT_Les
+- LD_Les
+- LG2_Les
+- LM_Les
+- LS2_Les
+- SK2_Les 
+
+\newpage
+## Association studies and scatterplots 
+
+Based on the previous report, we decided to 
+
+- focus on normalized densities
+- focus on average across slides from the same biopsies (keep the ability for doing select slides as well)
+- focus on three metrics
+  - DEJ1000, DI
+  - skin1000, I
+  - EI
+- expand to additional markers
+- expand to examine Treg, which are CD4+CD8+Foxp3+
+
+Normalized count is the number of cells in a vertical strip 100um wide.
+
+R2* is computed without slides from AS_Les, which has the highest shedding rate and appears an outlier.
+
+\newpage
+```{r DEJ depth controlledscatterplot of shedding_rate vs cnt_total, results='asis', echo=FALSE, fig.height=12, fig.width=7, fig.align='center'}
+
+# count.tables is a list. each element is named after a slide name, e.g. AS1_Les
+# count.tables$AS1_Les is a list of 3 elements: DEJ500, DEJ1000, DEJInf
+# count.tables$AS1_Les[['DEJ500']] is a list with 4 columns: sizes, counts, densities, norm.densities
+# Similarly, count.tables.2
+xx=c("DEJ1000", "Skin1000"); names(xx)=xx
+
+cnt.tables=list()
+for (iter in c(3,1)) {
+  if(iter==1) {
+    slides=select.slides
+  } else if (iter==2) {
+    slides=all.slides
+  } else {
+    slides=avg_slides
+  }
+  
+  par(mfrow=c(length(key.markers),3), oma=c(2,0,0,0))
+  reduce_margin()
+  
+  for (a in key.markers) {
+    norm.densities=lapply(xx, function (x) {
+      out = as.data.frame(mysapply(slides, function (s) {
+        # myprint(s)
+        tables = if (startsWith(x,"DEJ")) count.tables else count.tables.2
+        tables[[s]][[x]]$norm.densities[,a]
+      }))
+      
+      cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
+            out,
+            initial = get.initial(rownames(out)),
+            total=rowSums(out))
+    })
+    
+    # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
+    ylim=NULL
+    x="DEJ1000"
+    with(norm.densities[[x]], {
+      plot(SR, DI, xlab="Shedding rate", main=glue("Normalized Count DI ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+      legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    })
+  
+    # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
+    ylim=NULL
+    x="Skin1000"
+    with(norm.densities[[x]], {
+      plot(SR, I, xlab="Shedding rate", main=glue("Normalized Count I ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+      legend("topright", legend=paste("R2*=", round(summary(lm(I[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    })
+  
+    # scatterplot of normalized densities for epidermis intact. does not depend on the DEJ500/DEJ1000/DEJInf
+    ylim=NULL
+    with(norm.densities$DEJ1000, {
+      plot(SR, EI, xlab="Shedding rate", main=glue("Normalized Count EI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+      legend("topright", legend=paste("R2*=", round(summary(lm(EI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+    })
+  
+    # create count tables for avg slides
+    if (iter==3) {
+      for (x in xx) cnt.tables = append(cnt.tables, list(kable(round(norm.densities[[x]][, -which (names(norm.densities[[x]]) %in% c("initial", "SR"))], 0), caption=paste0(a, ", ", x, ", ", ifelse(iter==1, "select slide", "slides average"), ". Normalized counts in different regions: ", ifelse(startsWith(x,"DEJ"), "dermis intact (DI); dermis ulcerative (DU); epidermis intact (EI); epidermis ulcerative (EU)", "intact (I); ulcerative (U)"), ". Total = row sum."))) )
+    }
+
+  } # for a: marker
+  
+  mtext(ifelse(iter==3, "Each biopsy is represented by the average of all available slides from the biopsy.", "Each biopsy is represented by one select slide."), side = 1, outer = TRUE, line = 1, cex = .9)
+}
+
+# print count tables
+counter=0
+for (tbl in cnt.tables) {
+  counter = (counter+1) %% 2
+  print(tbl)
+  if (counter==0) cat("\\newpage")
+}
+
+```
+
+
+\newpage
+## Density curves
+
+In this section we plot the number of cells per 100x100 um2 tissue as a function of distance to skin or DEJ.
+Each bin in the histogram represents the count in a 100x100 um2 area. Normalized density used in the correlates study is computed as the area under the curve with cutoff at a given depth.
+
+
+### Intact vs. ulcerative - representative slides
+
+In this subsection, there are two figures, one for dist2skin and one for dist2DEJ. Each figure shows 13 representative slides. Some observations:
+
+- Comparing the CD3 cell distribution between CF and DD, we see that the ratio of the area under the curve across both epi and dermis between red and blue(ulcerative and intact) is about 1 for CD3/CF and 1/3 for CD3/DD. This suggests that CD3 is depleted in lesion in DD, but not in CF.
+
+- Comparing the CD15 cell distribution in CF between intact and ulcerative, we see that the lesion peak is shifted to the left compared to the normal peak. This pattern is more clear in CF than in DD. We don't see this pattern for CD3.
+
+\newpage
+```{r intact+ulcer select, results='asis', echo=FALSE}
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ.png}\\end{figure}\n")
+```
+
+### Intact vs. ulcerrative - all slides
+
+In this subsection, each figure shows all slides from a single biopsy. 
+
+\newpage
+```{r intact+ulcer all, results='asis', echo=FALSE}
+for (b in biopsies) {
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%".png}\\end{figure}\n\\newpage")
+}
+```
+
+### Markers comparison - select slides   
+
+In this subsection, there is one figure showing 13 representative slides. Some observations:
+
+- The CD15 dist2skin peak in DD/lesion is near skin while the corresponding dist2DEJ peak is near DEJ is due to the fact that the DEJ line is very curvy.
+
+```{r results='asis', echo=FALSE}
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers.png}\\end{figure}\n")
+```
+
+### Markers comparison - all slides
+
+In this subsection, each figure shows all slides from a single biopsy. 
+
+\newpage
+```{r, results='asis', echo=FALSE}
+for (b in biopsies) {
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%".png}\\end{figure}\n\\newpage")
+}
+```
+        
+
+## Count tables
+
+For each slide, there is one table for up to 1000 um below DEJ.
+
+\newpage
+
+```{r count and density tables, results='asis', echo=FALSE}
+table_files <- list.files("output/tables/input/", pattern = ".*_counts+.*1000\\.tex$", full.names = TRUE)
+for (f in table_files) cat(paste0("\\input{", f, "}\n\\newpage"))
+```
+

@@ -50,12 +50,7 @@ severity = read.csv("R/Lesion_HSV_rates_04082025.csv")
 # add a column for the initial, which are the letter in front of the arabic number
 severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))
 
-}
 
-
-
-
-{
 region.labels=c(normal="intact", lesion="ulcerative")
 region.labels.title=c(normal="Intact", lesion="Ulcerative")
 
@@ -66,10 +61,10 @@ tissue.types=c("intact","ulcerative"); names(tissue.types)=tissue.types
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 ylim=list(dist2DEJ=c(0,100), dist2skin=c(0,100))
 
-
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 }
+
 
 
 # load mask-level data
@@ -321,40 +316,48 @@ count.tables.2 = lapply (all.slides, function(s) {
 
 
 # create avg.slides that average normalized densities across slides for a biopsy
-out = lapply(biopsies, function(b){
-  
-  depths=c(500, 1000, Inf)
-  depths=paste0("DEJ", depths)
-  names(depths)=depths
-  out=lapply (depths, function(max_depth) { # um
-    tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
-      count.tables[[s]][[max_depth]]$norm.densities[,"CD3",drop=F]
+# once for adding to count.tables and once for adding to count.tables.2
+for (iter in 1:2) {
+  out = lapply(biopsies, function(b){
+    if (iter==1){
+      depths=c(500, 1000, Inf); depths=paste0("DEJ", depths)
+    } else {
+      depths=c(1000, Inf); depths=paste0("Skin", depths)
+    }
+    names(depths)=depths
+    out=lapply (depths, function(max_depth) { 
+      # find the union of markers for slides.by.biopsy[[b]]
+      markers=c(); for (s in slides.by.biopsy[[b]]) markers=c(markers, markers.ls[[s]])
+      markers=sort(unique(markers))
+      markers=markers[!endsWith(markers, "_raw")]      # remove markers ending in raw
+      names(markers)=markers
+      
+      tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
+        # myprint(b, max_depth, s)
+        norm.densities=(if (iter==1) count.tables else count.tables.2)[[s]][[max_depth]]$norm.densities
+        # add a column of NAs to norm.densities for each marker in markers that is not in colnames(norm.densities)
+        missing_markers <- setdiff(markers, colnames(norm.densities))
+        if (length(missing_markers) > 0) {
+          na_matrix <- matrix(NA, nrow = nrow(norm.densities), ncol = length(missing_markers))
+          colnames(na_matrix) <- missing_markers
+          norm.densities <- cbind(norm.densities, na_matrix)
+        }
+        norm.densities[,markers,drop=F]
+      })
+      out=apply(tab,c(1,2), mean, na.rm=T)
+      list(norm.densities=out, sizes=NA, counts=NA, densities=NA)
     })
-    out=apply(tab,c(1,2), mean)
-    list(norm.densities=out, sizes=NA, counts=NA, densities=NA)
+    
   })
+  names(out) = glue("{biopsies}_Les_avg")
   
-})
-names(out) = glue("{biopsies}_Les_avg")
-count.tables = c(count.tables, out)
+  if (iter==1){
+    count.tables = c(count.tables, out)
+  } else {
+    count.tables.2 = c(count.tables.2, out)
+  }
+}
 
-# repeat for count.tables.2
-out = lapply(biopsies, function(b){
-  
-  depths=c(1000, Inf)
-  depths=paste0("Skin", depths)
-  names(depths)=depths
-  out=lapply (depths, function(max_depth) { # um
-    tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
-      count.tables.2[[s]][[max_depth]]$norm.densities[,"CD3",drop=F]
-    })
-    out=apply(tab,c(1,2), mean)
-    list(norm.densities=out, sizes=NA, counts=NA, densities=NA)
-  })
-  
-})
-names(out) = glue("{biopsies}_Les_avg")
-count.tables.2 = c(count.tables.2, out)
 
 
 # save the objects except alldat to a file
