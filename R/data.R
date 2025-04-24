@@ -1,82 +1,59 @@
 library(kyotil)
 library(glue)
 
-{
+{ # slide level data
 data.dir = "../Chipcytometry_images_from32bit"
+key.markers=c("CD3", "CD11c", "CD123", "CD15", "CD56", "CD68")
+cell_types=c("CD4T", "CD8T", "Treg")
+get.slide.name=function(ss)  sapply(ss, function (s) sub(".*?/(.*)", "\\1", s)) # "DD/DD1_Les" -> DD1_Les
+get.initial=function(ss)  sapply(ss, function (s) sub("^([^0-9_]+).*", "\\1", s) ) # "DD1_Les" -> "DD"
 
-tissue_size_by_depth_and_region=read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region.csv"))
+tissue_size=read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region.csv"))
+tissue_size$biopsy = get.slide.name(tissue_size$biopsy)
+all.slides = sort(unique(tissue_size$biopsy)); names(all.slides)=all.slides
 
-# define a function that returns c("DD1_Les") from c("DD/DD1_Les")
-get.slide.name=function(ss)  sapply(ss, function (s) sub(".*?/(.*)", "\\1", s))
-
-# define a function that returns c("DD") from c("DD1_Les")
-get.initial=function(ss)  sapply(ss, function (s) sub("^([^0-9_]+).*", "\\1", s) )
-
-all.slides = sort(unique(tissue_size_by_depth_and_region$biopsy))
-all.slides=get.slide.name(all.slides)
-names(all.slides)=all.slides
-
-markers.ls = lapply(all.slides, function(s) {
-  # s = 'JT_Les'
-  tmp = list.files(paste0(data.dir, "/", get.initial(s), "/", s, "/TSP_stitched"), pattern=".*_CD.*_m_c7.png")
-  tmp = sort(tmp)
-  out = sapply(tmp, function(n) sub("_m_.*.png", "", sub(s%.%"_","",n)))
-  names(out)=out
-  out
+markers.ls = lapply(all.slides, function(s) {  # s = 'JT_Les'
+  tmp = sort(list.files(paste0(data.dir, "/", get.initial(s), "/", s, "/TSP_stitched"), pattern=".*_d2b_regmem.csv"))
+  out = sapply(tmp, function(n) sub("_m.*.csv", "", sub(s%.%"_","",n)))
+  # move CD4T, CD8T, Treg to the end
+  out = c(setdiff(out, cell_types), setdiff(out, setdiff(out, cell_types)))
+  names(out)=out; out
 })
 
+# remove slides with no markers
 all.slides = all.slides[sapply(markers.ls, function(x) length(x)>0)]
-
 # choose one slide for each biopsy
-select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les",  "EB_Les", "JK1_Les", 
-          "JM1_Les", "JT_Les",  "LD_Les", "LG2_Les",  "LM_Les", 
-          "LS2_Les", "SK2_Les")
-names(select.slides)=get.slide.name(select.slides)
-
+select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les",  "EB_Les", "JK1_Les", "JM1_Les", "JT_Les",  "LD_Les", "LG2_Les",  "LM_Les", "LS2_Les", "SK2_Les"); names(select.slides)=get.slide.name(select.slides)
+stopifnot(all(sapply(select.slides, function(b) length(intersect(markers.ls[[b]], key.markers)))==6))# make sure all select.slides have all key markers
 biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biopsies
-
-# average norm.densities of all slides from a single biopsy
-avg_slides = glue("{biopsies}_Les_avg")
-
+avg_slides = glue("{biopsies}_Les_avg")# average norm.counts of all slides from a single biopsy
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
 
-key.markers=c("CD3", "CD11c", "CD123", "CD15", "CD56", "CD68")
-
-# make sure all select.slides have all key markers
-all(sapply(select.slides, function(b) length(intersect(markers.ls[[b]], key.markers)))==6)
-
-# read severity data
 severity = read.csv("R/Lesion_HSV_rates_04082025.csv")
-# add a column for the initial, which are the letter in front of the arabic number
-severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))
-
+severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))# add a column for the initial, which are the letter in front of the arabic number
 
 region.labels=c(normal="intact", lesion="ulcerative")
 region.labels.title=c(normal="Intact", lesion="Ulcerative")
-
 dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
-
 tissue.types=c("intact","ulcerative"); names(tissue.types)=tissue.types
-
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 ylim=list(dist2DEJ=c(0,100), dist2skin=c(0,100))
-
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 }
 
-
-
 # load mask-level data
 get.dat=function(s, marker) {
 # s="LG2_Les"; dist="dist2skin"; marker="CD3
+    # use CF5 CD68 instead of CF1 CD68 due to quality
+  if (s == "CF1_Les" && marker == "CD68") s = "CF5_Les"
   
-  # use CF5 CD68 instead of CF1 CD68 due to quality
-  if (s == "CF1_Les" && marker == "CD68") {
-    s = "CF5_Les"
+  fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_m_c7_d2b_regmem.csv")
+  if (!file.exists(fn)) {
+    fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_masks_d2b_regmem.csv")
+    if (!file.exists(fn)) return (NULL)
   }
-  
-  dat=read.csv(glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_m_c7_d2b_regmem.csv"))
+  dat=read.csv(fn)
   
   # find the column with epi_region and normal in the name
   normal_epi_col = grep("epi_region", grep("normal", colnames(dat), value=TRUE), value=TRUE)
@@ -128,26 +105,20 @@ get.dat=function(s, marker) {
 }
 
 
-alldat = 
-lapply (all.slides, function(s) {
-lapply (markers.ls[[s]], function (marker) {
-  get.dat(s, marker)
-})
-})
-
-
+alldat =  lapply (all.slides, function(s) {
+          lapply (markers.ls[[s]], function (marker) {
+            get.dat(s, marker)
+          })
+          })
 
 
 ################################################################################
 ## tabulate cell counts in epi/dermis x normal/lesion
+## count.tables stratifies by distance from DEJ
+## count.tables.2 stratifies by distance from skin
 
-tissue_size = read.csv(glue("{data.dir}/tissue_size_by_depth_and_region.csv"))
-
-tissue_size$biopsy = get.slide.name(tissue_size$biopsy)
-
-# count cells to different depths below DEJ
 count.tables = lapply (all.slides, function(s) {
-  # s="DD1_Les"
+  # s="DD1_Les"; max_depth="DEJ1000"
   
   markers=markers.ls[[s]]; names(markers)=markers
   
@@ -232,8 +203,12 @@ count.tables = lapply (all.slides, function(s) {
     })
     mode(counts3) <- "integer"
     
-    
-    list(sizes=sizes, counts=counts, densities=counts2, norm.densities=counts3)
+    # add ratio to counts3
+    if("Treg" %in% markers) {
+      counts3 = cbind(counts3, "Treg/CD3" = counts3[,"Treg"]/counts3[,"CD3"])
+    }
+  
+    list(sizes=sizes, counts=counts, densities=counts2, norm.counts=counts3)
     
   })
 }) 
@@ -308,8 +283,12 @@ count.tables.2 = lapply (all.slides, function(s) {
     })
     mode(counts3) <- "integer"
     
+    # add ratio to counts3
+    if("Treg" %in% markers) {
+      counts3 = cbind(counts3, "Treg/CD3" = counts3[,"Treg"]/counts3[,"CD3"])
+    }
     
-    list(sizes=sizes, counts=counts, densities=counts2, norm.densities=counts3)
+    list(sizes=sizes, counts=counts, densities=counts2, norm.counts=counts3)
     
   })
 }) 
@@ -326,6 +305,8 @@ for (iter in 1:2) {
     }
     names(depths)=depths
     out=lapply (depths, function(max_depth) { 
+      # iter=1; b=biopsies[1]; max_depth="DEJ1000"
+      
       # find the union of markers for slides.by.biopsy[[b]]
       markers=c(); for (s in slides.by.biopsy[[b]]) markers=c(markers, markers.ls[[s]])
       markers=sort(unique(markers))
@@ -334,18 +315,24 @@ for (iter in 1:2) {
       
       tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
         # myprint(b, max_depth, s)
-        norm.densities=(if (iter==1) count.tables else count.tables.2)[[s]][[max_depth]]$norm.densities
-        # add a column of NAs to norm.densities for each marker in markers that is not in colnames(norm.densities)
-        missing_markers <- setdiff(markers, colnames(norm.densities))
+        norm.counts=(if (iter==1) count.tables else count.tables.2)[[s]][[max_depth]]$norm.counts
+        # add a column of NAs to norm.counts for each marker in markers that is not in colnames(norm.counts)
+        missing_markers <- setdiff(markers, colnames(norm.counts))
         if (length(missing_markers) > 0) {
-          na_matrix <- matrix(NA, nrow = nrow(norm.densities), ncol = length(missing_markers))
+          na_matrix <- matrix(NA, nrow = nrow(norm.counts), ncol = length(missing_markers))
           colnames(na_matrix) <- missing_markers
-          norm.densities <- cbind(norm.densities, na_matrix)
+          norm.counts <- cbind(norm.counts, na_matrix)
         }
-        norm.densities[,markers,drop=F]
+        norm.counts[,markers,drop=F]
       })
       out=apply(tab,c(1,2), mean, na.rm=T)
-      list(norm.densities=out, sizes=NA, counts=NA, densities=NA)
+      
+      # add ratio
+      if("Treg" %in% markers) {
+        out = cbind(out, "Treg/CD3" = out[,"Treg"]/out[,"CD3"])
+      }
+      
+      list(norm.counts=out, sizes=NA, counts=NA, densities=NA)
     })
     
   })

@@ -22,10 +22,12 @@ load("R/forRmd.RData")# load the objects from a file
 There are 13 lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion. List of available markers per slide: 
 \bigskip
 
+\begingroup
+\footnotesize
 ```{r results='asis', echo=FALSE}
-print(lapply(markers.ls, function(x) names(x)), quote=F)
+print(lapply(markers.ls, function(x) if(length(x)==0) "" else concatList(x, " ")), quote=F)
 ```
-
+\endgroup
 \bigskip
 
 The key markers are: CD3 CD11c CD123 CD15 CD56 CD68. Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. Furthermore, for CF lesion CD68 staining, CF5_Les instead of CF1_Les is used due to quality reasons.
@@ -65,11 +67,11 @@ Normalized count is the number of cells in a vertical strip 100um wide.
 R2* is computed without slides from AS_Les, which has the highest shedding rate and appears an outlier.
 
 \newpage
-```{r DEJ depth controlledscatterplot of shedding_rate vs cnt_total, results='asis', echo=FALSE, fig.height=12, fig.width=7, fig.align='center'}
+```{r DEJ depth controlledscatterplot of shedding_rate vs cnt_total, results='asis', echo=FALSE, fig.height=20, fig.width=7, fig.align='center'}
 
 # count.tables is a list. each element is named after a slide name, e.g. AS1_Les
 # count.tables$AS1_Les is a list of 3 elements: DEJ500, DEJ1000, DEJInf
-# count.tables$AS1_Les[['DEJ500']] is a list with 4 columns: sizes, counts, densities, norm.densities
+# count.tables$AS1_Les[['DEJ500']] is a list with 4 columns: sizes, counts, densities, norm.counts
 # Similarly, count.tables.2
 xx=c("DEJ1000", "Skin1000"); names(xx)=xx
 
@@ -83,15 +85,17 @@ for (iter in c(3,1)) {
     slides=avg_slides
   }
   
-  par(mfrow=c(length(key.markers),3), oma=c(2,0,0,0))
+  toplot = c(key.markers, cell_types, "Treg/CD3")
+  
+  par(mfrow=c(length(toplot),3), oma=c(2,0,0,0))
   reduce_margin()
   
-  for (a in key.markers) {
-    norm.densities=lapply(xx, function (x) {
+  for (a in toplot) {
+    norm.counts=lapply(xx, function (x) {
+      # x="DEJ1000"; a="Treg"
       out = as.data.frame(mysapply(slides, function (s) {
-        # myprint(s)
         tables = if (startsWith(x,"DEJ")) count.tables else count.tables.2
-        tables[[s]][[x]]$norm.densities[,a]
+        tables[[s]][[x]]$norm.counts[,a]
       }))
       
       cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
@@ -103,7 +107,7 @@ for (iter in c(3,1)) {
     # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
     ylim=NULL
     x="DEJ1000"
-    with(norm.densities[[x]], {
+    with(norm.counts[[x]], {
       plot(SR, DI, xlab="Shedding rate", main=glue("Normalized Count DI ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
       legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
     })
@@ -111,21 +115,21 @@ for (iter in c(3,1)) {
     # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
     ylim=NULL
     x="Skin1000"
-    with(norm.densities[[x]], {
+    with(norm.counts[[x]], {
       plot(SR, I, xlab="Shedding rate", main=glue("Normalized Count I ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
       legend("topright", legend=paste("R2*=", round(summary(lm(I[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
     })
   
     # scatterplot of normalized densities for epidermis intact. does not depend on the DEJ500/DEJ1000/DEJInf
     ylim=NULL
-    with(norm.densities$DEJ1000, {
+    with(norm.counts$DEJ1000, {
       plot(SR, EI, xlab="Shedding rate", main=glue("Normalized Count EI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
       legend("topright", legend=paste("R2*=", round(summary(lm(EI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
     })
   
     # create count tables for avg slides
     if (iter==3) {
-      for (x in xx) cnt.tables = append(cnt.tables, list(kable(round(norm.densities[[x]][, -which (names(norm.densities[[x]]) %in% c("initial", "SR"))], 0), caption=paste0(a, ", ", x, ", ", ifelse(iter==1, "select slide", "slides average"), ". Normalized counts in different regions: ", ifelse(startsWith(x,"DEJ"), "dermis intact (DI); dermis ulcerative (DU); epidermis intact (EI); epidermis ulcerative (EU)", "intact (I); ulcerative (U)"), ". Total = row sum."))) )
+      for (x in xx) cnt.tables = append(cnt.tables, list(kable(round(norm.counts[[x]][, -which (names(norm.counts[[x]]) %in% c("initial", "SR"))], 0), caption=paste0(a, ", ", x, ", ", ifelse(iter==1, "select slide", "slides average"), ". Normalized counts in different regions: ", ifelse(startsWith(x,"DEJ"), "dermis intact (DI); dermis ulcerative (DU); epidermis intact (EI); epidermis ulcerative (EU)", "intact (I); ulcerative (U)"), ". Total = row sum."))) )
     }
 
   } # for a: marker

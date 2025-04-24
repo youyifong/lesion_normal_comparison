@@ -14,7 +14,7 @@ for (s in all.slides) {
   for (max_depth in c(500, 1000)) { # um 
     myprint(s, max_depth)
 
-    tab=with (count.tables[[s]][["DEJ"%.%max_depth]], t(rbind(counts, densities, norm.densities)))
+    tab=with (count.tables[[s]][["DEJ"%.%max_depth]], t(rbind(counts, densities, norm.counts)))
     mode(tab) <- "character" # convert to string
     tab=data.frame(tab)
     # add area
