@@ -22,9 +22,9 @@ for (s in all.slides) {
     print(tab)
     
     mytex(data.frame(tab), file.name="output/tables/"%.%s1%.%"_counts_"%.%max_depth, digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r|","r","r","r","r"),
-          floating=T, caption=escapeUnderline(s1)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. Area is measured in mm2. Density in count per mm2. normalized density refers to the average of positive density measurements taken at 100um DEJ depth intervals, i.e. each depth is weighted equally instead of based on tissue shape.",
+          floating=T, caption=escapeUnderline(s1)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. Area is measured in mm2. Density in count per mm2. Normalized Count refers to the cell count in a vertical strip 100um wide, i.e. each depth is weighted equally instead of variable depending on the tissue shape.",
           col.headers="\\hline\n 
-           \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Counts} & \\multicolumn{4}{c|}{Density} & \\multicolumn{4}{c}{normalized Density} \\\\ 
+           \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Counts} & \\multicolumn{4}{c|}{Density} & \\multicolumn{4}{c}{Normalized Counts} \\\\ 
            \\multicolumn{1}{c}{} & \\multicolumn{2}{c}{intact} & \\multicolumn{2}{c|}{ulcerative} & \\multicolumn{2}{c}{intact} & \\multicolumn{2}{c|}{ulcerative} & \\multicolumn{2}{c}{intact} & \\multicolumn{2}{c}{ulcerative}  \\\\ 
            \\multicolumn{1}{c}{} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & \\multicolumn{1}{c|}{dermis} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & \\multicolumn{1}{c|}{dermis} & \\multicolumn{1}{c}{epi} & dermis & \\multicolumn{1}{c}{epi} & dermis  \\\\ 
            \\hline

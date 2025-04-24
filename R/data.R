@@ -205,7 +205,14 @@ count.tables = lapply (all.slides, function(s) {
     
     # add ratio to counts3
     if("Treg" %in% markers) {
-      counts3 = cbind(counts3, "Treg/CD3" = counts3[,"Treg"]/counts3[,"CD3"])
+      counts3 = cbind(counts3, 
+                  "Treg/CD3" = counts3[,"Treg"]/counts3[,"CD3"],
+                  "Treg/CD4T" = counts3[,"Treg"]/counts3[,"CD4T"],
+                  "Treg/CD8T" = counts3[,"Treg"]/counts3[,"CD8T"],
+                  "CD4T/CD3" = counts3[,"CD4T"]/counts3[,"CD3"],
+                  "CD8T/CD3" = counts3[,"CD8T"]/counts3[,"CD3"],
+                  "CD4T/CD8T" = counts3[,"CD4T"]/counts3[,"CD8T"]
+      )
     }
   
     list(sizes=sizes, counts=counts, densities=counts2, norm.counts=counts3)
@@ -285,7 +292,14 @@ count.tables.2 = lapply (all.slides, function(s) {
     
     # add ratio to counts3
     if("Treg" %in% markers) {
-      counts3 = cbind(counts3, "Treg/CD3" = counts3[,"Treg"]/counts3[,"CD3"])
+      counts3 = cbind(counts3, 
+                      "Treg/CD3" = counts3[,"Treg"]/counts3[,"CD3"],
+                      "Treg/CD4T" = counts3[,"Treg"]/counts3[,"CD4T"],
+                      "Treg/CD8T" = counts3[,"Treg"]/counts3[,"CD8T"],
+                      "CD4T/CD3" = counts3[,"CD4T"]/counts3[,"CD3"],
+                      "CD8T/CD3" = counts3[,"CD8T"]/counts3[,"CD3"],
+                      "CD4T/CD8T" = counts3[,"CD4T"]/counts3[,"CD8T"]
+      )
     }
     
     list(sizes=sizes, counts=counts, densities=counts2, norm.counts=counts3)
@@ -327,9 +341,16 @@ for (iter in 1:2) {
       })
       out=apply(tab,c(1,2), mean, na.rm=T)
       
-      # add ratio
+      # add ratios Treg/CD3, CD4T/CD3, CD8T/CD3, CD4T/CD8T, Treg/CD4T, Treg/CD8T
       if("Treg" %in% markers) {
-        out = cbind(out, "Treg/CD3" = out[,"Treg"]/out[,"CD3"])
+        out = cbind(out, 
+                    "Treg/CD3" = out[,"Treg"]/out[,"CD3"],
+                    "Treg/CD4T" = out[,"Treg"]/out[,"CD4T"],
+                    "Treg/CD8T" = out[,"Treg"]/out[,"CD8T"],
+                    "CD4T/CD3" = out[,"CD4T"]/out[,"CD3"],
+                    "CD8T/CD3" = out[,"CD8T"]/out[,"CD3"],
+                    "CD4T/CD8T" = out[,"CD4T"]/out[,"CD8T"]
+        )
       }
       
       list(norm.counts=out, sizes=NA, counts=NA, densities=NA)
