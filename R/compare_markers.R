@@ -9,8 +9,22 @@ get.peak = function(x_start, freq) {
   x_start[which.max(freq)] + (x_start[2]-x_start[1])/2
 }
 
-
-mypng(mfrow=c(length(select.slides),4), file="output/figures/compare_markers", 
+for (marker_set in c(1,2)) {
+  
+  if (marker_set==1) {
+    markers = key.markers
+  } else if (marker_set==2) {
+    markers = c("CD3", cell_types)
+  } else {
+    markers = c("Treg/CD3", "Treg/CD4T", "Treg/CD8T", "CD4T/CD3", "CD8T/CD3", "CD4T/CD8T")
+  }
+  # use all markers
+  # markers=markers.ls[[s]]; names(markers)=markers
+  # use a subset of mostly shared markers
+  # markers = c("CD3", "CD15", "CD11c", "CD123", "CD4", "CD8", if(!s%in%c("LG/LG1_Les","SK/SK1_Les")) "CD68")
+  names(markers)=markers
+  
+  mypng(mfrow=c(length(select.slides),4), file=glue("output/figures/compare_markers_set{marker_set}"), 
       width=10, height=4/2*length(select.slides), mar=c(4,0,2,0), oma=c(1,5,0,0))
         
   dist.bt.peaks = 
@@ -20,17 +34,10 @@ mypng(mfrow=c(length(select.slides),4), file="output/figures/compare_markers",
   # tissue.type="intact"; dist="dist2skin"; s="AS/AS1_Les"; 
     myprint(tissue.type, dist, s)
   
-    # use all markers
-    # markers=markers.ls[[s]]; names(markers)=markers
-    # use a subset of mostly shared markers
-    # markers = c("CD3", "CD15", "CD11c", "CD123", "CD4", "CD8", if(!s%in%c("LG/LG1_Les","SK/SK1_Les")) "CD68")
-    markers = key.markers
-    names(markers)=markers
-    
     dat.ls = lapply(markers, function (a) subset(alldat[[s]][[a]], region==tissue.type)[[dist]])
     
     all.freq = scaled.hist(dat.ls,
-         scale.factors=lapply(markers, function(a) subset(tissue_size_by_depth_and_region, biopsy==get.initial(s)%.%"/"%.%s & dist_type==dist & region==tissue.type)),
+         scale.factors=lapply(markers, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type)),
          xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
          xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
          main=ifelse(s==select.slides[1],tissue.type,""),
@@ -50,7 +57,6 @@ mypng(mfrow=c(length(select.slides),4), file="output/figures/compare_markers",
   })
   })
   
-  
   # leftmost labeling
   tmp=get.slide.name(select.slides)
   for (i in 1:length(tmp)) {
@@ -61,26 +67,19 @@ mypng(mfrow=c(length(select.slides),4), file="output/figures/compare_markers",
           adj = NA, padj = NA, cex = NA, col = NA, font = NA)
   }
 
-dev.off()
+  dev.off()
 
-
-
-for (biopsy in biopsies) {
-  slides = slides.by.biopsy[[biopsy]]
-  mypng(mfrow=c(length(slides),4), file="output/figures/compare_markers_"%.%biopsy, width=8, height=4/2*length(slides), mar=c(4,0,2,0), oma=c(1,5,0,0))
   
+  
+  for (biopsy in biopsies) {
+    slides = slides.by.biopsy[[biopsy]]
+    mypng(mfrow=c(length(slides),4), file=glue("output/figures/compare_markers_{biopsy}_set{marker_set}"), width=8, height=4/2*length(slides), mar=c(4,0,2,0), oma=c(1,5,0,0))
+    
     lapply (slides, function(s) {
       sapply (tissue.types, function(tissue.type) { 
         sapply (dist.labels, simplify="array", function(dist) {
           # tissue.type="intact"; dist="dist2skin"; s="AS_Les"; 
           myprint(tissue.type, dist, s)
-          
-          # use all markers
-          # markers=markers.ls[[s]]; names(markers)=markers
-          # use a subset of mostly shared markers
-          # markers = c("CD3", "CD15", "CD11c", "CD123", "CD4", "CD8", if(!s%in%c("LG/LG1_Les","SK/SK1_Les")) "CD68")
-          markers = key.markers
-          names(markers)=markers
           
           dat.ls = lapply(markers, function (a) {
             if (is.null(alldat[[s]][[a]])) NULL else subset(alldat[[s]][[a]], region==tissue.type)[[dist]]
@@ -88,7 +87,7 @@ for (biopsy in biopsies) {
           dat.ls=dat.ls[sapply(dat.ls, function(x) !is.null(x))]
           
           all.freq = scaled.hist(dat.ls,
-                                 scale.factors=lapply(markers, function(a) subset(tissue_size_by_depth_and_region, biopsy==get.initial(s)%.%"/"%.%s & dist_type==dist & region==tissue.type)),
+                                 scale.factors=lapply(markers, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type)),
                                  xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
                                  xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
                                  main=ifelse(s==slides[1],tissue.type,""),
@@ -107,19 +106,21 @@ for (biopsy in biopsies) {
         }) 
       })
     })
+    
+    
+    # leftmost labeling
+    tmp=get.slide.name(slides)
+    for (i in 1:length(tmp)) {
+      # ylab
+      mtext("Cells/100x100 um2", side = 2, line = 2., outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2)+0., 
+            adj = NA, padj = NA, cex = .7, col = NA, font = NA)
+      mtext(tmp[i], side = 2, line = 3.5, outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2), 
+            adj = NA, padj = NA, cex = NA, col = NA, font = NA)
+    }
+    
+    dev.off()
   
-  
-  # leftmost labeling
-  tmp=get.slide.name(slides)
-  for (i in 1:length(tmp)) {
-    # ylab
-    mtext("Cells/100x100 um2", side = 2, line = 2., outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2)+0., 
-          adj = NA, padj = NA, cex = .7, col = NA, font = NA)
-    mtext(tmp[i], side = 2, line = 3.5, outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2), 
-          adj = NA, padj = NA, cex = NA, col = NA, font = NA)
   }
-  
-  dev.off()
 
 }
 
