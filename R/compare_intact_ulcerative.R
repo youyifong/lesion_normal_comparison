@@ -15,8 +15,7 @@ for (biopsy in c("select_slides", biopsies)) {
   } else if (marker_set==2) {
     toplot = c("CD3", cell_types)
   } else {
-    toplot = c("Treg/CD3", "Treg/CD4T", "Treg/CD8T", "CD4T/CD3", "CD8T/CD3", "CD4T/CD8T")
-    ylim.ratio = c("Treg/CD3"=50, "Treg/CD4T"=50, "Treg/CD8T"=50, "CD4T/CD3"=100, "CD8T/CD3"=100, "CD4T/CD8T"=500)
+    toplot = ratio_pairs_labels
   }
   
   if (biopsy=="select_slides") {
@@ -36,11 +35,11 @@ for (biopsy in c("select_slides", biopsies)) {
     # dist="dist2skin"; a="CD4T/CD3"; marker_set=3; biopsy="LG"; s="LG3_Les"
   
     if (marker_set==1 | marker_set==2) {
-      if (is.null(alldat[[s]][[a]])) {
+      if (is.null(cell_dat[[s]][[a]])) {
         empty.plot() 
         title(main=ifelse(s==slides[1],a,""))
       } else {
-        dat.ls = lapply(tissue.types, function (t) subset(alldat[[s]][[a]], region==t)[[dist]])
+        dat.ls = lapply(tissue.types, function (t) subset(cell_dat[[s]][[a]], region==t)[[dist]])
         # remove empty element
         dat.ls =  dat.ls[sapply(dat.ls, length)>0]
         scaled.hist(dat.ls,
@@ -56,17 +55,22 @@ for (biopsy in c("select_slides", biopsies)) {
       }      
     } else {
       # market_set 3 is ratio data
-      if (is.null(count.tables[[s]]$DEJInf$density.ratio.by.depth[[a]])) {
-        empty.plot() 
-        title(main=ifelse(s==slides[1],a,""))
+      if (dist=="dist2DEJ") {
+        dat.tmp = count_dat[[s]]$DEJInf
       } else {
-        if (dist=="dist2DEJ") {
-          dat.tmp = count.tables[[s]]$DEJInf$density.ratio.by.depth[[a]]
-        } else {
-          dat.tmp = count.tables.2[[s]]$SkinInf$density.ratio.by.depth[[a]]
-        }
-        # merge dat.tmp$I and dat.tmp$U on depth
-        dat.tmp = merge(dat.tmp$I, dat.tmp$U, by="depth", suffixes=c(".I",".U"))
+        dat.tmp = count_dat[[s]]$SkinInf
+      }
+      if (!is.null(dat.tmp$depth_density$ulcerative)) {
+        dat.tmp = merge(dat.tmp$depth_density$intact[,c("depth",a)], dat.tmp$depth_density$ulcerative[,c("depth",a)], by="depth", suffixes=c(".I",".U"))
+      } else {
+        dat.tmp = cbind(dat.tmp$depth_density$intact[,c("depth",a)], NA)
+      }
+      # convert to percent
+      dat.tmp[,2]=100*dat.tmp[,2]; dat.tmp[,3]=100*dat.tmp[,3]; colnames(dat.tmp)[2:3]=c("perc.I","perc.U")
+      
+      if (all(is.na(dat.tmp[,c("perc.I","perc.U")]))) {
+        empty.plot(); title(main=ifelse(s==slides[1],a,""))
+      } else {
         mymatplot(dat.tmp$depth, dat.tmp[,c("perc.I","perc.U")],
                   type="l", lty=c(1,1), col=c("red","blue"), lwd=2,
                   main=ifelse(s==slides[1],a,""),
@@ -74,8 +78,7 @@ for (biopsy in c("select_slides", biopsies)) {
                   xlab=dist %.% " (um)", xlim=xlim.ls[[dist]],
                   ylab="", ylim=c(0,ylim.ratio[a]), 
                   # yaxt=ifelse(a==toplot[1],"s","n"),
-                  bty="n", impute.missing.for.line = F
-        )
+                  bty="n", impute.missing.for.line = F)
       }
     }  
     

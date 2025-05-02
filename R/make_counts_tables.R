@@ -17,9 +17,9 @@ format_mixed_rounding <- function(x) {
 
 # count cells to different depths
 for (s in all.slides) {
-# s="DD/DD1_Les"
+# s="SK3_Les"
   
-  s1 = sub(".*?/(.*)", "\\1", s)
+  # s1 = sub(".*?/(.*)", "\\1", s)
   
   markers=markers.ls[[s]]; names(markers)=markers
   
@@ -27,15 +27,18 @@ for (s in all.slides) {
     myprint(s, max_depth)
 
     # put norm.counts first so that the row names are complete
-    tab=with (count.tables[[s]][["DEJ"%.%max_depth]], t(rbind(norm.counts, densities, counts)))
+    tab=with (count_dat[[s]][["DEJ"%.%max_depth]], t(rbind(norm.counts, densities, counts)))
     tab = apply(tab, 2, format_mixed_rounding)
     tab=data.frame(tab)
     # add area
-    tab=rbind(tab, "Size of biopsy"=formatDouble(c(rep(NA,8), count.tables[[s]][["DEJ"%.%max_depth]]$sizes), digits = 2, remove.leading0=F))
-    print(tab)
+    tab=rbind(tab, "Size of biopsy"=formatDouble(c(rep(NA,8), count_dat[[s]][["DEJ"%.%max_depth]]$sizes), digits = 2, remove.leading0=F))
+    tab
     
-    mytex(data.frame(tab), file.name="output/tables/"%.%s1%.%"_counts_"%.%max_depth, digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r|","r","r","r","r"),
-          floating=T, caption=escapeUnderline(s1)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. The unit of area is mm2; the unit of density is count/mm2. Normalized count is cell count in a vertical strip 100um wide, i.e. each depth is weighted equally instead of variable depending on the tissue shape.",
+    mytex(data.frame(tab), file.name="output/tables/"%.%s%.%"_counts_"%.%max_depth, digit=0,  include.colnames = F, align=c("l","r","r","r","r|","r","r","r","r|","r","r","r","r"),
+          floating=T, caption=escapeUnderline(s)%.%". All measurements are up to "%.%max_depth%.%" um below DEJ. 
+          Size of biopy is measured in mm2; the unit of density is count/mm2. 
+          Normalized count is the number of cells in a vertical strip 100um wide.
+          Ratios are presented as fractions, not percentages.",
           col.headers="\\hline\n 
            \\multicolumn{1}{c}{} & \\multicolumn{4}{c|}{Normalized Counts} & \\multicolumn{4}{c|}{Density} & \\multicolumn{4}{c}{Counts} \\\\ 
            \\multicolumn{1}{c}{} & \\multicolumn{2}{c}{intact} & \\multicolumn{2}{c|}{ulcerative} & \\multicolumn{2}{c}{intact} & \\multicolumn{2}{c|}{ulcerative} & \\multicolumn{2}{c}{intact} & \\multicolumn{2}{c}{ulcerative}  \\\\ 

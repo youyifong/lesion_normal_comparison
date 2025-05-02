@@ -8,6 +8,22 @@ cell_types=c("CD4T", "CD8T", "Treg")
 get.slide.name=function(ss)  sapply(ss, function (s) sub(".*?/(.*)", "\\1", s)) # "DD/DD1_Les" -> DD1_Les
 get.initial=function(ss)  sapply(ss, function (s) sub("^([^0-9_]+).*", "\\1", s) ) # "DD1_Les" -> "DD"
 
+depths = c(1000, 500, Inf)
+modes = c("DEJ", "Skin"); names(modes)=modes
+depth_vals = c("DEJ1000", "DEJ500", "DEJInf", "Skin1000", "Skin500", "SkinInf"); names(depth_vals)=depth_vals
+
+ratio_pairs = list(
+  c("Treg", "CD3"),
+  c("Treg", "CD4T"),
+  c("Treg", "CD8T"),
+  c("CD4T", "CD3"),
+  c("CD8T", "CD3"),
+  c("CD8T", "CD4T")
+)
+
+ratio_pairs_labels=sapply(ratio_pairs, function (x) glue("{x[1]}/{x[2]}"))
+ylim.ratio = c("Treg/CD3"=50, "Treg/CD4T"=50, "Treg/CD8T"=50, "CD4T/CD3"=100, "CD8T/CD3"=100, "CD8T/CD4T"=200)
+
 # in tissue_size, the depth column is the starting point of the bin.
 tissue_size=read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region.csv"))
 tissue_size$biopsy = get.slide.name(tissue_size$biopsy)
@@ -33,14 +49,17 @@ slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides
 severity = read.csv("R/Lesion_HSV_rates_04082025.csv")
 severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))# add a column for the initial, which are the letter in front of the arabic number
 
-region.labels=c(normal="intact", lesion="ulcerative")
-region.labels.title=c(normal="Intact", lesion="Ulcerative")
+region.labels=c(intact="intact", lesion="ulcerative")
+region.labels.title=c(intact="Intact", lesion="Ulcerative")
 dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 tissue.types=c("intact","ulcerative"); names(tissue.types)=tissue.types
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 ylim=list(dist2DEJ=c(0,100), dist2skin=c(0,100))
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
+
+# create output/csv if not exists
+if (!dir.exists("output/csv")) dir.create("output/csv", recursive = TRUE)
 }
 
 
@@ -55,24 +74,25 @@ get.dat=function(s, marker) {
   
   fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_m_c7_d2b_regmem.csv")
   if (!file.exists(fn)) {
+    # T cell subset files are named differently
     fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_masks_d2b_regmem.csv")
     if (!file.exists(fn)) return (NULL)
   }
   dat=read.csv(fn)
   
-  # find the column with epi_region and normal in the name
+  # find the column with epi_region and intact in the name
   normal_epi_col = grep("epi_region", grep("normal", colnames(dat), value=TRUE), value=TRUE)
-  # find the column with dermis_region and normal in the name
+  # find the column with dermis_region and intact in the name
   normal_dermis_col = grep("dermis_region", grep("normal", colnames(dat), value=TRUE), value=TRUE)
   # find the column with epi_region and lesion in the name
   lesion_epi_col = grep("epi_region", grep("lesion", colnames(dat), value=TRUE), value=TRUE)
   # find the column with dermis_region and lesion in the name
   lesion_dermis_col = grep("dermis_region", grep("lesion", colnames(dat), value=TRUE), value=TRUE)
   
-  # define column normal.epi as any of the normal_epi_col columns equals "True"
-  dat$normal.epi = rowSums(dat[, normal_epi_col, drop=F] == "True", na.rm=TRUE) > 0
-  # define column normal.dermis as any of the normal_dermis_col columns equals "True"
-  dat$normal.dermis = rowSums(dat[, normal_dermis_col, drop=F] == "True", na.rm=TRUE) > 0
+  # define column intact.epi as any of the normal_epi_col columns equals "True"
+  dat$intact.epi = rowSums(dat[, normal_epi_col, drop=F] == "True", na.rm=TRUE) > 0
+  # define column intact.dermis as any of the normal_dermis_col columns equals "True"
+  dat$intact.dermis = rowSums(dat[, normal_dermis_col, drop=F] == "True", na.rm=TRUE) > 0
   # define column lesion.epi as any of the lesion_epi_col columns equals "True"
   dat$lesion.epi = rowSums(dat[, lesion_epi_col, drop=F] == "True", na.rm=TRUE) > 0
   # define column lesion.dermis as any of the lesion_dermis_col columns equals "True"
@@ -96,11 +116,11 @@ get.dat=function(s, marker) {
   dat$dist2DEJ = dat[, DEJ_col]
   
   
-  dat$epi = dat$normal.epi | dat$lesion.epi
-  dat$dermis = dat$normal.dermis | dat$lesion.dermis
+  dat$epi = dat$intact.epi | dat$lesion.epi
+  dat$dermis = dat$intact.dermis | dat$lesion.dermis
 
   dat$region = NA
-  dat$region[dat$normal.epi | dat$normal.dermis] = "intact"
+  dat$region[dat$intact.epi | dat$intact.dermis] = "intact"
   dat$region[dat$lesion.epi | dat$lesion.dermis] = "ulcerative"
 
   # each pixel is 1/2 micron, negative dist in epi
@@ -110,358 +130,234 @@ get.dat=function(s, marker) {
 }
 
 
-alldat =  lapply (all.slides, function(s) {
+cell_dat =  lapply (all.slides, function(s) {
           lapply (markers.ls[[s]], function (marker) {
             get.dat(s, marker)
           })
           })
 
 
+
 ################################################################################
-## count cells in epi/dermis x normal/lesion
-## count.tables stratifies by distance from DEJ
-## count.tables.2 stratifies by distance from skin
+## count cells in epi/dermis x intact/lesion
+# count_dat comprises a list of slides
+# count_dat$AS1_Les comprises DEJ500, DEJ1000, DEJInf, Skin500, Skin1000, SkinInf
+# count_dat$AS1_Les$DEJ500 comprises sizes, counts, densities, norm.counts, depth_density
 
-count.tables = lapply (all.slides, function(s) {
-  # s="LG3_Les"; max_depth=500
+count_dat = lapply(all.slides, function(s) {
+  # s="SK1_Les"; depth_val="DEJ1000"
+  markers = markers.ls[[s]]; names(markers) = markers
   
-  markers=markers.ls[[s]]; names(markers)=markers
-  
-  depths=c(500, 1000, Inf)
-  names(depths)=paste0("DEJ", depths)
-  
-  lapply (depths, function(max_depth) { # um
+  # region_stats is region (EI, EU etc.)-level data
+  region_stats = lapply(depth_vals, function(depth_val) {
+    myprint(s, depth_val)
     
-    myprint(s, max_depth)
-    
-    counts = sapply(markers, function (a) 
-      c(EI=nrow(subset(alldat[[s]][[a]], dist2DEJ<max_depth & epi &    region=="intact")),
-        DI=nrow(subset(alldat[[s]][[a]], dist2DEJ<max_depth & dermis & region=="intact")),
-        EU=nrow(subset(alldat[[s]][[a]], dist2DEJ<max_depth & epi &    region=="ulcerative")),
-        DU=nrow(subset(alldat[[s]][[a]], dist2DEJ<max_depth & dermis & region=="ulcerative")))
-    )
-    
-    
-    # compute sizes of epi/dermis, normal/lesion
-    dat = tissue_size[tissue_size$biopsy==s & tissue_size$dist_type=="dist2DEJ",] # max_depth is relative to DEJ
-    dat = dat[dat$depth<max_depth,] # < b/c depth is the beginning of the bin
-    sizes = with(dat, c(EI=sum(area[depth<0 & region=="intact"]),
-                        DI=sum(area[depth>=0 & region=="intact"]),
-                        EU=sum(area[depth<0 & region=="ulcerative"]),
-                        DU=sum(area[depth>=0 & region=="ulcerative"])))
-    # convert size from 100um x 100um to 1mm x 1mm
-    sizes = sizes/100
-    
-    # density
-    counts2=counts/sizes
-    mode(counts2) <- "integer"
-    
-    ## depth-specific density
-    
-    # first, compute sizes of epi/dermis, normal/lesion
-    dat = tissue_size[tissue_size$biopsy==s & tissue_size$dist_type=="dist2DEJ",] # max_depth is relative to DEJ
-    dat = dat[dat$depth<max_depth,] # use < instead of <= b/c depth is the beginning of the bin
-    dat$area = dat$area/100    # convert size from 100um x 100um to 1mm x 1mm
-    size_epi_normal = dat[dat$depth<0 & dat$region=="intact",]
-    size_epi_lesion = dat[dat$depth<0 & dat$region=="ulcerative",]
-    size_dermis_normal = dat[dat$depth>=0 & dat$region=="intact",]
-    size_dermis_lesion = dat[dat$depth>=0 & dat$region=="ulcerative",]
-    
-    counts3 = NULL
-    density.by.depth = list()
-    for (a in markers) {
-      
-      # epi normal
-      
-      epi_normal = subset(alldat[[s]][[a]], dist2DEJ<max_depth & epi &    region=="intact")
-      # add a depth column computed as the floor of dist2DEJ/100
-      epi_normal$depth = floor(epi_normal$dist2DEJ/100)*100
-      count_by_depth = mytable(epi_normal$depth)
-      # add count_by_depth column to size_epi_normal by matching the depth in size_epi_normal and count_by_depth
-      size_epi_normal$count_by_depth = count_by_depth[size_epi_normal$depth%.%""]
-      # set NA in size_epi_normal$count_by_depth to 0 because there are no cells at the depth
-      size_epi_normal$count_by_depth[is.na(size_epi_normal$count_by_depth)] = 0
-      # unname is needed otherwise rownames of counts becomes weird
-      # set to NA when there is no lesion or normal
-      epi_normal_density = unname(ifelse (sizes["EI"]==0, NA, sum(size_epi_normal$count_by_depth/size_epi_normal$area, na.rm=TRUE)))
-      
-      # dermis normal
-      
-      dermis_normal = subset(alldat[[s]][[a]], dist2DEJ<max_depth & dermis & region=="intact")
-      # add a depth column computed as the floor of dist2DEJ/100
-      dermis_normal$depth = floor(dermis_normal$dist2DEJ/100)*100
-      count_by_depth = mytable(dermis_normal$depth)
-      # add count_by_depth column to size_dermis_normal by match the depth in size_dermis_normal and count_by_depth
-      size_dermis_normal$count_by_depth = count_by_depth[size_dermis_normal$depth%.%""]
-      size_dermis_normal$count_by_depth[is.na(size_dermis_normal$count_by_depth)]=0
-      dermis_normal_density = unname(ifelse (sizes["DI"]==0, NA, sum(size_dermis_normal$count_by_depth/size_dermis_normal$area, na.rm=TRUE)))
-      
-      # epi lesion
-      
-      epi_lesion = subset(alldat[[s]][[a]], dist2DEJ<max_depth & epi &    region=="ulcerative")
-      # add a depth column computed as the floor of dist2DEJ/100
-      epi_lesion$depth = floor(epi_lesion$dist2DEJ/100)*100
-      count_by_depth = mytable(epi_lesion$depth)
-      # add count_by_depth column to size_epi_lesion by match the depth in size_epi_lesion and count_by_depth
-      size_epi_lesion$count_by_depth = count_by_depth[size_epi_lesion$depth%.%""]
-      size_epi_lesion$count_by_depth[is.na(size_epi_lesion$count_by_depth)] = 0
-      epi_lesion_density = unname(ifelse (sizes["EU"]==0, NA, sum(size_epi_lesion$count_by_depth/size_epi_lesion$area, na.rm=TRUE)))
-      
-      # dermis lesion
-      
-      dermis_lesion = subset(alldat[[s]][[a]], dist2DEJ<max_depth & dermis & region=="ulcerative")
-      # add a depth column computed as the floor of dist2DEJ/100
-      dermis_lesion$depth = floor(dermis_lesion$dist2DEJ/100)*100
-      count_by_depth = mytable(dermis_lesion$depth)
-      # add count_by_depth column to size_dermis_lesion by match the depth in size_dermis_lesion and count_by_depth
-      size_dermis_lesion$count_by_depth = count_by_depth[size_dermis_lesion$depth%.%""]
-      size_dermis_lesion$count_by_depth[is.na(size_dermis_lesion$count_by_depth)] = 0
-      dermis_lesion_density = unname(ifelse (sizes["DU"]==0, NA, sum(size_dermis_lesion$count_by_depth/size_dermis_lesion$area, na.rm=TRUE)))
-      
-      # return the counts
-      counts3 = cbind(counts3, c(EI=epi_normal_density, DI=dermis_normal_density, EU=epi_lesion_density, DU=dermis_lesion_density))
-    
-      density.by.depth[[a]] = list(
-        EI = cbind(density=size_epi_normal$count_by_depth/size_epi_normal$area, depth=size_epi_normal$depth), 
-        DI = cbind(density=size_dermis_normal$count_by_depth/size_dermis_normal$area, depth=size_dermis_normal$depth),
-        EU = cbind(density=size_epi_lesion$count_by_depth/size_epi_lesion$area, depth=size_epi_lesion$depth),
-        DU = cbind(density=size_dermis_lesion$count_by_depth/size_dermis_lesion$area, depth=size_dermis_lesion$depth)
-      )
-    }
-    mode(counts3) <- "integer"; colnames(counts3)=markers
-    
-    # add ratio to counts3
-    density.ratio.by.depth=list()
-    # add the same number of columns to counts and counts2
-    counts=cbind(counts, NA, NA, NA, NA, NA, NA)
-    counts2=cbind(counts2, NA, NA, NA, NA, NA, NA)
-      
-    # make density.ratio.by.depth
-    for(i in 1:6) {
-      if (i==1) {a="Treg"; b="CD3"}
-      if (i==2) {a="Treg"; b="CD4T"}
-      if (i==3) {a="Treg"; b="CD8T"}
-      if (i==4) {a="CD4T"; b="CD3"}
-      if (i==5) {a="CD8T"; b="CD3"}
-      if (i==6) {a="CD4T"; b="CD8T"}
-      
-      if(a %in% colnames(counts3) & b %in% colnames(counts3)) {
-        counts3 = cbind(counts3, counts3[,a]/counts3[,b])
-        colnames(counts3)[ncol(counts3)]=glue("{a}/{b}")
-        
-        tmp = list(
-          EI=cbind(perc = 100*density.by.depth[[a]]$EI[,"density"]/density.by.depth[[b]]$EI[,"density"], depth = density.by.depth[[b]]$EI[,"depth"]),
-          DI=cbind(perc = 100*density.by.depth[[a]]$DI[,"density"]/density.by.depth[[b]]$DI[,"density"], depth = density.by.depth[[b]]$DI[,"depth"]),
-          EU=cbind(perc = 100*density.by.depth[[a]]$EU[,"density"]/density.by.depth[[b]]$EU[,"density"], depth = density.by.depth[[b]]$EU[,"depth"]),
-          DU=cbind(perc = 100*density.by.depth[[a]]$DU[,"density"]/density.by.depth[[b]]$DU[,"density"], depth = density.by.depth[[b]]$DU[,"depth"])
-        )
-        density.ratio.by.depth[[glue("{a}/{b}")]]$I = rbind(EI=tmp$EI, DI=tmp$DI)
-        density.ratio.by.depth[[glue("{a}/{b}")]]$U = rbind(EU=tmp$EU, DU=tmp$DU)
-        # adjust depth by 50 so that the depth is in the middle of the bin
-        density.ratio.by.depth[[glue("{a}/{b}")]]$I[,"depth"] = density.ratio.by.depth[[glue("{a}/{b}")]]$I[,"depth"] + 50
-        density.ratio.by.depth[[glue("{a}/{b}")]]$U[,"depth"] = density.ratio.by.depth[[glue("{a}/{b}")]]$U[,"depth"] + 50
-        
-      } else {
-        counts3 = cbind(counts3, NA)
-        colnames(counts3)[ncol(counts3)]=glue("{a}/{b}")
-        
-      }
-    }
-
-    list(sizes=sizes, counts=counts, densities=counts2, norm.counts=counts3, density.ratio.by.depth = density.ratio.by.depth)
-    
-  })
-}) 
-
-
-# count cells to different depths below skin
-count.tables.2 = lapply (all.slides, function(s) {
-  # s="LG3_Les" 
-  
-  markers=markers.ls[[s]]; names(markers)=markers
-  
-  depths=c(1000, 500, Inf)
-  names(depths)=paste0("Skin", depths)
-  
-  lapply (depths, function(max_depth) { # um
-    
-    myprint(s, max_depth)
-    
-    counts = sapply(markers, function (a) 
-      c(EI=nrow(subset(alldat[[s]][[a]], dist2skin<max_depth & epi &    region=="intact")),
-        DI=nrow(subset(alldat[[s]][[a]], dist2skin<max_depth & dermis & region=="intact")),
-        EU=nrow(subset(alldat[[s]][[a]], dist2skin<max_depth & epi &    region=="ulcerative")),
-        DU=nrow(subset(alldat[[s]][[a]], dist2skin<max_depth & dermis & region=="ulcerative")))
-    )
-    
-    
-    # compute sizes of epi/dermis, normal/lesion
-    dat = tissue_size[tissue_size$biopsy==s & tissue_size$dist_type=="dist2skin",] # max_depth is relative to skin
-    dat = dat[dat$depth<max_depth,] # < b/c depth is the beginning of the bin
-    sizes = with(dat, c(I=sum(area[region=="intact"]),
-                        U=sum(area[region=="ulcerative"])))
-    # convert size from 100um x 100um to 1mm x 1mm
-    sizes = sizes/100
-    # rep to match the dimension of counts: I I U U
-    sizes = rep(sizes, each = 2)
-    
-    # density
-    counts2=counts/sizes
-    mode(counts2) <- "integer"
-    
-    ## depth-specific density
-    
-    # first, compute sizes of normal/lesion
-    dat = tissue_size[tissue_size$biopsy==s & tissue_size$dist_type=="dist2skin",] # max_depth is relative to skin
-    dat = dat[dat$depth<max_depth,] # use < instead of <= b/c depth is the beginning of the bin
-    dat$area = dat$area/100    # convert size from 100um x 100um to 1mm x 1mm
-    size_normal = dat[dat$region=="intact",]
-    size_lesion = dat[dat$region=="ulcerative",]
-    size_normal = dat[dat$region=="intact",]
-    size_lesion = dat[dat$region=="ulcerative",]
-    
-    counts3 = NULL
-    density.by.depth = list()
-    
-    for (a in markers) {
-      
-      # normal
-      
-      normal = subset(alldat[[s]][[a]], dist2skin<max_depth & region=="intact")
-      # add a depth column computed as the floor of dist2skin/100
-      normal$depth = floor(normal$dist2skin/100)*100
-      count_by_depth = mytable(normal$depth)
-      # add count_by_depth column to size_normal by match the depth in size_normal and count_by_depth
-      size_normal$count_by_depth = count_by_depth[size_normal$depth%.%""]
-      size_normal$count_by_depth[is.na(size_normal$count_by_depth)] = 0
-      normal_density = unname(ifelse (sizes["I"]==0, NA, sum(size_normal$count_by_depth/size_normal$area, na.rm=TRUE)))
-      
-      # epi lesion
-      
-      lesion = subset(alldat[[s]][[a]], dist2skin<max_depth & region=="ulcerative")
-      # add a depth column computed as the floor of dist2skin/100
-      lesion$depth = floor(lesion$dist2skin/100)*100
-      count_by_depth = mytable(lesion$depth)
-      # add count_by_depth column to size_lesion by match the depth in size_lesion and count_by_depth
-      size_lesion$count_by_depth = count_by_depth[size_lesion$depth%.%""]
-      size_lesion$count_by_depth[is.na(size_lesion$count_by_depth)] = 0
-      lesion_density = unname(ifelse (sizes["U"]==0, NA, sum(size_lesion$count_by_depth/size_lesion$area, na.rm=TRUE)))
-      
-      # return the counts
-      counts3 = cbind(counts3, c(I=normal_density, U=lesion_density))
-      
-      density.by.depth[[a]] = list(
-        I = cbind(density=size_normal$count_by_depth/size_normal$area, depth=size_normal$depth), 
-        U = cbind(density=size_lesion$count_by_depth/size_lesion$area, depth=size_lesion$depth)
-      )
-    }
-    mode(counts3) <- "integer"; colnames(counts3)=markers
-    
-    # add the same number of columns to counts and counts2
-    counts=cbind(counts, NA, NA, NA, NA, NA, NA)
-    counts2=cbind(counts2, NA, NA, NA, NA, NA, NA)
-
-    # add ratio to counts3
-    density.ratio.by.depth=list()
-    
-    # make density.ratio.by.depth
-    for(i in 1:6) {
-      if (i==1) {a="Treg"; b="CD3"}
-      if (i==2) {a="Treg"; b="CD4T"}
-      if (i==3) {a="Treg"; b="CD8T"}
-      if (i==4) {a="CD4T"; b="CD3"}
-      if (i==5) {a="CD8T"; b="CD3"}
-      if (i==6) {a="CD4T"; b="CD8T"}
-      
-      if(a %in% colnames(counts3) & b %in% colnames(counts3)) {
-        counts3 = cbind(counts3, counts3[,a]/counts3[,b])
-        colnames(counts3)[ncol(counts3)]=glue("{a}/{b}")
-        
-        tmp = list(
-          I=cbind(perc = 100*density.by.depth[[a]]$I[,"density"]/density.by.depth[[b]]$I[,"density"], depth = density.by.depth[[b]]$I[,"depth"]),
-          U=cbind(perc = 100*density.by.depth[[a]]$U[,"density"]/density.by.depth[[b]]$U[,"density"], depth = density.by.depth[[b]]$U[,"depth"])
-        )
-        density.ratio.by.depth[[glue("{a}/{b}")]]$I = tmp$I
-        density.ratio.by.depth[[glue("{a}/{b}")]]$U = tmp$U
-        # add 50 to depth because the first depth is 0
-        density.ratio.by.depth[[glue("{a}/{b}")]]$I[,"depth"] = density.ratio.by.depth[[glue("{a}/{b}")]]$I[,"depth"] + 50
-        density.ratio.by.depth[[glue("{a}/{b}")]]$U[,"depth"] = density.ratio.by.depth[[glue("{a}/{b}")]]$U[,"depth"] + 50
-        
-      } else {
-        counts3 = cbind(counts3, NA)
-        colnames(counts3)[ncol(counts3)]=glue("{a}/{b}")
-      
-      }
-      
-      
-    }
-    
-    list(sizes=sizes, counts=counts, densities=counts2, norm.counts=counts3, density.ratio.by.depth = density.ratio.by.depth)
-    
-  })
-}) 
-
-
-# create avg.slides that average normalized densities across slides for a biopsy
-# once for adding to count.tables and once for adding to count.tables.2
-for (iter in 1:2) {
-  out = lapply(biopsies, function(b){
-    if (iter==1){
-      depths=c(500, 1000, Inf); depths=paste0("DEJ", depths)
+    # split depth_val into mode and max_depth
+    if (startsWith(depth_val, "DEJ")) {
+      mode = "DEJ"
+      max_depth = as.numeric(sub("DEJ", "", depth_val))
+    } else if (startsWith(depth_val, "Skin")) {
+      mode = "Skin"
+      max_depth = as.numeric(sub("Skin", "", depth_val))
     } else {
-      depths=c(500, 1000, Inf); depths=paste0("Skin", depths)
+      stop("Invalid depth_val")
     }
-    names(depths)=depths
-    out=lapply (depths, function(max_depth) { 
-      # iter=1; b=biopsies[1]; max_depth="DEJ1000"
-      
-      # find the union of markers for slides.by.biopsy[[b]]
-      markers=c(); for (s in slides.by.biopsy[[b]]) markers=c(markers, markers.ls[[s]])
-      markers=sort(unique(markers))
-      markers=markers[!endsWith(markers, "_raw")]      # remove markers ending in raw
-      names(markers)=markers
-      
-      tab=sapply(slides.by.biopsy[[b]],simplify="array", function(s){
-        # myprint(b, max_depth, s)
-        norm.counts=(if (iter==1) count.tables else count.tables.2)[[s]][[max_depth]]$norm.counts
-        # add a column of NAs to norm.counts for each marker in markers that is not in colnames(norm.counts)
-        missing_markers <- setdiff(markers, colnames(norm.counts))
-        if (length(missing_markers) > 0) {
-          na_matrix <- matrix(NA, nrow = nrow(norm.counts), ncol = length(missing_markers))
-          colnames(na_matrix) <- missing_markers
-          norm.counts <- cbind(norm.counts, na_matrix)
+    
+    dist_col = if (mode == "DEJ") "dist2DEJ" else "dist2skin"
+
+    counts = sapply(markers, function(a) 
+      if (mode=="DEJ") c(
+        EI = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & epi    & region == "intact")),
+        DI = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & dermis & region == "intact")),
+        EU = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & epi    & region == "ulcerative")),
+        DU = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & dermis & region == "ulcerative"))
+      ) else c(
+        I  = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & region == "intact")),
+        U  = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & region == "ulcerative"))
+      )
+    )
+    
+    dat_depth = tissue_size[tissue_size$biopsy == s & tissue_size$dist_type == dist_col & tissue_size$depth < max_depth, ]
+    dat_depth$area = dat_depth$area / 100 # convert size from 100um x 100um to 1mm x 1mm
+    
+    sizes = with(dat_depth, 
+      if (mode=="DEJ") c(
+        EI = sum(area[depth < 0 & region == "intact"]),
+        DI = sum(area[depth >= 0 & region == "intact"]),
+        EU = sum(area[depth < 0 & region == "ulcerative"]),
+        DU = sum(area[depth >= 0 & region == "ulcerative"])
+      ) else c(
+        I  = sum(area[region == "intact"]),
+        U  = sum(area[region == "ulcerative"])
+      )
+    )
+    
+    sizes[sizes==0] = NA; sizes 
+    counts[is.na(sizes),]=NA; counts
+    densities = counts / sizes; mode(densities) <- "integer"; densities
+    
+    depth_density = lapply(tissue.types, function (t) {
+      out = dat_depth[dat_depth$region == t, ]
+      if (sum(out$area)==0) return (NULL) else {
+        # remove rows with 0 area
+        out = subset(out, area>0)
+        # if depth are not contiguous, raise an error
+        if (any(diff(out$depth) != 100)) {
+          print(out)
+          stop("depths are not contiguous")
         }
-        norm.counts[,markers,drop=F]
-      })
-      out=apply(tab,c(1,2), mean, na.rm=T)
-      
-      # add ratios Treg/CD3, CD4T/CD3, CD8T/CD3, CD4T/CD8T, Treg/CD4T, Treg/CD8T
-      if("Treg" %in% markers) {
-        out = cbind(out, 
-                    "Treg/CD3" = out[,"Treg"]/out[,"CD3"],
-                    "Treg/CD4T" = out[,"Treg"]/out[,"CD4T"],
-                    "Treg/CD8T" = out[,"Treg"]/out[,"CD8T"],
-                    "CD4T/CD3" = out[,"CD4T"]/out[,"CD3"],
-                    "CD8T/CD3" = out[,"CD8T"]/out[,"CD3"],
-                    "CD4T/CD8T" = out[,"CD4T"]/out[,"CD8T"]
-        )
+        for (a in markers) {
+          tmp = subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & region == t)
+          tmp$depth = floor(tmp[[dist_col]] / 100) * 100
+          count_by_depth = mytable(tmp$depth)
+          out[[a%.%".count"]] = count_by_depth[out$depth %.% ""]
+          out[[a%.%".count"]][is.na(out[[a%.%".count"]])] = 0 # NA is introduced in count_by_depth_normal when there are no cells at a depth. 0 is more interpretable
+          out[[a%.%".density"]] = out[[a%.%".count"]] / out$area
+        }
       }
       
-      list(norm.counts=out, sizes=NA, counts=NA, densities=NA)
-    })
+      # Add density ratio at each depth
+      for (i in seq_along(ratio_pairs)) {
+        m1 <- ratio_pairs[[i]][1]
+        m2 <- ratio_pairs[[i]][2]
+        if (m1%.%".density" %in% colnames(out) && m2%.%".density" %in% colnames(out)) {
+          out = cbind(out, c(out[, m1%.%".density"] / out[, m2%.%".density"]))
+        } else {
+          out = cbind(out, NA)
+        }
+        colnames(out)[ncol(out)] = glue("{m1}/{m2}")
+      }
+      
+      out
+    }); depth_density
     
+    # if depth_val ends with Inf, save each non-null element of depth_density to a csv file
+    if (endsWith(depth_val, "Inf")) {
+      for (region in names(depth_density)) 
+        if (!is.null(depth_density[[region]])) 
+          write.csv(depth_density[[region]], file = paste0("output/csv/depth_density_", s, "_", region, "_", depth_val, ".csv"), row.names = FALSE)
+    }
+
+    
+    # sum over depth_density to get norm.counts 
+    norm.counts = list()
+    if (mode=="DEJ") {
+      # DEJ mode, count by EI,DI,EU,DU
+      for (t in c("intact","ulcerative")) {
+        if (is.null(depth_density[[t]])) E<-D<-NA else {
+          # get density columns in epidermis
+          E = depth_density[[t]][depth_density[[t]]$depth<0, grep("density$", colnames(depth_density[[t]]), value=TRUE)]
+          if (nrow(E)==0) E=NA else {
+            colnames(E) = sub("\\.density$", "", colnames(E))
+            E = colSums(E)
+          }
+          
+          # get density columns in dermis
+          D = depth_density[[t]][depth_density[[t]]$depth>=0, grep("density$", colnames(depth_density[[t]]), value=TRUE)]
+          if (nrow(D)==0) D=NA else {
+            colnames(D) = sub("\\.density$", "", colnames(D))
+            D = colSums(D)
+          }
+        }
+        norm.counts = append(norm.counts, list(E, D))
+      }
+      norm.counts=do.call(rbind, norm.counts); rownames(norm.counts) = c("EI","DI","EU","DU")
+      
+    } else {
+      # skin mode, count I and U
+      for (t in c("intact","ulcerative")) {
+        if (is.null(depth_density[[t]])) ED<-NA else {
+          # get density columns 
+          ED = depth_density[[t]][, grep("density$", colnames(depth_density[[t]]), value=TRUE)]
+          if (nrow(ED)==0) ED=NA else {
+            colnames(ED) = sub("\\.density$", "", colnames(ED))
+            ED = colSums(ED)
+          }
+        }
+        norm.counts = append(norm.counts, list(ED))
+      }
+      norm.counts=do.call(rbind, norm.counts); rownames(norm.counts) = c("I","U")
+      
+    }
+    # divide by 100 to get the number of cells in a 100um wide vertical strip
+    norm.counts = norm.counts/100
+    norm.counts
+    
+    
+    # Add stats for ratios to norm.counts
+    for (i in seq_along(ratio_pairs)) {
+      m1 <- ratio_pairs[[i]][1]
+      m2 <- ratio_pairs[[i]][2]
+      if (m1 %in% colnames(norm.counts) && m2 %in% colnames(norm.counts)) {
+        norm.counts = cbind(norm.counts, norm.counts[, m1] / norm.counts[, m2])
+      } else {
+        norm.counts = cbind(norm.counts, NA)
+      }
+      colnames(norm.counts)[ncol(norm.counts)] = glue("{m1}/{m2}")
+      
+      # add a column to counts and densities so that they can be rbind with norm.counts
+      counts = cbind(counts, NA)
+      densities = cbind(densities, NA)
+    }
+    
+    
+    list(counts=counts, densities=densities, sizes=sizes, depth_density=depth_density, norm.counts=norm.counts)
   })
-  names(out) = glue("{biopsies}_Les_avg")
   
-  if (iter==1){
-    count.tables = c(count.tables, out)
-  } else {
-    count.tables.2 = c(count.tables.2, out)
+}) # slides
+
+
+
+# add avg.slides 
+out = lapply(biopsies, function(b){
+      lapply(depth_vals, function(max_depth) { 
+      # b="AS"; max_depth="DEJ1000"; s="AS1_Les"
+  
+  slides = slides.by.biopsy[[b]]
+  
+  # find the union of markers for slides
+  markers=c(); for (s in slides) markers=c(markers, markers.ls[[s]])
+  markers=sort(unique(markers))
+  markers=markers[!endsWith(markers, "_raw")]      # remove markers ending in raw
+  names(markers)=markers
+  
+  # add a column of NAs to norm.counts for each marker in markers that is not in colnames(norm.counts)
+  tab=sapply(slides,simplify="array", function(s){
+    norm.counts=count_dat[[s]][[max_depth]]$norm.counts
+    missing_markers <- setdiff(markers, colnames(norm.counts))
+    if (length(missing_markers) > 0) {
+      na_matrix <- matrix(NA, nrow = nrow(norm.counts), ncol = length(missing_markers))
+      colnames(na_matrix) <- missing_markers
+      norm.counts <- cbind(norm.counts, na_matrix)
+    }
+    norm.counts[,markers,drop=F]
+  })
+  out=apply(tab,c(1,2), mean, na.rm=T)
+  
+  # add ratios 
+  # ratios for combined slides := sum 1/sum 2
+  # make sure only use slides that have both markers in the ratio
+  for (i in seq_along(ratio_pairs)) {
+    m1 <- ratio_pairs[[i]][1]
+    m2 <- ratio_pairs[[i]][2]
+    good.slides = slides[sapply(slides, function(s) m1 %in% markers.ls[[s]] && m2 %in% markers.ls[[s]])]
+    tab1=sapply(good.slides,simplify="array", function(s) count_dat[[s]][[max_depth]]$norm.counts[,c(m1,m2)])
+    res=apply(tab1,c(1,2), sum)
+    out = cbind(out, res[,1]/res[,2] )
+    colnames(out)[ncol(out)] = glue("{m1}/{m2}")
   }
-}
+  
+  
+  list(norm.counts=out, sizes=NA, counts=NA, densities=NA) # no depth density for average slide
+})
+})
+names(out) = glue("{biopsies}_Les_avg")
+
+count_dat = c(count_dat, out)
 
 
 
-# save the objects except alldat to a file
-# alldat is large and only used for plotting histograms
-save(list = setdiff(ls(), "alldat"), file = "R/forRmd.RData")
+
+# save the objects except cell_dat to a file
+# cell_dat is large and only used for plotting histograms
+save(list = setdiff(ls(), "cell_dat"), file = "R/forRmd.RData")
