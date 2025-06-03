@@ -130,21 +130,40 @@ for (slide_set in c(3,1)) {
     ylim=NULL
     for (x in c("DEJ1000","DEJ500")){with(norm.counts[[x]], {
       plot(SR, DI, xlab="Shedding rate", main=glue("Normalized Count DI ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
-      legend("topright", legend=paste("R2*=", round(summary(lm(DI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      fit.lm = lm(DI[initial!="AS"] ~ SR[initial!="AS"])
+      legend("topright", legend=c(
+        paste("R2=", round(summary(fit.lm)$r.squared, 3)),
+        # extract p value from fit.lm
+        paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
+      ), bty="n")
+      # add a line for the fit
+      abline(fit.lm, col="black", lty=2)
     })}
   
     # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
     ylim=NULL
     for (x in c("Skin1000","Skin500")){with(norm.counts[[x]], {
       plot(SR, I, xlab="Shedding rate", main=glue("Normalized Count I ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
-      legend("topright", legend=paste("R2*=", round(summary(lm(I[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      fit.lm = lm(I[initial!="AS"] ~ SR[initial!="AS"])
+      legend("topright", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)),
+        # extract p value from fit.lm
+        paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
+      ), bty="n")
+      # add a line for the fit
+      abline(fit.lm, col="black", lty=2)
     })}
   
     # scatterplot of normalized densities for epidermis intact. does not depend on the DEJ500/DEJ1000/DEJInf
     ylim=NULL
     with(norm.counts$DEJ1000, {
       plot(SR, EI, xlab="Shedding rate", main=glue("Normalized Count EI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
-      legend("topright", legend=paste("R2*=", round(summary(lm(EI[initial!="AS"] ~ SR[initial!="AS"]))$r.squared, 3)), bty="n")
+      fit.lm = lm(EI[initial!="AS"] ~ SR[initial!="AS"])
+      legend("topright", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)),
+        # extract p value from fit.lm
+        paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
+      ), bty="n")
+      # add a line for the fit
+      abline(fit.lm, col="black", lty=2)
     })
     
     # plot legend only on the first row
