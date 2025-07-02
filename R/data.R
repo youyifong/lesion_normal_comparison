@@ -31,8 +31,8 @@ all.slides = sort(unique(tissue_size$biopsy)); names(all.slides)=all.slides
 
 markers.ls = lapply(all.slides, function(s) {  # s = 'JT_Les'
   tmp = sort(list.files(paste0(data.dir, "/", get.initial(s), "/", s, "/TSP_stitched"), pattern=".*_d2b_regmem.csv"))
-  out = sapply(tmp, function(n) sub("_m.*.csv", "", sub(s%.%"_","",n)))
-  # move CD4T, CD8T, Treg to the end
+  out = sapply(tmp, function(n) sub("_HIL.*.csv", "", sub("_m.*.csv", "", sub(s%.%"_","",n))))
+  # move CD4T, CD8T, Treg to the end. by using setdiff, replicates are also lost
   out = c(setdiff(out, cell_types), setdiff(out, setdiff(out, cell_types)))
   names(out)=out; out
 })
@@ -72,11 +72,17 @@ get.dat=function(s, marker) {
     # use CF5 CD68 instead of CF1 CD68 due to quality
   if (s == "CF1_Les" && marker == "CD68") s = "CF5_Les"
   
-  fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_m_c7_d2b_regmem.csv")
+  # use HIL if exists
+  fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_HIL_d2b_regmem.csv")
   if (!file.exists(fn)) {
-    # T cell subset files are named differently
-    fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_masks_d2b_regmem.csv")
-    if (!file.exists(fn)) return (NULL)
+    fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_m_c7_d2b_regmem.csv")
+    if (!file.exists(fn)) {
+      # T cell subset files are named differently
+      fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_masks_d2b_regmem.csv")
+      if (!file.exists(fn)) stop("unexpected") #return (NULL)
+    }
+  } else {
+    print(fn)
   }
   dat=read.csv(fn)
   
@@ -165,7 +171,7 @@ count_dat = lapply(all.slides, function(s) {
     
     dist_col = if (mode == "DEJ") "dist2DEJ" else "dist2skin"
 
-    counts = sapply(markers, function(a) 
+    counts = sapply(markers, function(a) {
       if (mode=="DEJ") c(
         EI = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & epi    & region == "intact")),
         DI = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & dermis & region == "intact")),
@@ -175,7 +181,7 @@ count_dat = lapply(all.slides, function(s) {
         I  = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & region == "intact")),
         U  = nrow(subset(cell_dat[[s]][[a]], get(dist_col) < max_depth & region == "ulcerative"))
       )
-    )
+    })
     
     dat_depth = tissue_size[tissue_size$biopsy == s & tissue_size$dist_type == dist_col & tissue_size$depth < max_depth, ]
     dat_depth$area = dat_depth$area / 100 # convert size from 100um x 100um to 1mm x 1mm

@@ -7,7 +7,7 @@ if (Sys.info()[["sysname"]] == "Windows") {
   setwd(paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/.."))
 } else {
   # automatically set working directory to the parent of the location of this file
-}
+} 
 
 # this write a Rdata file with the data
 source("R/data.R")
