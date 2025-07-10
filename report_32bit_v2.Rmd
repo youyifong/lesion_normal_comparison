@@ -61,7 +61,8 @@ Notes on methods:
 - Depth density function is a function of the number of cells per 100x100 um2 tissue over the distance to skin or DEJ in 100 um increment. Each bin in the histogram represents the count in a 100x100 um2 area. 
 - Normalized count is the number of cells in a vertical strip 100um wide, and is equivalent to the area under the depth density function (restricted to certain depth if applicable). It is called normalized count because each depth is weighted equally instead of variable depending on the tissue shape. 
 - Ratio is presented as fraction in tables and percentages in graphs. A gap in depth density ratio function is often due to the denominator being 0.
-- R$^2$* is computed without slides from AS_Les, which has the highest shedding rate and appears an outlier.
+- Ratio for average slides is computed as the ratio of averages, and not the average of normalized counts, across all slides.
+- R$^2$ is computed without slides from AS_Les, which has the highest shedding rate and appears an outlier.
 
 Notes on results:
 

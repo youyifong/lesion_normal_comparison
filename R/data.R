@@ -29,6 +29,13 @@ tissue_size=read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region.csv"))
 tissue_size$biopsy = get.slide.name(tissue_size$biopsy)
 all.slides = sort(unique(tissue_size$biopsy)); names(all.slides)=all.slides
 
+# for each biopsy, determine if it has no intact region
+tmp = mysapply(all.slides, function(s) {
+  tmp1 = tissue_size[tissue_size$biopsy==s & tissue_size$region=="intact" & tissue_size$area>0, ]
+  tmp2 = tissue_size[tissue_size$biopsy==s & tissue_size$region=="ulcerative" & tissue_size$area>0, ]
+  c(no_intact = nrow(tmp1)==0, no_lesion = nrow(tmp2)==0)
+}); tmp
+
 markers.ls = lapply(all.slides, function(s) {  # s = 'JT_Les'
   tmp = sort(list.files(paste0(data.dir, "/", get.initial(s), "/", s, "/TSP_stitched"), pattern=".*_d2b_regmem.csv"))
   out = sapply(tmp, function(n) sub("_HIL.*.csv", "", sub("_m.*.csv", "", sub(s%.%"_","",n))))
