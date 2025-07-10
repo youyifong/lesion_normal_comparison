@@ -90,3 +90,6 @@ python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions
 python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
 ```
 
+### Spatial analysis
+
+Run Rstudio online on Gizmo and source _run.R.
