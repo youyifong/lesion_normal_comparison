@@ -1,22 +1,19 @@
 # Analysis of 32-bit images
 
+```{bash}
+ml cuDNN/8.2.2.26-CUDA-11.4.1
+ml Python/3.9.6-GCCcore-11.2.0
+source ~/envs/tspenv/bin/activate
+export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
+cd /fh/fast/fong_y/images_from_K/lesion_normal_comparison
+```
+
 Analysis of images that are processed through a 32-bit import from the instrument. Older analysis files using 8-bit import are saved under the folder 8bit.
 
 Workflow: 
 - For image processing and cell segmentation, use python
 - For making report, work with files on the cluster. Use Rstudio online to run the R scripts, which generate a Rdata file. Use Rstudio on laptop to write R scripts and run Rmd. 
 
-
-### Setup
-Load modules on Volta or the Hutch cluster.
-```{bash}
-cd /fh/fast/fong_y/images_from_K/lesion_normal_comparison
-ml cuDNN/8.2.2.26-CUDA-11.4.1
-ml Python/3.9.6-GCCcore-11.2.0
-ml IPython/7.26.0-GCCcore-11.2.0
-source ~/envs/tspenv/bin/activate
-export CUBLAS_WORKSPACE_CONFIG=:4096:8 # for GPU computation reproducibility
-```
 
 
 ### Directory structure
@@ -67,9 +64,9 @@ Performed by K. From K:
 
 ### Extraction of spatial features
 
-This is done by K. Note that xxx_region_area_length is no longer needed because we now use tissue_size_by_depth_and_region.csv.
+Slide-specific xxx_region_area_length files are no longer needed because we now use tissue_size_by_depth_and_region.csv.
 
-Steps:
+K performs the following steps to extract spatial features from the stitched images:
 - Define an environment variable XX. In shell commands, ${XX} can be used to represent a generic biopsy, e.g., CF, DD, AS. Note that it needs to be enclosed within double quotes not single quotes for it to work.
 - Enter ROI_regions folder
 - Make a png file with region boundaries
@@ -89,4 +86,6 @@ cd ..
 python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/${XX}_skin_boundary.roi,ROI_regions/DD_Les_DEJviaDAPI-WGA_alternate.roi] 
 python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
 ```
+
+When a slide has multiple discontiguous lesion or intact regions, the region membership is computed by passing all the region ROIs to the regionmembership command.
 
