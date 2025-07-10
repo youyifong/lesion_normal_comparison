@@ -35,6 +35,7 @@ tmp = mysapply(all.slides, function(s) {
   tmp2 = tissue_size[tissue_size$biopsy==s & tissue_size$region=="ulcerative" & tissue_size$area>0, ]
   c(no_intact = nrow(tmp1)==0, no_lesion = nrow(tmp2)==0)
 }); tmp
+lesion_slides = rownames(tmp)[!tmp[,"no_lesion"]]
 
 markers.ls = lapply(all.slides, function(s) {  # s = 'JT_Les'
   tmp = sort(list.files(paste0(data.dir, "/", get.initial(s), "/", s, "/TSP_stitched"), pattern=".*_d2b_regmem.csv"))
@@ -48,7 +49,9 @@ markers.ls = lapply(all.slides, function(s) {  # s = 'JT_Les'
 all.slides = all.slides[sapply(markers.ls, function(x) length(x)>0)]
 # choose one slide for each biopsy
 select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les",  "EB_Les", "JK1_Les", "JM1_Les", "JT_Les",  "LD_Les", "LG2_Les",  "LM_Les", "LS2_Les", "SK2_Les"); names(select.slides)=get.slide.name(select.slides)
-stopifnot(all(sapply(select.slides, function(b) length(intersect(markers.ls[[b]], key.markers)))==6))# make sure all select.slides have all key markers
+# CF1_Les has no CD68. We used to use CF5_Les CD68 to replace it, but that is not a very good soln. For one thing, CD5_Les has no ulcerative part.
+#stopifnot(all(sapply(select.slides, function(b) length(intersect(markers.ls[[b]], key.markers)))==6))# make sure all select.slides have all key markers
+
 biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biopsies
 avg_slides = glue("{biopsies}_Les_avg")# average norm.counts of all slides from a single biopsy
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
@@ -75,11 +78,13 @@ if (!dir.exists("output/csv")) dir.create("output/csv", recursive = TRUE)
 # cell-level data
 
 get.dat=function(s, marker) {
-# s="LG2_Les"; dist="dist2skin"; marker="CD3
-    # use CF5 CD68 instead of CF1 CD68 due to quality
-  if (s == "CF1_Les" && marker == "CD68") s = "CF5_Les"
+# s="CF1_Les"; dist="dist2skin"; marker="CD68"
+    
+  # in the beginning, we use CF5 CD68 instead of CF1 CD68 due to quality
+  # later, we decide not to do this
+  # if (s == "CF1_Les" && marker == "CD68") s = "CF5_Les" 
   
-  # use HIL if exists
+  # use HIL over _m_c7 if it exists
   fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_HIL_d2b_regmem.csv")
   if (!file.exists(fn)) {
     fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_m_c7_d2b_regmem.csv")

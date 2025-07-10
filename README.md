@@ -10,30 +10,30 @@ cd /fh/fast/fong_y/images_from_K/lesion_normal_comparison
 
 Analysis of images that are processed through a 32-bit import from the instrument. Older analysis files using 8-bit import are saved under the folder 8bit.
 
-Workflow: 
-- For image processing and cell segmentation, use python
-- For making report, work with files on the cluster. Use Rstudio online to run the R scripts, which generate a Rdata file. Use Rstudio on laptop to write R scripts and run Rmd. 
-
 
 
 ### Directory structure
 
-- ../Chipcytometry_images_from32bit contains the ZellKraftWerk tiff images of biopsy samples
-  - Each subfolder contains images from one subject, e.g., CF
-    - Each subfolder contains one slide, representing one slice of a biopsy at one of the five timepoints of HSV infection and healing: Lesion, Healed, 2 weeks post heal (wph), 4wph, 8wph, and 8wph control. In addition, 8wph control is a contralateral biopsy of 8wph, so it is biopsied at the same time as 8wph.
+The only clone of lesion_normal_comparison is on the cluster. 
+- py. For image processing and cell segmentation. 
+- R. For spatial analysis. Use Rstudio on laptop to write on the files from X drive (too slow to run from X drive). Use Rstudio online to write or run scripts. 
 
-    - For each slide folder, e.g. AS/AS1_Les, the content is organized as follows:
+../Chipcytometry_images_from32bit contains the ZellKraftWerk tiff images of biopsy samples
+- Each subfolder contains images from one subject, e.g., CF
+  - Each subfolder contains one slide, representing one slice of a biopsy at one of the five timepoints of HSV infection and healing: Lesion, Healed, 2 weeks post heal (wph), 4wph, 8wph, and 8wph control. In addition, 8wph control is a contralateral biopsy of 8wph, so it is biopsied at the same time as 8wph.
 
-      - TSP_stitched
-        - stitched full-size images of the sample 
-        - aligned to CD45 if CD45 is available, if not, I just align CD3 to CD8.  They are not cropped, just stitched the active positions, or positions with images
+  - For each slide folder, e.g. AS/AS1_Les, the content is organized as follows:
 
-        - ROI_regions folder. A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files under the ROI_regions folder:
-           - skin boundary. Type: line or polyline. File name example: AS_Les_**skin_boundary**.roi
-           - DEJ. Type: line or polyline. File name example: AS_Les_**DEJ**_v2.roi
-           - whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi. Note that this file is not needed if the regions have tight boundaries.
-           - epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
-           - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
+    - TSP_stitched
+      - stitched full-size images of the sample 
+      - aligned to CD45 if CD45 is available, if not, I just align CD3 to CD8.  They are not cropped, just stitched the active positions, or positions with images
+
+      - ROI_regions folder. A biopsy is divided into contiguous regions. A region is either lesion (ulcerative) or normal (intact). Each region is further divided into epidermis and dermis. For each region, we expect three roi files under the ROI_regions folder:
+         - skin boundary. Type: line or polyline. File name example: AS_Les_**skin_boundary**.roi
+         - DEJ. Type: line or polyline. File name example: AS_Les_**DEJ**_v2.roi
+         - whole tissue boundary roi. Type: polygon. File name example: AS_Les_**whole_tissue**.roi. Note that this file is not needed if the regions have tight boundaries.
+         - epi region boundary. Type: polygon. File name example: AS_Les_**epi_region**_1_normal.roi
+         - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
 
 
 ### Background
@@ -42,9 +42,9 @@ Marker groups
 
 - T cell: CD3 CD4 CD8 CD69 CD279 Foxp3
 - Neutrophil: CD15
-- Dendritic cells: CD11c CD123 
-- Macrophage: CD68
-- NK cells: CD56. This marker is expressed on both NK and nerve fibers, need to check if the staining on the latter affects the NK cell count.
+- Dendritic cells: CD11c CD123.  CD123 also stains blood vessels, so need human-in-loop to remove the segmented outline of blood vessels.
+- Macrophage: CD68.  CD68 staining often result in bright epidermis and thus segmented.  Can also stain dendritic cells/dendrites in skin.  Require human-in-loop to remove these segmented signals.
+- NK cells: CD56. This marker is expressed on both NK and nerve fibers, need to check if the staining on the latter affects the NK cell count.  Remove nerve fiber segmentation via human-in-loop.
 
 
 
@@ -83,7 +83,7 @@ cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from32bit/${YY}/${XX}/TSP_
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --saveas "../${XX}_region_boundary.png" --saveoutlineonly
 
 cd ..
-python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/${XX}_skin_boundary.roi,ROI_regions/DD_Les_DEJviaDAPI-WGA_alternate.roi] 
+python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/${XX}_skin_boundary.roi,ROI_regions/${XX}_Les_DEJ*.roi] 
 python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
 ```
 
@@ -93,3 +93,5 @@ When a slide has multiple discontiguous lesion or intact regions, the region mem
 ### Spatial analysis
 
 Run Rstudio online on Gizmo and source _run.R.
+
+The density results saved in output/csv/ are in the unit of count/mm2, not count/100umx100um as in the density depth plots. 

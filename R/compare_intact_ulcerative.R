@@ -8,7 +8,7 @@ dir.exists("output/figures") || dir.create("output/figures", recursive = TRUE)
 
 for (dist in dist.labels) {
 for (marker_set in c(1,2,3)) {
-for (biopsy in c("select_slides", biopsies)) {
+for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
     
   if (marker_set==1) {
     toplot = key.markers
@@ -21,6 +21,9 @@ for (biopsy in c("select_slides", biopsies)) {
   if (biopsy=="select_slides") {
     # 13 select slides on one page"
     slides = select.slides
+  } else if (biopsy=="lesion_slides") {
+    # 9 slides with lesions on one page"
+    slides = lesion_slides
   } else {
     slides = slides.by.biopsy[[biopsy]]
   }
