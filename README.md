@@ -59,7 +59,16 @@ python py/get_biopsy_size_by_depth_and_region_32bit.py --grid 5
 
 Performed by K. From K:
 - There are problems with some CD68 segmentation because the antibody also stained the epidermis of some tissues. I tried to reduce the epidermis brightness with some success. Thus, some samples will have *CD68.png (original) and *CD68_2.png (my attempt to adjust epidermis).
-
+- CD4T (CD3+CD4+) and CD8T (CD3+CD8+) cell populations are obtained by the following:
+  - Segment CD3 with python -m tsp runcellpose
+  - Shrink CD3 masks by 1 pixel via python -m tsp dilatemasks
+    - Shrunken masks files are saved in the format *_m_c7_d-1.png
+  - Use shrunken CD3 masks files in python -m tsp cellphenotyping to identify coexpressions in respective CD4 or CD8 images by fluorescence intensity.
+    - Intensity_median analysis for (--m)
+    - Set threshold to 9.8 for (--c)
+    - 'True' value for (--p)
+  - Cellphenotyping results include a csv file as one of the outputs.
+    - The csv file is saved in the format *_masks.csv, and can be used in 'Extraction of spatial features'.
 
 
 ### Extraction of spatial features
@@ -83,7 +92,7 @@ cd /fh/fast/fong_y/images_from_K/Chipcytometry_images_from32bit/${YY}/${XX}/TSP_
 python -m tsp roifiles2mask --f "*region*.roi" --imagefile "../${XX}_CD3.png" --saveas "../${XX}_region_boundary.png" --saveoutlineonly
 
 cd ..
-python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/${XX}_skin_boundary.roi,ROI_regions/${XX}_Les_DEJ*.roi] 
+python -m tsp dist2boundary --f "*_Les_CD*_masks.csv" --boundaryroi [ROI_regions/${XX}_skin_boundary.roi,ROI_regions/${XX}_Les_DEJ.roi] 
 python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_regions/${XX}_*_region_*.roi"
 ```
 
