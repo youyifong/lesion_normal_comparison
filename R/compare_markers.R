@@ -39,25 +39,31 @@ for (biopsy in c("select_slides", biopsies)) {
   lapply (slides, function(s) {
   sapply (tissue.types, function(tissue.type) { 
   sapply (dist.labels, simplify="array", function(dist) {
-  # tissue.type="ulcerative"; dist="dist2skin"; s="LG2_Les"; marker_set=1
+  # tissue.type="ulcerative"; dist="dist2skin"; s="CF5_Les"; marker_set=1
     myprint(tissue.type, dist, s, marker_set)
   
     if (marker_set==1 | marker_set==2) {
       dat.ls = lapply(markers, function (a) if (is.null(cell_dat[[s]][[a]])) NULL else subset(cell_dat[[s]][[a]], region==tissue.type)[[dist]])
       dat.ls = dat.ls[sapply(dat.ls, function(x) !is.null(x))]
-      
+
       if(all(sapply(dat.ls,length)==0)) {
         empty.plot(); title(main=ifelse(s==slides[1],tissue.type,""))
       } else {
+        # not all markers may be present
+        markers.1 = names(dat.ls)
+        # print(seq_along(markers)[match(markers.1, markers)])
+        # print(markers.1)
+        # print(subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type))
+        # print(ylim[[dist]])
         all.freq = scaled.hist(dat.ls,
-           scale.factors=lapply(markers, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type)),
+           scale.factors=lapply(markers.1, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type)),
            xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
            xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
            main=ifelse(s==slides[1],tissue.type,""),
-           col=seq_along(markers),
+           col=seq_along(markers)[match(markers.1, markers)],
            cex.legend=0.7,
            yaxt=ifelse(tissue.types[1]==tissue.type & dist.labels[1]==dist,"s","n"), # only have y axis in column 1
-           legend=markers)
+           legend=markers.1)
       }
       
     } else {

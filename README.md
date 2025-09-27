@@ -47,7 +47,6 @@ Marker groups
 - NK cells: CD56. This marker is expressed on both NK and nerve fibers, need to check if the staining on the latter affects the NK cell count.  Remove nerve fiber segmentation via human-in-loop.
 
 
-
 ### Tissue stats
 
 ```{bash}
@@ -55,14 +54,7 @@ python py/get_biopsy_size_by_depth_and_region_32bit.py --grid 5
 ```
 
 
-### Segmentation
-
-Performed by K. From K:
-- There are problems with some CD68 segmentation because the antibody also stained the epidermis of some tissues. I tried to reduce the epidermis brightness with some success. Thus, some samples will have *CD68.png (original) and *CD68_2.png (my attempt to adjust epidermis).
-
-
-
-### Extraction of spatial features
+### Segmentation and extraction of spatial features
 
 Slide-specific xxx_region_area_length files are no longer needed because we now use tissue_size_by_depth_and_region.csv.
 
@@ -90,6 +82,24 @@ python -m tsp regionmembership --f "${XX}_CD*_masks_d2b.csv" --regionroi "ROI_re
 When a slide has multiple discontiguous lesion or intact regions, the region membership is computed by passing all the region ROIs to the regionmembership command.
 
 
+Human_In_Loop editing (HIL)
+
+- Required when antibodies/markers like CD56, CD68, CD123 are also present in other structures (CD123 on blood vessels) or cells (CD56 on NK and neuronal cells)
+- Also when tissue regions such as the epidermis is bright enough to get segmented
+- This leads to over-counting the cell population of interest
+- These unintended segmented masks should be removed before continuing with spatial analyses
+  - For example, CD123
+      - Segment CD123 via runcellpose  python -m tsp runcellpose --f 'XX_CD123.png' --model c7 --min_size 100 --flow 0.5 --l [0,0] --s
+      - Convert XX_CD123_cp_outlines.txt to ImageJ ROI's using 'imagej_roi_converter.py'
+          - Drag and drop 'image_roi.converter.py' into ImageJ to open a conversion window
+          - Open CD123 image
+          - Click 'Run' in the window to find and open XX_CD123_cp_outlines.txt to generate ImageJ ROI's
+      - Look through the image and ROI's to delete unintended ROI's (HIL)
+      - When done, save all ROI's as a .zip file
+      - Convert .zip back to mask files using 'roifiles2masks' command to obtain .csv file for the HIL masks
+      - Run 'dist2boundary' with the .csv file, then 'regionmembership' 
+
+  
 ### Spatial analysis
 
 Run Rstudio online on Gizmo and source _run.R.

@@ -4,7 +4,7 @@ library(glue)
 { # slide level data
 data.dir = "../Chipcytometry_images_from32bit"
 key.markers=c("CD3", "CD11c", "CD123", "CD15", "CD56", "CD68")
-cell_types=c("CD4T", "CD8T", "Treg")
+cell_types=c("CD8T", "CD4T", "Treg")
 get.slide.name=function(ss)  sapply(ss, function (s) sub(".*?/(.*)", "\\1", s)) # "DD/DD1_Les" -> DD1_Les
 get.initial=function(ss)  sapply(ss, function (s) sub("^([^0-9_]+).*", "\\1", s) ) # "DD1_Les" -> "DD"
 
@@ -56,7 +56,7 @@ biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biop
 avg_slides = glue("{biopsies}_Les_avg")# average norm.counts of all slides from a single biopsy
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
 
-severity = read.csv("R/Lesion_HSV_rates_04082025.csv")
+severity = read.csv("../../HSV406/Lesion_HSV_rates_04082025.csv")
 severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))# add a column for the initial, which are the letter in front of the arabic number
 
 region.labels=c(intact="intact", lesion="ulcerative")

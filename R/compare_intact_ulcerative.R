@@ -49,7 +49,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
                     scale.factors=lapply(tissue.types, function(t) 
                       subset(tissue_size, biopsy==s & dist_type==dist & region==t)),
                     main=ifelse(s==slides[1],a,""),
-                    col=c("red","blue"),
+                    col=rev(c("red","blue")),
                     legend=names(dat.ls),
                     xlim=xlim.ls[[dist]], xlab=dist %.% " (um)", 
                     ylim=ylim[[dist]], ylab="",
@@ -75,7 +75,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
         empty.plot(); title(main=ifelse(s==slides[1],a,""))
       } else {
         mymatplot(dat.tmp$depth, dat.tmp[,c("perc.I","perc.U")],
-                  type="l", lty=c(1,1), col=c("red","blue"), lwd=2,
+                  type="l", lty=c(1,1), col=rev(c("red","blue")), lwd=2,
                   main=ifelse(s==slides[1],a,""),
                   legend=tissue.types[!c(all(is.na(dat.tmp$perc.I)), all(is.na(dat.tmp$perc.U)))], legend.x=3,
                   xlab=dist %.% " (um)", xlim=xlim.ls[[dist]],

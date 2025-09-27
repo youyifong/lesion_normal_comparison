@@ -15,9 +15,9 @@ format_mixed_rounding <- function(x) {
   })
 }
 
-# count cells to different depths
+# Tables by slides
 for (s in all.slides) {
-# s="SK3_Les"
+# s="SK1_Les"; max_depth=1000
   
   # s1 = sub(".*?/(.*)", "\\1", s)
   

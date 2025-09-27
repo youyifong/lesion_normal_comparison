@@ -2,6 +2,7 @@
 title: "report_32bit"
 output: 
   pdf_document:
+    number_sections: true
     includes:
       in_header: header.tex
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
@@ -17,7 +18,7 @@ load("R/forRmd.RData")# load the objects from a file
 library(knitr)
 ```
 
-## Introduction
+# Introduction
 
 There are 13 lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion. List of available markers per slide: 
 \bigskip
@@ -41,7 +42,7 @@ The key markers are: CD3 CD11c CD123 CD15 CD56 CD68.
 Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. Furthermore, for CF lesion CD68 staining, CF5_Les instead of CF1_Les is used due to quality reasons.
 
 \newpage
-## Correlation with shedding rate
+# Correlation with shedding rate
 
 Based on the previous report, we decided to 
 
@@ -60,9 +61,11 @@ Notes on methods:
 - Density is the number of cells/mm$^2$. The size of biopsy is on the order of mm$^2$.
 - Depth density function is a function of the number of cells per 100x100 um2 tissue over the distance to skin or DEJ in 100 um increment. Each bin in the histogram represents the count in a 100x100 um2 area. 
 - Normalized count is the number of cells in a vertical strip 100um wide, and is equivalent to the area under the depth density function (restricted to certain depth if applicable). It is called normalized count because each depth is weighted equally instead of variable depending on the tissue shape. 
+- Average slide is computed as the mean norm.counts.
 - Ratio is presented as fraction in tables and percentages in graphs. A gap in depth density ratio function is often due to the denominator being 0.
-- Ratio for average slides is computed as the ratio of averages, and not the average of normalized counts, across all slides.
+- Ratio for average slides is computed as the ratio of two sums across norm.counts from all slides for the two markers
 - R$^2$ is computed without slides from AS_Les, which has the highest shedding rate and appears an outlier.
+- The association is done on intact only. Previously we explored association with ulcerative + intact, but decided to focus on intact
 
 Notes on results:
 
@@ -119,7 +122,8 @@ for (slide_set in c(1,3)) {
       # x="Skin500"; a="Treg"
       tmp=slides; if (a=="CD68") tmp=setdiff(slides, "CF1_Les")
       out = as.data.frame(mysapply(tmp, function (s) {
-        count_dat[[s]][[x]]$norm.counts[,a]
+        ret = count_dat[[s]][[x]]$norm.counts
+        if (a %in% colnames(ret)) ret[,a] else stop(glue("{a} is missing for {s}"))
       })); out
       
       cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
@@ -195,10 +199,10 @@ for (slide_set in c(1,3)) {
 
 
 \newpage
-## Depth density function
+# Depth density function
 
 
-### Intact vs. ulcerative - select slides
+## Intact vs. ulcerative - select slides
 
 In this subsection, there are two sets of figures, one for dist2skin and one for dist2DEJ. Each figure shows 13 representative slides.
 
@@ -213,7 +217,7 @@ cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{outpu
 cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set3.png}\\end{figure}\n")
 ```
 
-### Intact vs. ulcerative - lesion slides
+## Intact vs. ulcerative - lesion slides
 
 In this subsection, there are two sets of figures, one for dist2skin and one for dist2DEJ. Each figure shows the 9 slides with lesions.
 
@@ -228,7 +232,7 @@ cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{outpu
 cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set3.png}\\end{figure}\n")
 ```
 
-### Intact vs. ulcerrative - all slides
+## Intact vs. ulcerrative - all slides
 
 In this subsection, each figure shows all slides from a single biopsy. 
 
@@ -245,7 +249,7 @@ for (b in biopsies) {
 }
 ```
 
-### Markers comparison - select slides   
+## Markers comparison - select slides   
 
 In this subsection, there is one figure showing 13 representative slides. 
 
@@ -256,7 +260,7 @@ cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{outpu
 cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set3.png}\\end{figure}\n")
 ```
 
-### Markers comparison - all slides
+## Markers comparison - all slides
 
 In this subsection, each figure shows all slides from a single biopsy. 
 
@@ -270,7 +274,7 @@ for (b in biopsies) {
 ```
         
 
-## Tables by markers
+# Tables by markers
 
 ```{r, results='asis', echo=FALSE}
 # print count tables
@@ -283,7 +287,7 @@ for (tbl in cnt.tables) {
 ```
 
 
-## Tables by biopsies
+# Tables by biopsies
 
 
 ```{r count and density tables, results='asis', echo=FALSE}
