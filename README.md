@@ -105,7 +105,7 @@ Human_In_Loop editing (HIL)
 - This leads to over-counting the cell population of interest
 - These unintended segmented masks should be removed before continuing with spatial analyses
   - For example, CD123
-      - Segment CD123 via runcellpose  python -m tsp runcellpose --f 'XX_CD123.png' --model c7 --min_size 100 --flow 0.5 --l [0,0] --s
+      - Segment CD123 via runcellpose  python -m tsp runcellpose --f 'XX_CD123.png' --model c7 --min_size 100 --flow 0.5 --l [0,0] --s --saveroi (required to generate the necessary .txt file)
       - Convert XX_CD123_cp_outlines.txt to ImageJ ROI's using 'imagej_roi_converter.py'
           - Drag and drop 'image_roi.converter.py' into ImageJ to open a conversion window
           - Open CD123 image
