@@ -6,7 +6,9 @@ dir.exists("output/tables") || dir.create("output/tables", recursive = TRUE)
 format_mixed_rounding <- function(x) {
   sapply(x, function(val) {
     if (is.nan(val)) NA else if (is.na(val)) NA else {
-      if (val %% 1 == 0) {
+      if (val == Inf) { # Inf
+        "Inf"
+      } else if (val %% 1 == 0) {
         formatC(val, format = "f", digits = 0)  # integer: 0 decimal digits
       } else {
         formatC(val, format = "f", digits = 2)  # non-integer: 2 decimal digits

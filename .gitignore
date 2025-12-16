@@ -1,6 +1,7 @@
+nohup.out
+*.pdf
 R/forRmd.RData
 output/
-Rplots.pdf
 .DS_Store
 R/.Rhistory
 report/report.out

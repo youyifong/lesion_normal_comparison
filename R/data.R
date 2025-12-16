@@ -56,7 +56,7 @@ biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biop
 avg_slides = glue("{biopsies}_Les_avg")# average norm.counts of all slides from a single biopsy
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
 
-severity = read.csv("../../HSV406/Lesion_HSV_rates_04082025.csv")
+severity = read.csv("../HSV406/Lesion_HSV_rates_04082025.csv")
 severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))# add a column for the initial, which are the letter in front of the arabic number
 
 region.labels=c(intact="intact", lesion="ulcerative")
@@ -84,14 +84,18 @@ get.dat=function(s, marker) {
   # later, we decide not to do this
   # if (s == "CF1_Les" && marker == "CD68") s = "CF5_Les" 
   
-  # use HIL over _m_c7 if it exists
-  fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_HIL_d2b_regmem.csv")
+  # human edited and augmented phenotypic
+  fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_HIL_aug_d2b_regmem.csv")
   if (!file.exists(fn)) {
-    fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_m_c7_d2b_regmem.csv")
+    # human edited 
+    fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_HIL_d2b_regmem.csv")
     if (!file.exists(fn)) {
-      # T cell subset files are named differently
-      fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_masks_d2b_regmem.csv")
-      if (!file.exists(fn)) stop("unexpected") #return (NULL)
+      fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_m_c7_d2b_regmem.csv")
+      if (!file.exists(fn)) {
+        # T cell subset files are named differently
+        fn = glue("{data.dir}/{get.initial(s)}/{s}/TSP_stitched/{s}_{marker}_masks_d2b_regmem.csv")
+        if (!file.exists(fn)) stop("error: fn not exists: "%.%fn) #return (NULL)
+      }
     }
   } else {
     print(fn)
@@ -150,6 +154,7 @@ get.dat=function(s, marker) {
 
 cell_dat =  lapply (all.slides, function(s) {
           lapply (markers.ls[[s]], function (marker) {
+            myprint(s, marker)
             get.dat(s, marker)
           })
           })
