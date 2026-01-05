@@ -48,7 +48,11 @@ markers.ls = lapply(all.slides, function(s) {  # s = 'JT_Les'
 # remove slides with no markers
 all.slides = all.slides[sapply(markers.ls, function(x) length(x)>0)]
 # choose one slide for each biopsy
-select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les",  "EB_Les", "JK1_Les", "JM1_Les", "JT_Les",  "LD_Les", "LG2_Les",  "LM_Les", "LS2_Les", "SK2_Les"); names(select.slides)=get.slide.name(select.slides)
+select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les", "EB_Les", "JK1_Les", "JM1_Les", "JT_Les",  "LD_Les", "LG2_Les",  "LM_Les", "LS2_Les", "SK2_Les",
+                  # add second batch, defined by K. 
+                  # SG2_Les and SA3_Les are removed due to lack of Treg in any of the slides from these biopsies
+                  "EW1_Les", "KS2_Les", "MC3_Les", "ML1_Les", "MM1_Les", "PJ1_Les", "RC3_Les", "ST3_Les", "SW1_Les", "WS3_Les"
+); names(select.slides)=get.slide.name(select.slides)
 # CF1_Les has no CD68. We used to use CF5_Les CD68 to replace it, but that is not a very good soln. For one thing, CD5_Les has no ulcerative part.
 #stopifnot(all(sapply(select.slides, function(b) length(intersect(markers.ls[[b]], key.markers)))==6))# make sure all select.slides have all key markers
 
@@ -154,7 +158,7 @@ get.dat=function(s, marker) {
 
 cell_dat =  lapply (all.slides, function(s) {
           lapply (markers.ls[[s]], function (marker) {
-            myprint(s, marker)
+            # myprint(s, marker)
             get.dat(s, marker)
           })
           })
@@ -334,7 +338,7 @@ count_dat = lapply(all.slides, function(s) {
 # add avg.slides 
 out = lapply(biopsies, function(b){
       lapply(depth_vals, function(max_depth) { 
-      # b="AS"; max_depth="DEJ1000"; s="AS1_Les"
+      # b="SA"; max_depth="DEJ1000"; s="SA3_Les"
   
   slides = slides.by.biopsy[[b]]
   
@@ -346,6 +350,9 @@ out = lapply(biopsies, function(b){
   
   # add a column of NAs to norm.counts for each marker in markers that is not in colnames(norm.counts)
   tab=sapply(slides,simplify="array", function(s){
+
+    # myprint(b, max_depth, s)
+    
     norm.counts=count_dat[[s]][[max_depth]]$norm.counts
     missing_markers <- setdiff(markers, colnames(norm.counts))
     if (length(missing_markers) > 0) {
@@ -364,9 +371,15 @@ out = lapply(biopsies, function(b){
     m1 <- ratio_pairs[[i]][1]
     m2 <- ratio_pairs[[i]][2]
     good.slides = slides[sapply(slides, function(s) m1 %in% markers.ls[[s]] && m2 %in% markers.ls[[s]])]
-    tab1=sapply(good.slides,simplify="array", function(s) count_dat[[s]][[max_depth]]$norm.counts[,c(m1,m2)])
-    res=apply(tab1,c(1,2), sum)
-    out = cbind(out, res[,1]/res[,2] )
+    
+    # sometimes there are no good slides
+    if (len(good.slides)==0) {
+      out=cbind(out, NA)
+    } else {
+      tab1=sapply(good.slides,simplify="array", function(s) count_dat[[s]][[max_depth]]$norm.counts[,c(m1,m2)])
+      res=apply(tab1,c(1,2), sum)
+      out = cbind(out, res[,1]/res[,2] )
+    }
     colnames(out)[ncol(out)] = glue("{m1}/{m2}")
   }
   
@@ -379,8 +392,14 @@ names(out) = glue("{biopsies}_Les_avg")
 count_dat = c(count_dat, out)
 
 
-
-
 # save the objects except cell_dat to a file
 # cell_dat is large and only used for plotting histograms
 save(list = setdiff(ls(), "cell_dat"), file = "R/forRmd.RData")
+
+
+# check if all select slides to have a set of key markers:
+sapply(select.slides, function(s) {
+  all(c(key.markers, "Treg") %in% markers.ls[[s]])
+} )
+
+
