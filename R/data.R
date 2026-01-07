@@ -49,9 +49,9 @@ markers.ls = lapply(all.slides, function(s) {  # s = 'JT_Les'
 all.slides = all.slides[sapply(markers.ls, function(x) length(x)>0)]
 # choose one slide for each biopsy
 select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les", "EB_Les", "JK1_Les", "JM1_Les", "JT_Les",  "LD_Les", "LG2_Les",  "LM_Les", "LS2_Les", "SK2_Les",
-                  # add second batch, defined by K. 
-                  # SG2_Les and SA3_Les are removed due to lack of Treg in any of the slides from these biopsies
-                  "EW1_Les", "KS2_Les", "MC3_Les", "ML1_Les", "MM1_Les", "PJ1_Les", "RC3_Les", "ST3_Les", "SW1_Les", "WS3_Les"
+                  # second batch
+                  "EW1_Les", "KS2_Les", "MC3_Les", "ML1_Les", "MM1_Les", "PJ1_Les", "RC3_Les", "ST3_Les", "SW1_Les", "WS3_Les",
+                  "SG2_Les", "SA3_Les" # no Treg in any of the slides from these biopsies
 ); names(select.slides)=get.slide.name(select.slides)
 # CF1_Les has no CD68. We used to use CF5_Les CD68 to replace it, but that is not a very good soln. For one thing, CD5_Les has no ulcerative part.
 #stopifnot(all(sapply(select.slides, function(b) length(intersect(markers.ls[[b]], key.markers)))==6))# make sure all select.slides have all key markers
@@ -61,7 +61,14 @@ avg_slides = glue("{biopsies}_Les_avg")# average norm.counts of all slides from 
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
 
 severity = read.csv("../HSV406/Lesion_HSV_rates_04082025.csv")
-severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))# add a column for the initial, which are the letter in front of the arabic number
+# rename HSV.activity.rate to Activity.rate
+colnames(severity)[colnames(severity)=="HSV.activity.rate"] = "Activity.rate"
+# add a column for the initial, which are the letter in front of the arabic number
+severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))
+# make sure no duplicate initials
+stopifnot(!anyDuplicated(severity$initial))
+# sort by initial
+severity = severity [order(severity$initial), ]
 
 region.labels=c(intact="intact", lesion="ulcerative")
 region.labels.title=c(intact="Intact", lesion="Ulcerative")

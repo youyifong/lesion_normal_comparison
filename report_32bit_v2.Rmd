@@ -5,9 +5,13 @@ output:
     number_sections: true
     includes:
       in_header: header.tex
+header-includes:
+  - \usepackage{chngcntr}
+  - \counterwithin{table}{section}
+  - \counterwithin{figure}{section}
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 ---
-<!-- can be rendered in Rstudio on Windows using files from the remote drive or from command line on the Hutch server -->
+<!-- This file can be rendered in Rstudio on Windows using files from the remote drive or from command line on the Hutch server -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -20,7 +24,7 @@ library(knitr)
 
 # Introduction
 
-There are 13 lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion. List of available markers per slide: 
+There are `r len(biopsies)` lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion. List of available markers per slide: 
 \bigskip
 
 \begingroup
@@ -34,15 +38,22 @@ print(lapply(markers.ls, function(x) if(length(x)==0) "" else concatList(x, " ")
 Most lesion biopsies have multiple sections. The following choices of representative slides are made: 
 
 ```{r results='asis', echo=FALSE}
-tab=cbind("Select slide"=sort(select.slides), "Shedding rate"=severity[order(severity$initial),c(2), drop=T]); rownames(tab)=NULL
-kable(tab, align = 'c')
+# make sure order is the same before cbind
+stopifnot(all(sort(substr(select.slides, 1, 2)) == severity$initial))
+tab=cbind("Select slide"=sort(select.slides)
+          , "Shedding Rate"=severity$Shedding.rate
+          , "Activity Rate"=severity$Activity.rate
+          ); rownames(tab)=NULL
+kable(tab, align = 'c', caption="HSV activity rates and shedding rates.")
 ```
 The key markers are: CD3 CD11c CD123 CD15 CD56 CD68. 
 
-Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. Furthermore, for CF lesion CD68 staining, CF5_Les instead of CF1_Les is used due to quality reasons.
+Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. 
+
+
 
 \newpage
-# Correlation with shedding rate
+# Correlation with HSV activity rate and shedding rate
 
 Based on the previous report, we decided to 
 
@@ -66,6 +77,14 @@ Notes on methods:
 - Ratio for average slides is computed as the ratio of two sums across norm.counts from all slides for the two markers
 - R$^2$ is computed without slides from AS_Les, which has the highest shedding rate and appears an outlier.
 - The association is done on intact only. Previously we explored association with ulcerative + intact, but decided to focus on intact
+
+Notes on samples:
+
+- CF1_Les has no CD68
+- RC1_Les, RC2_Les, RC3_Les, and RC_Les_avg have no CD123
+- SA1_Les, SA2_Les, SA3_Les, and SA_Les_avg have no Foxp3, hence no Treg
+- SG1_Les, SG2_Les, SG3_Les, and SG_Les_avg have no Foxp3, hence no Treg
+
 
 Notes on results:
 
@@ -114,90 +133,107 @@ for (slide_set in c(1,3)) {
     toplot = c(cell_types)
   }
   
-  par(mfrow=c(6,length(xx)+1), oma=c(0,0,3,0))
-  reduce_margin()
+  for (iter in 1:2) { 
+    # 1: association with shedding rate
+    # 2: association with activity rate
+    rate = ifelse(iter==1,"Shedding.rate","Activity.rate")
   
-  for (a in toplot) {
-    norm.counts=lapply(xx, function (x) {
-      # x="Skin500"; a="Treg"
-      tmp=slides
-      
-      # all select slides to have a set of key markers, with the following exceptions:
-      if (a=="CD68")  tmp=setdiff(slides, "CF1_Les")
-      if (a=="CD123") tmp=setdiff(slides, c("RC3_Les", "RC_Les_avg"))
-      
-      out = as.data.frame(mysapply(tmp, function (s) {
-        ret = count_dat[[s]][[x]]$norm.counts
-        if (a %in% colnames(ret)) ret[,a] else stop(glue("{a} is missing for {s}"))
-      })); out
-      
-      cbind(SR = severity$Shedding.rate[match(get.initial(rownames(out)), severity$initial)], 
-            out,
-            initial = get.initial(rownames(out)),
-            total=rowSums(out))
-    })
+    par(mfrow=c(6,length(xx)+1), oma=c(0,0,3,0))
+    reduce_margin()
     
-    # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
-    ylim=NULL
-    for (x in c("DEJ1000","DEJ500")){with(norm.counts[[x]], {
-      plot(SR, DI, xlab="Shedding rate", main=glue("Normalized Count DI ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
-      fit.lm = lm(DI[initial!="AS"] ~ SR[initial!="AS"])
-      legend("topright", legend=c(
-        paste("R2=", round(summary(fit.lm)$r.squared, 3)),
-        # extract p value from fit.lm
-        paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
-      ), bty="n")
-      # add a line for the fit
-      abline(fit.lm, col="black", lty=2)
-    })}
+    for (a in toplot) {
+      norm.counts=lapply(xx, function (x) {
+        # x="Skin500"; a="Treg"
+        tmp=slides
+        
+        # all select slides to have a set of key markers, with the following exceptions:
+        if (a=="CD68")  tmp=setdiff(slides, "CF1_Les")
+        if (a=="CD123") tmp=setdiff(slides, c("RC3_Les", "RC_Les_avg"))
+        
+        # No results for Foxp3 for any of the SA and SG slides
+        if (a=="Treg")  tmp=setdiff(slides, c("SA1_Les", "SA2_Les", "SA3_Les", "SA_Les_avg",
+                                              "SG1_Les", "SG2_Les", "SG3_Les", "SG_Les_avg"))
+        
+        out = as.data.frame(mysapply(tmp, function (s) {
+          ret = count_dat[[s]][[x]]$norm.counts
+          if (a %in% colnames(ret)) ret[,a] else stop(glue("{a} is missing for {s}"))
+        })); out
+        
+        tmp = cbind(SR = severity [match(get.initial(rownames(out)), severity$initial), rate, drop=T], 
+              out,
+              initial = get.initial(rownames(out)),
+              total=rowSums(out))
+        
+        tmp[tmp$initial!="AS",] # this removes AS from plot as well
+      })
+      
+      # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
+      ylim=NULL
+      for (x in c("DEJ1000","DEJ500")){
+        with(norm.counts[[x]], {
+        plot(SR, DI, xlab=rate, main=glue("Normalized Count DI ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+        fit.lm = lm(DI[initial!="AS"] ~ SR[initial!="AS"])
+        legend("topright", legend=c(
+          paste("R2=", round(summary(fit.lm)$r.squared, 3)),
+          # extract p value from fit.lm
+          paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
+        ), bty="n")
+        # add a line for the fit
+        abline(fit.lm, col="black", lty=2)
+      })}
+    
+      # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
+      ylim=NULL
+      for (x in c("Skin1000","Skin500")){
+        with(norm.counts[[x]], {
+        plot(SR, I, xlab=rate, main=glue("Normalized Count I ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+        fit.lm = lm(I[initial!="AS"] ~ SR[initial!="AS"])
+        legend("topright", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)),
+          # extract p value from fit.lm
+          paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
+        ), bty="n")
+        # add a line for the fit
+        abline(fit.lm, col="black", lty=2)
+      })}
+    
+      # scatterplot of normalized densities for epidermis intact. does not depend on the DEJ500/DEJ1000/DEJInf
+      ylim=NULL
+      with(norm.counts$DEJ1000, {
+        plot(SR, EI, xlab=rate, main=glue("Normalized Count EI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
+        fit.lm = lm(EI[initial!="AS"] ~ SR[initial!="AS"])
+        legend("topright", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)),
+          # extract p value from fit.lm
+          paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
+        ), bty="n")
+        # add a line for the fit
+        abline(fit.lm, col="black", lty=2)
+      })
+      
+      # plot legend only on the first row
+      # empty.plot()
+      # if (a==toplot[1]) {
+      #   mylegend(x=1, pch=1:13, col=1:13, legend=biopsies, cex=.7)
+      # }
+      
+      # create count tables for avg slides
+      if (iter==1) # only need to do this once because only cnts not rates are collected
+        for (x in xx) cnt.tables = append(cnt.tables, list(
+          mykable(round(norm.counts[[x]][, -which (names(norm.counts[[x]]) %in% c("initial", "SR"))], ifelse(marker_set==2,2,0)), 
+                caption=paste0(a, ", ", x, ", ", ifelse(slide_set==1, "select slide", "slides average"), ". Normalized counts in different regions: ", ifelse(startsWith(x,"DEJ"), "dermis intact (DI); dermis ulcerative (DU); epidermis intact (EI); epidermis ulcerative (EU)", "intact (I); ulcerative (U)"), ". Total = row sum.")) 
+        ))
+      
   
-    # scatterplot of normalized densities for dermis intact, because not all tissues have ulcerative
-    ylim=NULL
-    for (x in c("Skin1000","Skin500")){with(norm.counts[[x]], {
-      plot(SR, I, xlab="Shedding rate", main=glue("Normalized Count I ({x})"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
-      fit.lm = lm(I[initial!="AS"] ~ SR[initial!="AS"])
-      legend("topright", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)),
-        # extract p value from fit.lm
-        paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
-      ), bty="n")
-      # add a line for the fit
-      abline(fit.lm, col="black", lty=2)
-    })}
+    } # for a: marker
   
-    # scatterplot of normalized densities for epidermis intact. does not depend on the DEJ500/DEJ1000/DEJInf
-    ylim=NULL
-    with(norm.counts$DEJ1000, {
-      plot(SR, EI, xlab="Shedding rate", main=glue("Normalized Count EI"), ylab=a, ylim=ylim, cex.main = 0.9, col=match(initial, biopsies), pch=match(initial, biopsies))
-      fit.lm = lm(EI[initial!="AS"] ~ SR[initial!="AS"])
-      legend("topright", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)),
-        # extract p value from fit.lm
-        paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
-      ), bty="n")
-      # add a line for the fit
-      abline(fit.lm, col="black", lty=2)
-    })
+    mtext(ifelse(slide_set==3, "Average Slides. ", "Select Slides. ")%.%concatList(toplot, ", "), side = 3, outer = TRUE, line = 2, cex = .9)
     
-    # plot legend only on the first row
-    # empty.plot()
-    # if (a==toplot[1]) {
-    #   mylegend(x=1, pch=1:13, col=1:13, legend=biopsies, cex=.7)
-    # }
-    
-    # create count tables for avg slides
-    #if (slide_set==3) 
-      for (x in xx) cnt.tables = append(cnt.tables, list(
-        mykable(round(norm.counts[[x]][, -which (names(norm.counts[[x]]) %in% c("initial", "SR"))], ifelse(marker_set==2,2,0)), 
-              caption=paste0(a, ", ", x, ", ", ifelse(slide_set==1, "select slide", "slides average"), ". Normalized counts in different regions: ", ifelse(startsWith(x,"DEJ"), "dermis intact (DI); dermis ulcerative (DU); epidermis intact (EI); epidermis ulcerative (EU)", "intact (I); ulcerative (U)"), ". Total = row sum.")) 
-      ))
-    
+    cat("\\newpage")
+  } # for iter
+  
+}
+}
 
-  } # for a: marker
-  
-  mtext(ifelse(slide_set==3, "Average Slides. ", "Select Slides. ")%.%concatList(toplot, ", "), side = 3, outer = TRUE, line = 2, cex = .9)
-  
-  cat("\\newpage")
-}
-}
+
 ```
 
 
