@@ -1,3 +1,16 @@
+# this file is run from local drive and the data resides from the X drive
+
+# JoinFile_20190719_JZ_KP.xlsx
+# Column K is the PCR data of the entire genital sweep, independent of the ulcer lesion (I &J), trying to get an overall shedding status in the genital area.
+# Column I is genital_lesion
+# Column L is the PCR data for the lesion site from which we collected the biopsy.
+# Columns N & O recorded a new lesion site and PCR data.
+# Column P counts the days for positive PCR; it could come from different lesion sites, as long as that day is HSV PCR positive.
+# Column Q based on the patient’s diary, recorded in Column J and N.
+# Column R combines both data from P and Q to count for HSV+ activity for that day. We used this to calculate HSV activity rate.
+
+
+
 {
 library(ggplot2)
 library(dplyr)
@@ -8,6 +21,7 @@ library(kyotil)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+dir.create("output", showWarnings = FALSE)
 }
 
 {
@@ -65,6 +79,10 @@ colL = shedding_data[[which(LETTERS == "L")]]
 colO = shedding_data[[which(LETTERS == "O")]]
 MaxKLO = pmax(colK, colL, colO, na.rm = TRUE)
 
+# save MaxKLO and ID from shedding_data to a csv file
+maxklo_data <- data.frame(ID = shedding_data$ID, MaxKLO = MaxKLO)
+write.csv(maxklo_data, "X:/fast/fong_y/images_from_K/HSV406/MaxKLO_data.csv", row.names = FALSE)
+
 
 # column N
 mytable(shedding_data$new_gen_lesion)
@@ -92,16 +110,7 @@ print(activity_data1, n=100)
 
 }
 
-# Column K is the PCR data of the entire genital sweep, independent of the ulcer lesion (I &J), trying to get an overall shedding status in the genital area.
-# Column I is genital_lesion
-# Column L is the PCR data for the lesion site from which we collected the biopsy.
-# Columns N & O recorded a new lesion site and PCR data.
-# Column P counts the days for positive PCR; it could come from different lesion sites, as long as that day is HSV PCR positive.
-# Column Q based on the patient’s diary, recorded in Column J and N.
-# Column R combines both data from P and Q to count for HSV+ activity for that day. We used this to calculate HSV activity rate.
-
-
-################################################################################
+{
 # plot the overall shedding status in the genital area (column K)
 
 value=round (shedding_data[[which(LETTERS == "K")]])
@@ -121,7 +130,6 @@ ggplot(shedding_plot_data, aes(x = day, y = factor(ID, levels = activity_data1$I
 ggsave("output/clinical_outcome_profile_col_K.png", width = 10, height = 8)
 
 
-################################################################################
 # plot lesions
 
 # primary lesion site
@@ -145,11 +153,11 @@ ggplot(shedding_plot_data2, aes(x = day, y = factor(ID))) +
   xlim(0, NA)
 
 ggsave("output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
+}
 
 
-################################################################################
-# combine copy number and lesion
 {
+# combine copy number and lesion in the same plot
   
   # Extract values
   # value  <- round(shedding_data[[which(LETTERS == "K")]])
@@ -272,8 +280,11 @@ ggsave("output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
       labels = activity_data1$ID,
       expand = expansion(mult = 0.02)
     ) +
-    xlim(0, NA)
-  
+    scale_x_continuous(
+      limits = c(1, NA),                         # Force axis to start at 1
+      breaks = function(x) seq(1, max(x), by=10), # Optional: Force ticks at every day (1, 2, 3...)
+      # expand = expansion(mult = c(0, 0.05))      # Removes the empty padding before Day 1
+    )  
   ggsave("output/clinical_outcome_profile_combined.png", width = 10, height = 8)
   
 }
@@ -282,7 +293,7 @@ ggsave("output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
 # plot for each ptid
 
 unique_IDs <- unique(shedding_data$ID)
-for (ptid in unique_IDs) {
+out = mysapply (unique_IDs, function(ptid) {
   
   ptid_data <- shedding_data[shedding_data$ID == ptid, ]
   ptid_data$MaxKLO = pmax(
@@ -295,9 +306,14 @@ for (ptid in unique_IDs) {
   
   # Extract values
   value4 <- factor(ptid_data[[which(LETTERS == "J")]])# site lesion
-  value3 <- round(ptid_data[[which(LETTERS == "K")]]) # genital sweep, real num
+  value35<-  round(ptid_data[[which(LETTERS == "L")]]) # pcr bx lesion, real num
+  value3 <-  round(ptid_data[[which(LETTERS == "K")]]) # genital sweep, real num
   value2 <- factor(ptid_data[[which(LETTERS == "N")]])# new lesion
-  value1 <- round(ptid_data[['MaxKLO']]) # real num
+  value1 <-  round(ptid_data[['MaxKLO']]) # real num
+  
+  pcr_activity = mean(value1>0, na.rm=TRUE)
+  len_study = nrow(subset(ptid_data, day>=1))
+  lesion_activity = sum(!is.na(value4) | !is.na(value2))/len_study
   
   # Prepare datasets
   df_value4 <- ptid_data %>%
@@ -305,6 +321,14 @@ for (ptid in unique_IDs) {
       variable = "value4",
       val_num = NA_real_,
       val_chr = as.character(value4),
+      y_pos = 5
+    )
+  
+  df_value35 <- ptid_data %>%
+    mutate(
+      variable = "value35",
+      val_num = value35,
+      val_chr = as.character(value35),
       y_pos = 4
     )
   
@@ -333,7 +357,7 @@ for (ptid in unique_IDs) {
     )
   
   # Combine
-  shedding_plot_data_combined <- bind_rows(df_value1, df_value2, df_value3, df_value4)
+  shedding_plot_data_combined <- bind_rows(df_value1, df_value2, df_value3, df_value35, df_value4)
   
   # CATEGORICAL AS HOLLOW FOREGROUND SYMBOLS (no background tiles)
   df_cat <- subset(shedding_plot_data_combined, variable == "value2")
@@ -347,23 +371,33 @@ for (ptid in unique_IDs) {
   
   
   #### -------------------------------------------------------------------------------------
-  dir.create("output/by_ptid", showWarnings = FALSE)
-  
-  p=ggplot() +
+
+  p = ggplot() +
     
   # Foreground dots for numeric variable (value) 
+    
   geom_point(
     data = subset(shedding_plot_data_combined, variable == "value1"),
     aes(x = day, y = y_pos, color = val_num),
     size = 3, shape = 16, na.rm = TRUE
   ) +
-  scale_color_gradient(
-    low = "white", high = "firebrick4", na.value = "transparent",
-    name = "Copy number (log10)"
-  ) +
-  
+  # scale_color_gradient(
+  #   low = "white", high = "firebrick4", na.value = "transparent",
+  #   name = "Copy number (log10)"
+  # ) +
+    
   geom_point(
     data = subset(shedding_plot_data_combined, variable == "value3"),
+    aes(x = day, y = y_pos, color = val_num),
+    size = 3, shape = 16, na.rm = TRUE
+  ) +
+  # scale_color_gradient(
+  #   low = "white", high = "firebrick4", na.value = "transparent",
+  #   name = "Copy number (log10)"
+  # ) +
+  
+  geom_point(
+    data = subset(shedding_plot_data_combined, variable == "value35"),
     aes(x = day, y = y_pos, color = val_num),
     size = 3, shape = 16, na.rm = TRUE
   ) +
@@ -374,6 +408,7 @@ for (ptid in unique_IDs) {
     
     
   # Categorical variable now plotted as SHAPE-only foreground symbols
+    
   # column N first, so that primary site will not be overridden by new site
   geom_point(
     data = df_cat3,
@@ -400,7 +435,7 @@ for (ptid in unique_IDs) {
     na.translate = FALSE   # <--- HIDE NA from the legend
   ) +
   
-  ggnewscale::new_scale_color() +  # keep this (now switching cleanly to numeric layer)
+  # ggnewscale::new_scale_color() +  # keep this (now switching cleanly to numeric layer)
   
   
   # Layout and theme
@@ -422,12 +457,30 @@ for (ptid in unique_IDs) {
       panel.grid.major.y = element_blank()
     ) +
     scale_y_continuous(
-      breaks = 4:1, 
-      labels = c("site lesion", "genital sweep", "new lesion", "max KLO")
+      breaks = 5:1, 
+      labels = c("site lesion", "PCR bx lesion", "PCR genital sweep", "new gen lesion", "max KLO")
     ) +    
-    xlim(0, 80)
-    
+    scale_x_continuous(
+      limits = c(1, 76),                         # Force axis to start at 1
+      breaks = function(x) seq(1, max(x), by=10), # Optional: Force ticks at every day (1, 2, 3...)
+      # expand = expansion(mult = c(0, 0.05))      # Removes the empty padding before Day 1
+    )  
+  
   ggsave(paste0("output/by_ptid/", ptid, ".png"), plot = p, width = 8, height = 3.1)
-}
+  
+  # return 
+  c(ptid, pcr_activity, lesion_activity) 
+})
 
 
+colnames(out) = c("ptid", "PCR.activity.rate", "lesion.activity.rate")
+out
+
+severity = read.csv("X:/fast/fong_y/images_from_K/HSV406/Lesion_HSV_rates_04082025.csv")
+severity$ptid = substr(severity$PID, 3, 100)
+
+final_out = merge (out, severity, by.x="ptid", by.y="ptid", all.x=TRUE)
+
+mypdf("output/correlations_activity_rates", width=6, height=6)
+mypairs(final_out[,c("HSV.activity.rate", "PCR.activity.rate", "lesion.activity.rate")])
+dev.off()
