@@ -10,11 +10,11 @@
 # Column R combines both data from P and Q to count for HSV+ activity for that day. We used this to calculate HSV activity rate.
 
 {
-# choose this if running on latptop
-base_dir = 'X:/fast/fong_y/images_from_K'
-# choose this if running online
-# base_dir = '..'
-
+if (.Platform$OS.type == "windows") {
+  base_dir = 'X:/fast/fong_y/images_from_K'
+} else {
+  base_dir = '..'
+}
 library(ggplot2)
 library(dplyr)
 library(RColorBrewer)

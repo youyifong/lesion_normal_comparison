@@ -16,7 +16,7 @@ source("R/compare_markers.R")
 
 #source("R/compare_biopsies.R")
 
-# do correlation study
+# do correlates study
 rmarkdown::render(
   "report_32bit_v2.Rmd",
   output_file = sprintf(

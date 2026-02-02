@@ -61,7 +61,7 @@ biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biop
 avg_slides = glue("{biopsies}_Les_avg")# average norm.counts of all slides from a single biopsy
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
 
-severity = read.csv("../HSV406/Lesion_HSV_rates_04082025.csv")
+severity = read.csv("../HSV406/Lesion_HSV_rates_04082025_plus.csv")
 # rename HSV.activity.rate to Activity.rate
 colnames(severity)[colnames(severity)=="HSV.activity.rate"] = "Activity.rate"
 # add a column for the initial, which are the letter in front of the arabic number
@@ -69,11 +69,9 @@ severity$initial = sapply(severity$PID, function(x) sub("[0-9]+$", "", x))
 # add a column for sample number 
 severity$sample_number = sapply(severity$PID, function(x) sub("^[A-Za-z]+", "", x))
 # make sure no duplicate initials
-stopifnot(!anyDuplicated(severity$initial))
+stopifnot(0!=anyDuplicated(severity$initial))
 # sort by initial
 severity = severity [order(severity$initial), ]
-
-maxKLO = read.csv("../HSV406/MaxKLO_data.csv")
 
 sample_numbers = severity$sample_number[match(biopsies, severity$initial)]
 

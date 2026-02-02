@@ -121,3 +121,5 @@ Human_In_Loop editing (HIL)
 Run Rstudio online on Gizmo and source _run.R.
 
 The density results saved in output/csv/ are in the unit of count/mm2, not count/100umx100um as in the density depth plots. 
+
+Report pdf is rendered by a line of R code in _run.R.

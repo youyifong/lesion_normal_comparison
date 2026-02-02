@@ -41,7 +41,8 @@ Most lesion biopsies have multiple sections. The following choices of representa
 tab=cbind(
     "Select slide"=sort(select.slides)
   , "Shedding Rate"=severity [match(get.initial(sort(select.slides)), severity$initial), "Shedding.rate", drop=T]
-  , "Activity Rate"=severity [match(get.initial(sort(select.slides)), severity$initial), "Activity.rate", drop=T]
+  , "HSV Rate"=severity [match(get.initial(sort(select.slides)), severity$initial), "Activity.rate", drop=T]
+  , "PCR Rate"=severity [match(get.initial(sort(select.slides)), severity$initial), "PCR.positivity.rate", drop=T]
 )
 rownames(tab)=NULL
 kable(tab, align = 'c', caption="HSV activity rates and shedding rates.")
@@ -136,10 +137,11 @@ for (slide_set in c(1,3)) {
   
   R2.matrix.ls = list()
   pv.matrix.ls = list()
-  for (iter in 1:2) { 
+  for (iter in 1:3) { 
     # 1: association with shedding rate
-    # 2: association with activity rate
-    rate = ifelse(iter==1,"Shedding.rate","Activity.rate")
+    # 2: association with HSV activity rate
+    # 3: association with PCR positivity rate
+    rate = c("Shedding.rate","Activity.rate","PCR.positivity.rate")[iter]
   
     par(mfrow=c(6,length(xx)+1), oma=c(0,0,3,0))
     reduce_margin()
@@ -281,11 +283,12 @@ fits=list(
   , lm(Activity.rate~HSV1, severity)
 )
 
-getFormattedSummary(fits, robust=F)
+tab=getFormattedSummary(fits, robust=F)
+colnames(tab)=c("Gender","Age.at.enrollment","HSV1")
+rownames(tab)[2]="Slope"
+kable(tab)
 
-summary(lm(Activity.rate~Gender, severity))
-
-myboxplot(Activity.rate~Gender, severity)
+myboxplot(Activity.rate~Gender, severity, names=c("Female","Male"))
 
 ```
 
@@ -298,10 +301,13 @@ R2 <- list(
   Activity.rate = NULL  
 )
 
-for (iter in 1:2) { 
+for (iter in 1:3) { 
   # 1: association with shedding rate
   # 2: association with activity rate
-  rate = ifelse(iter==1,"Shedding.rate","Activity.rate")
+  # 3: association with PCR positivity rate
+  rate = c("Shedding.rate","Activity.rate","PCR.positivity.rate")[iter]
+  
+  cat("\\newpage \n ## ", rate, "\n")
   
   markers = c('CD3','CD11c','CD68','CD56','CD15')
 
