@@ -73,6 +73,8 @@ stopifnot(!anyDuplicated(severity$initial))
 # sort by initial
 severity = severity [order(severity$initial), ]
 
+maxKLO = read.csv("../HSV406/MaxKLO_data.csv")
+
 sample_numbers = severity$sample_number[match(biopsies, severity$initial)]
 
 region.labels=c(intact="intact", lesion="ulcerative")

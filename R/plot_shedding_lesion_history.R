@@ -9,6 +9,10 @@
 # Column Q based on the patient’s diary, recorded in Column J and N.
 # Column R combines both data from P and Q to count for HSV+ activity for that day. We used this to calculate HSV activity rate.
 
+# choose this if running on latptop
+# base_dir = 'X:/fast/fong_y/images_from_K'
+# choose this if running online
+base_dir = '..'
 
 
 {
@@ -37,7 +41,7 @@ dir.create("output", showWarnings = FALSE)
 IDs.to.rm = c(13484, 14864, 14862, 14259, 14981, 13369, 13373, 15396, 15402, 13555)
 
 # specify the file path (replace with your actual file path)
-file_path <- "X:/fast/fong_y/images_from_K/HSV406/JoinFile_20190719_JZ_KP.xlsx"
+file_path <- base_dir%.%"/HSV406/JoinFile_20190719_JZ_KP.xlsx"
 
 # read the data from the "Shedding Rate" sheet
 shedding_data <- read_excel(file_path, sheet = "Shedding Rate")
@@ -79,9 +83,6 @@ colL = shedding_data[[which(LETTERS == "L")]]
 colO = shedding_data[[which(LETTERS == "O")]]
 MaxKLO = pmax(colK, colL, colO, na.rm = TRUE)
 
-# save MaxKLO and ID from shedding_data to a csv file
-maxklo_data <- data.frame(ID = shedding_data$ID, MaxKLO = MaxKLO)
-write.csv(maxklo_data, "X:/fast/fong_y/images_from_K/HSV406/MaxKLO_data.csv", row.names = FALSE)
 
 
 # column N
@@ -473,14 +474,18 @@ out = mysapply (unique_IDs, function(ptid) {
 })
 
 
-colnames(out) = c("ptid", "PCR.activity.rate", "lesion.activity.rate")
+colnames(out) = c("ptid", "PCR.positivity.rate", "lesion.activity.rate")
 out
 
-severity = read.csv("X:/fast/fong_y/images_from_K/HSV406/Lesion_HSV_rates_04082025.csv")
+
+severity = read.csv(base_dir %.% "/HSV406/Lesion_HSV_rates_04082025.csv")
 severity$ptid = substr(severity$PID, 3, 100)
 
 final_out = merge (out, severity, by.x="ptid", by.y="ptid", all.x=TRUE)
 
+write.csv(final_out, base_dir%.%"/HSV406/Lesion_HSV_rates_04082025_plus.csv", row.names = FALSE)
+
+
 mypdf("output/correlations_activity_rates", width=6, height=6)
-mypairs(final_out[,c("HSV.activity.rate", "PCR.activity.rate", "lesion.activity.rate")])
+mypairs(final_out[,c("HSV.activity.rate", "PCR.positivity.rate", "lesion.activity.rate")])
 dev.off()
