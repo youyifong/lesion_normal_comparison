@@ -9,13 +9,12 @@
 # Column Q based on the patient’s diary, recorded in Column J and N.
 # Column R combines both data from P and Q to count for HSV+ activity for that day. We used this to calculate HSV activity rate.
 
-# choose this if running on latptop
-# base_dir = 'X:/fast/fong_y/images_from_K'
-# choose this if running online
-base_dir = '..'
-
-
 {
+# choose this if running on latptop
+base_dir = 'X:/fast/fong_y/images_from_K'
+# choose this if running online
+# base_dir = '..'
+
 library(ggplot2)
 library(dplyr)
 library(RColorBrewer)
@@ -25,7 +24,7 @@ library(kyotil)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-dir.create("output", showWarnings = FALSE)
+dir.create("R/output", showWarnings = FALSE)
 }
 
 {
@@ -128,7 +127,7 @@ ggplot(shedding_plot_data, aes(x = day, y = factor(ID, levels = activity_data1$I
   theme(legend.position = "none") +
   theme(axis.text.y = element_text(size = 6)) +
   theme(axis.title.y = element_blank()) + xlim(0, NA)
-ggsave("output/clinical_outcome_profile_col_K.png", width = 10, height = 8)
+ggsave("R/output/clinical_outcome_profile_col_K.png", width = 10, height = 8)
 
 
 # plot lesions
@@ -140,9 +139,8 @@ shedding_plot_data2 <- subset(shedding_data, !is.na(value2))
 value2=value[!is.na(value2)]
 mytable(value2)
 
-# make a plot where x axis is day. Each row corresponds to one ID: plot a dot with varying degrees of red that correspond to the value of shedding_data[[which(LETTERS == "K")]], and a white dot if it is NA
 ggplot(shedding_plot_data2, aes(x = day, y = factor(ID))) +
-  geom_point(aes(color = value2), size = 3, shape = 16, na.rm = TRUE) +
+  geom_point(aes(color = as.factor(value2)), size = 3, shape = 16, na.rm = TRUE) +
   scale_color_brewer(palette = "Set1") +
   labs(x = "Day", y = "ID", color = "Genital Lesion") +
   theme_minimal() +
@@ -153,7 +151,7 @@ ggplot(shedding_plot_data2, aes(x = day, y = factor(ID))) +
   ) +
   xlim(0, NA)
 
-ggsave("output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
+ggsave("R/output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
 }
 
 
@@ -286,7 +284,7 @@ ggsave("output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
       breaks = function(x) seq(1, max(x), by=10), # Optional: Force ticks at every day (1, 2, 3...)
       # expand = expansion(mult = c(0, 0.05))      # Removes the empty padding before Day 1
     )  
-  ggsave("output/clinical_outcome_profile_combined.png", width = 10, height = 8)
+  ggsave("R/output/clinical_outcome_profile_combined.png", width = 10, height = 8)
   
 }
 
@@ -467,7 +465,7 @@ out = mysapply (unique_IDs, function(ptid) {
       # expand = expansion(mult = c(0, 0.05))      # Removes the empty padding before Day 1
     )  
   
-  ggsave(paste0("output/by_ptid/", ptid, ".png"), plot = p, width = 8, height = 3.1)
+  ggsave(paste0("R/output/by_ptid/", ptid, ".png"), plot = p, width = 8, height = 3.1)
   
   # return 
   c(ptid, pcr_activity, lesion_activity) 
@@ -486,6 +484,6 @@ final_out = merge (out, severity, by.x="ptid", by.y="ptid", all.x=TRUE)
 write.csv(final_out, base_dir%.%"/HSV406/Lesion_HSV_rates_04082025_plus.csv", row.names = FALSE)
 
 
-mypdf("output/correlations_activity_rates", width=6, height=6)
+mypdf("R/output/correlations_activity_rates", width=6, height=6)
 mypairs(final_out[,c("HSV.activity.rate", "PCR.positivity.rate", "lesion.activity.rate")])
 dev.off()
