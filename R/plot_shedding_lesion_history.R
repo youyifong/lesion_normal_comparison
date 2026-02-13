@@ -24,7 +24,7 @@ library(kyotil)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-dir.create("R/output", showWarnings = FALSE)
+dir.create("output", showWarnings = FALSE)
 }
 
 {
@@ -77,10 +77,11 @@ shedding_data$site_lesion <- case_when(
 )
 mytable(shedding_data$site_lesion)
 
+colG = shedding_data[[which(LETTERS == "G")]]
 colK = shedding_data[[which(LETTERS == "K")]]
 colL = shedding_data[[which(LETTERS == "L")]]
 colO = shedding_data[[which(LETTERS == "O")]]
-MaxKLO = pmax(colK, colL, colO, na.rm = TRUE)
+MaxGKLO = pmax(colG, colK, colL, colO, na.rm = TRUE)
 
 
 
@@ -110,6 +111,8 @@ print(activity_data1, n=100)
 
 }
 
+
+
 {
 # plot the overall shedding status in the genital area (column K)
 
@@ -127,7 +130,7 @@ ggplot(shedding_plot_data, aes(x = day, y = factor(ID, levels = activity_data1$I
   theme(legend.position = "none") +
   theme(axis.text.y = element_text(size = 6)) +
   theme(axis.title.y = element_blank()) + xlim(0, NA)
-ggsave("R/output/clinical_outcome_profile_col_K.png", width = 10, height = 8)
+ggsave("output/clinical_outcome_profile_col_K.png", width = 10, height = 8)
 
 
 # plot lesions
@@ -151,16 +154,28 @@ ggplot(shedding_plot_data2, aes(x = day, y = factor(ID))) +
   ) +
   xlim(0, NA)
 
-ggsave("R/output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
+ggsave("output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
 }
 
 
-{
+
+
 # combine copy number and lesion in the same plot
+# two iterations, first all ptids, second only ptids in correlates analysis
+for (iter in 1:2) {
+  if (iter==1) {
+    IDs=activity_data1$ID
+  } else {
+    # 22 ptids for correlates analysis
+    IDs=c(15052, 14655, 14995, 15094, 13581, 9149, 15206, 14999, 14989, 14866, 15017, 13279, 10110, 15368, 14341, 14939, 15328, 14883, 15146, 14900, 14954, 14888)
+    # sort IDs in the order they appear in activity_data1$ID
+    IDs <- activity_data1$ID[sort(match(IDs, activity_data1$ID))]
+  }
+  
   
   # Extract values
   # value  <- round(shedding_data[[which(LETTERS == "K")]])
-  value  <- MaxKLO
+  value  <- MaxGKLO
   value2 <- factor(shedding_data[[which(LETTERS == "J")]])
   value3 <- factor(shedding_data[[which(LETTERS == "N")]])
   
@@ -170,7 +185,7 @@ ggsave("R/output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
       variable = "value",
       val_num = value,
       val_chr = NA_character_,
-      y_pos = as.numeric(factor(ID, levels = activity_data1$ID))
+      y_pos = as.numeric(factor(ID, levels = IDs))
     )
   
   df_value2 <- shedding_data %>%
@@ -178,7 +193,7 @@ ggsave("R/output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
       variable = "value2",
       val_num = NA_real_,
       val_chr = as.character(value2),
-      y_pos = as.numeric(factor(ID, levels = activity_data1$ID))
+      y_pos = as.numeric(factor(ID, levels = IDs))
     )
   
   df_value3 <- shedding_data %>%
@@ -186,9 +201,10 @@ ggsave("R/output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
       variable = "value3",
       val_num = NA_real_,
       val_chr = as.character(value3),
-      y_pos = as.numeric(factor(ID, levels = activity_data1$ID))
+      y_pos = as.numeric(factor(ID, levels = IDs))
     )
   
+    
   # Combine
   shedding_plot_data_combined <- bind_rows(df_value, df_value2, df_value3)
   
@@ -216,22 +232,6 @@ ggsave("R/output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
     name = "Copy number (log10)"
   ) +
     
-  #   # ------------------------------------------------------------------
-  # # Background rectangles for categorical variable (value2)
-  # geom_tile(
-  #   data = subset(shedding_plot_data_combined, variable == "value2"),
-  #   aes(x = day, y = y_pos, fill = val_chr),
-  #   width = 1, height = 0.8, na.rm = TRUE
-  # ) +
-  #   scale_fill_manual(
-  #     values = RColorBrewer::brewer.pal(6, "Set1"),
-  #     na.value = "transparent",
-  #     name = "Lesion site"
-  #   ) +
-  # 
-  #   ggnewscale::new_scale_color() +  # reset for next color scale
-  
-  
   # ------------------------------------------------------------------
   # Categorical variable now plotted as SHAPE-only foreground symbols
   # column N first, so that primary site will not be overridden by new site
@@ -275,8 +275,8 @@ ggsave("R/output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
       panel.grid.major.y = element_blank()
     ) +
     scale_y_continuous(
-      breaks = seq_along(activity_data1$ID),
-      labels = activity_data1$ID,
+      breaks = seq_along(IDs),
+      labels = IDs,
       expand = expansion(mult = 0.02)
     ) +
     scale_x_continuous(
@@ -284,9 +284,10 @@ ggsave("R/output/clinical_outcome_profile_col_J.png", width = 10, height = 8)
       breaks = function(x) seq(1, max(x), by=10), # Optional: Force ticks at every day (1, 2, 3...)
       # expand = expansion(mult = c(0, 0.05))      # Removes the empty padding before Day 1
     )  
-  ggsave("R/output/clinical_outcome_profile_combined.png", width = 10, height = 8)
+  ggsave(glue("output/clinical_outcome_profile_combined{ifelse(iter==2, '_22', '')}.png"), width = 10, height = 8*ifelse(iter==1,1,22/37))
   
 }
+
 
 
 # plot for each ptid
@@ -295,7 +296,7 @@ unique_IDs <- unique(shedding_data$ID)
 out = mysapply (unique_IDs, function(ptid) {
   
   ptid_data <- shedding_data[shedding_data$ID == ptid, ]
-  ptid_data$MaxKLO = pmax(
+  ptid_data$MaxGKLO = pmax(
     ptid_data[[which(LETTERS == "K")]],
     ptid_data[[which(LETTERS == "L")]],
     ptid_data[[which(LETTERS == "O")]],
@@ -308,11 +309,11 @@ out = mysapply (unique_IDs, function(ptid) {
   value35<-  round(ptid_data[[which(LETTERS == "L")]]) # pcr bx lesion, real num
   value3 <-  round(ptid_data[[which(LETTERS == "K")]]) # genital sweep, real num
   value2 <- factor(ptid_data[[which(LETTERS == "N")]])# new lesion
-  value1 <-  round(ptid_data[['MaxKLO']]) # real num
+  value1 <-  round(ptid_data[['MaxGKLO']]) # real num
   
-  pcr_activity = mean(value1>0, na.rm=TRUE)
+  pcr_positivity = mean(value1>0, na.rm=TRUE)
   len_study = nrow(subset(ptid_data, day>=1))
-  lesion_activity = sum(!is.na(value4) | !is.na(value2))/len_study
+  lesion_positivity = sum(!is.na(value4) | !is.na(value2))/len_study
   
   # Prepare datasets
   df_value4 <- ptid_data %>%
@@ -465,14 +466,14 @@ out = mysapply (unique_IDs, function(ptid) {
       # expand = expansion(mult = c(0, 0.05))      # Removes the empty padding before Day 1
     )  
   
-  ggsave(paste0("R/output/by_ptid/", ptid, ".png"), plot = p, width = 8, height = 3.1)
+  ggsave(paste0("output/by_ptid/", ptid, ".png"), plot = p, width = 8, height = 3.1)
   
   # return 
-  c(ptid, pcr_activity, lesion_activity) 
+  c(ptid, pcr_positivity, lesion_positivity) 
 })
 
 
-colnames(out) = c("ptid", "PCR.positivity.rate", "lesion.activity.rate")
+colnames(out) = c("ptid", "PCR.positivity.rate", "lesion.positivity.rate")
 out
 
 
@@ -484,6 +485,6 @@ final_out = merge (out, severity, by.x="ptid", by.y="ptid", all.x=TRUE)
 write.csv(final_out, base_dir%.%"/HSV406/Lesion_HSV_rates_04082025_plus.csv", row.names = FALSE)
 
 
-mypdf("R/output/correlations_activity_rates", width=6, height=6)
-mypairs(final_out[,c("HSV.activity.rate", "PCR.positivity.rate", "lesion.activity.rate")])
+mypdf("output/correlations_activity_rates", width=6, height=6)
+  mypairs(final_out[,c("HSV.activity.rate", "PCR.positivity.rate", "lesion.positivity.rate")])
 dev.off()
