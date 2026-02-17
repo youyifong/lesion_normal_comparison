@@ -62,10 +62,10 @@ for (biopsy in c("select_slides", biopsies)) {
         # print(seq_along(markers)[match(markers.1, markers)])
         # print(markers.1)
         # print(subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type))
-        # print(ylim[[dist]])
+        # print(ylim.ls[[dist]])
         all.freq = scaled.hist(dat.ls,
            scale.factors=lapply(markers.1, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type)),
-           xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
+           xlim=xlim.ls[[dist]], ylim=ylim.ls[[dist]],
            xlab=dist %.% " (um)", ylab="Cells/100x100 um2",
            main=ifelse(s==slides[1],tissue.type,""),
            col=seq_along(markers)[match(markers.1, markers)],

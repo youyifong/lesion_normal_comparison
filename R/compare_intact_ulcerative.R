@@ -29,6 +29,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
   }
       
   mypng(mfrow=c(length(slides),length(toplot)), 
+        res=600, type = "cairo",
         width=ifelse(marker_set==3,2.3,2)*length(toplot), height=30/13*length(slides), 
         mar=c(4,ifelse(marker_set==3,2,0),2,0), oma=c(1,5,0,0),
         file=glue("output/figures/compare_normal_lesion_{dist}_{biopsy}_set{marker_set}"))
@@ -52,7 +53,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
                     col=rev(c("red","blue")),
                     legend=names(dat.ls),
                     xlim=xlim.ls[[dist]], xlab=dist %.% " (um)", 
-                    ylim=ylim[[dist]], ylab="",
+                    ylim=ylim.ls[[dist]], ylab="",
                     yaxt=ifelse(a==toplot[1],"s","n") # only have y axis in column 1
         )
       }      

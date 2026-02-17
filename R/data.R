@@ -80,7 +80,7 @@ region.labels.title=c(intact="Intact", lesion="Ulcerative")
 dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 tissue.types=c("intact","ulcerative"); names(tissue.types)=tissue.types
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
-ylim=list(dist2DEJ=c(0,100), dist2skin=c(0,100))
+ylim.ls=list(dist2DEJ=c(0,100), dist2skin=c(0,100))
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
