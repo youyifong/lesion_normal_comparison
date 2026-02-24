@@ -79,6 +79,13 @@ Notes on methods:
 - R$^2$ is computed without slides from AS_Les, which has the highest shedding rate and appears an outlier.
 - The association is done on intact only. Previously we explored association with ulcerative + intact, but decided to focus on intact
 
+
+**Methods for manuscript**:
+
+Cellular density was quantified as the number of cells per mm². To characterize the spatial distribution of cells across tissue depth, we computed a depth density function defined as the number of cells per 100×100 µm² tissue area as a function of distance from the skin surface or dermal-epidermal junction (DEJ), binned in 100 µm increments. To summarize cellular abundance in a manner that accounts for variable tissue geometry, we computed a normalized count, defined as the number of cells in a vertical strip 100 µm wide, which is equivalent to the area under the depth density function. Gaps in the depth density ratio function reflect bins where the denominator is zero. An average slide was computed as the mean normalized count across slides. For average slides, the ratio was computed as the ratio of summed normalized counts across all slides for the two markers of interest. 
+
+
+
 Notes on samples:
 
 - CF1_Les has no CD68
