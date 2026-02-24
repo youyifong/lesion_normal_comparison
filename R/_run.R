@@ -16,7 +16,7 @@ source("R/compare_markers.R")
 
 #source("R/compare_biopsies.R")
 
-# do correlates study
+# correlates study is done in the Rmd
 rmarkdown::render(
   "report_32bit_v2.Rmd",
   output_file = sprintf(
@@ -25,3 +25,4 @@ rmarkdown::render(
   )
 )
 
+# clinical figure is drawn with plot_shedding_lesion_history.R

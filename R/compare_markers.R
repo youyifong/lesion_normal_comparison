@@ -5,6 +5,9 @@
 
 dir.exists("output/figures") || dir.create("output/figures", recursive = TRUE)
 
+# flag for adding y axis only in the first column
+yaxis.first.col.only=F
+
 get.peak = function(x_start, freq) {
   x_start[which.max(freq)] + (x_start[2]-x_start[1])/2
 }
@@ -33,13 +36,18 @@ for (biopsy in c("select_slides", biopsies)) {
   }
   
   mypng(mfrow=c(length(slides),4), file=glue("output/figures/compare_markers_{biopsy}_set{marker_set}"), 
-      width=8*ifelse(marker_set==3,1.15,1), height=4/2*length(slides), mar=c(4,ifelse(marker_set==3,2,0),2,0), oma=c(1,5,0,0))
-
+        res=700, type = "cairo",
+        width=8*ifelse(marker_set==3,1.15,1), height=4/2*length(slides), 
+        # mar=c(4,ifelse(marker_set==3,2,0),2,0), # superceded by reduce_margin
+        oma=c(1,2,0,0))
+  
+  reduce_margin()
+  
   dist.bt.peaks = 
   lapply (slides, function(s) {
-  sapply (tissue.types, function(tissue.type) { 
   sapply (dist.labels, simplify="array", function(dist) {
-  # tissue.type="ulcerative"; dist="dist2skin"; s="CF5_Les"; marker_set=1
+  sapply (tissue.types, function(tissue.type) { 
+    # tissue.type="ulcerative"; dist="dist2skin"; s="CF5_Les"; marker_set=1
     myprint(tissue.type, dist, s, marker_set)
   
     if (marker_set==1 | marker_set==2) {
@@ -58,11 +66,11 @@ for (biopsy in c("select_slides", biopsies)) {
         all.freq = scaled.hist(dat.ls,
            scale.factors=lapply(markers.1, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type)),
            xlim=xlim.ls[[dist]], ylim=ylim[[dist]],
-           xlab=dist %.% " (um)", ylab="Number of cells/100x100 um2",
+           xlab=dist %.% " (um)", ylab="Cells/100x100 um2",
            main=ifelse(s==slides[1],tissue.type,""),
            col=seq_along(markers)[match(markers.1, markers)],
            cex.legend=0.7,
-           yaxt=ifelse(tissue.types[1]==tissue.type & dist.labels[1]==dist,"s","n"), # only have y axis in column 1
+           yaxt=ifelse(!yaxis.first.col.only | tissue.types[1]==tissue.type & dist.labels[1]==dist,"s","n"), # only have y axis in column 1
            legend=markers.1)
       }
       
@@ -109,9 +117,9 @@ for (biopsy in c("select_slides", biopsies)) {
   tmp=get.slide.name(slides)
   for (i in 1:length(tmp)) {
     # ylab
-    mtext(ifelse(marker_set==3, "percent","Cells/100x100 um2"), side = 2, line = 2., outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2)+0., 
-          adj = NA, padj = NA, cex = .7, col = NA, font = NA)
-    mtext(tmp[i], side = 2, line = 3.5, outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2), 
+    # mtext(ifelse(marker_set==3, "percent","Cells/100x100 um2"), side = 2, line = 2., outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2)+0., 
+          # adj = NA, padj = NA, cex = .7, col = NA, font = NA)
+    mtext(tmp[i], side = 2, line = 0.5, outer = T, at = ((length(tmp)-i)*2 + 1)/(length(tmp)*2), 
           adj = NA, padj = NA, cex = NA, col = NA, font = NA)
   }
 
