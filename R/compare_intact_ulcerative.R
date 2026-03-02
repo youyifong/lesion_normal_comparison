@@ -51,9 +51,9 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
                       subset(tissue_size, biopsy==s & dist_type==dist & region==t)),
                     main=ifelse(s==slides[1],a,""),
                     col=rev(c("red","blue")),
-                    legend=names(dat.ls),
+                    # legend=names(dat.ls), # remove legend for publication figure
                     xlim=xlim.ls[[dist]], xlab=dist %.% " (um)", 
-                    ylim=ylim.ls[[dist]], ylab="",
+                    ylim=ylim.ls[[dist]], ylab="", span=0.3,
                     yaxt=ifelse(a==toplot[1],"s","n") # only have y axis in column 1
         )
       }      
@@ -78,7 +78,9 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
         mymatplot(dat.tmp$depth, dat.tmp[,c("perc.I","perc.U")],
                   type="l", lty=c(1,1), col=rev(c("red","blue")), lwd=2,
                   main=ifelse(s==slides[1],a,""),
-                  legend=tissue.types[!c(all(is.na(dat.tmp$perc.I)), all(is.na(dat.tmp$perc.U)))], legend.x=3,
+                  make.legend=F,
+                  legend=tissue.types[!c(all(is.na(dat.tmp$perc.I)), all(is.na(dat.tmp$perc.U)))],
+                  legend.x=3,
                   xlab=dist %.% " (um)", xlim=xlim.ls[[dist]],
                   ylab="", ylim=c(0,ylim.ratio[a]), 
                   # yaxt=ifelse(a==toplot[1],"s","n"),

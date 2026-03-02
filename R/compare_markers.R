@@ -71,7 +71,7 @@ for (biopsy in c("select_slides", biopsies)) {
            col=seq_along(markers)[match(markers.1, markers)],
            cex.legend=0.7,
            yaxt=ifelse(!yaxis.first.col.only | tissue.types[1]==tissue.type & dist.labels[1]==dist,"s","n"), # only have y axis in column 1
-           legend=markers.1)
+           legend=markers.1, span=0.3)
       }
       
     } else {

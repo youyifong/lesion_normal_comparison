@@ -3,7 +3,7 @@ library(glue)
 
 { # slide level data
 data.dir = "../Chipcytometry_images_from32bit"
-key.markers=c("CD3", "CD11c", "CD123", "CD15", "CD56", "CD68")
+key.markers=c("CD3", "CD15", "CD11c", "CD123", "CD56", "CD68")
 cell_types=c("CD8T", "CD4T", "Treg")
 get.slide.name=function(ss)  sapply(ss, function (s) sub(".*?/(.*)", "\\1", s)) # "DD/DD1_Les" -> DD1_Les
 get.initial=function(ss)  sapply(ss, function (s) sub("^([^0-9_]+).*", "\\1", s) ) # "DD1_Les" -> "DD"

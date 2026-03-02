@@ -5,8 +5,7 @@ if (Sys.info()[["sysname"]] == "Windows") {
   setwd(paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/.."))
 } 
 
-# this write a Rdata file with the data
-source("R/data.R")
+source("R/data.R") # writes a Rdata file with the data
 
 source("R/make_counts_tables.R") 
 
@@ -17,6 +16,7 @@ source("R/compare_markers.R")
 #source("R/compare_biopsies.R")
 
 # correlates study is done in the Rmd
+
 rmarkdown::render(
   "report_32bit_v2.Rmd",
   output_file = sprintf(
