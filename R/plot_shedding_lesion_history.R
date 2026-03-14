@@ -25,6 +25,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 dir.create("output", showWarnings = FALSE)
+dir.create("output/by_ptid", showWarnings = FALSE)
 }
 
 {

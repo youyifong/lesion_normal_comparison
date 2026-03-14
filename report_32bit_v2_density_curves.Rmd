@@ -1,0 +1,101 @@
+---
+title: "report_32bit"
+output: 
+  pdf_document:
+    number_sections: true
+    includes:
+      in_header: header.tex
+header-includes:
+  - \usepackage{chngcntr}
+  - \counterwithin{table}{section}
+  - \counterwithin{figure}{section}
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+---
+<!-- This file can be rendered in Rstudio on Windows using files from the remote drive or from command line on the Hutch server -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kyotil)
+# library(kableExtra)
+library(glue)
+load("R/forRmd.RData")# load the objects from a file
+library(knitr)
+```
+
+<!-- # Depth density function -->
+
+
+# Intact vs. ulcerative - select slides
+
+In this subsection, there are two sets of figures, one for dist2skin and one for dist2DEJ. Each figure shows 13 representative slides.
+
+\newpage
+```{r intact+ulcer select, results='asis', echo=FALSE}
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set1.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set2.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set3.png}\\end{figure}\n")
+
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set1.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set2.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set3.png}\\end{figure}\n")
+```
+
+# Intact vs. ulcerative - lesion slides
+
+In this subsection, there are two sets of figures, one for dist2skin and one for dist2DEJ. Each figure shows the 9 slides with lesions.
+
+\newpage
+```{r intact+ulcer lesion, results='asis', echo=FALSE}
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set1.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set2.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set3.png}\\end{figure}\n")
+
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set1.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set2.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set3.png}\\end{figure}\n")
+```
+
+# Intact vs. ulcerrative - all slides
+
+In this subsection, each figure shows all slides from a single biopsy. 
+
+\newpage
+```{r intact+ulcer all, results='asis', echo=FALSE}
+for (b in biopsies) {
+  cat("## ", b, "\n")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set1.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set2.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set3.png}\\end{figure}\n\\newpage")
+  
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set1.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set2.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set3.png}\\end{figure}\n\\newpage")
+}
+```
+
+# Markers comparison - select slides   
+
+In this subsection, there is one figure showing 13 representative slides. 
+
+
+```{r results='asis', echo=FALSE}
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set1.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set2.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set3.png}\\end{figure}\n")
+```
+
+# Markers comparison - all slides
+
+In this subsection, each figure shows all slides from a single biopsy. 
+
+\newpage
+```{r, results='asis', echo=FALSE}
+for (b in biopsies) {
+  cat("## ", b, "\n")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set1.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set2.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set3.png}\\end{figure}\n\\newpage")
+}
+```
+        
+

@@ -1,0 +1,45 @@
+---
+title: "report_32bit"
+output: 
+  pdf_document:
+    number_sections: true
+    includes:
+      in_header: header.tex
+header-includes:
+  - \usepackage{chngcntr}
+  - \counterwithin{table}{section}
+  - \counterwithin{figure}{section}
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+---
+<!-- This file can be rendered in Rstudio on Windows using files from the remote drive or from command line on the Hutch server -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kyotil)
+# library(kableExtra)
+library(glue)
+load("R/forRmd.RData")# load the objects from a file
+library(knitr)
+```
+
+# Tables by markers
+
+```{r, results='asis', echo=FALSE}
+# print count tables
+counter=0
+for (tbl in cnt.tables) {
+  counter = (counter+1) %% 2
+  print(tbl)
+  if (counter==0) cat("\\newpage") #put two tables on one page
+}
+```
+
+
+# Tables by biopsies
+
+
+```{r count and density tables, results='asis', echo=FALSE}
+table_files <- list.files("output/tables/input/", pattern = ".*_counts+.*1000\\.tex$", full.names = TRUE)
+for (f in table_files) cat(paste0("\\input{", f, "}\n\\newpage"))
+```
+

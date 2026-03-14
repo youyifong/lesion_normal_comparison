@@ -36,7 +36,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
   
   for (s in slides) { 
   for (a in toplot) {
-    # dist="dist2skin"; a="CD4T/CD3"; marker_set=3; biopsy="LG"; s="LG3_Les"
+    # dist="dist2skin"; a="CD3"; marker_set=1; biopsy="LG"; s="LG3_Les"
   
     if (marker_set==1 | marker_set==2) {
       if (is.null(cell_dat[[s]][[a]])) {
@@ -50,11 +50,12 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
                     scale.factors=lapply(tissue.types, function(t) 
                       subset(tissue_size, biopsy==s & dist_type==dist & region==t)),
                     main=ifelse(s==slides[1],a,""),
-                    col=rev(c("red","blue")),
+                    col=(c("blue","red")),
                     # legend=names(dat.ls), # remove legend for publication figure
                     xlim=xlim.ls[[dist]], xlab=dist %.% " (um)", 
                     ylim=ylim.ls[[dist]], ylab="", span=0.3,
-                    yaxt=ifelse(a==toplot[1],"s","n") # only have y axis in column 1
+                    yaxt=ifelse(a==toplot[1],"s","n"), # only have y axis in column 1
+                    add.minus.50 = dist=='dist2skin'
         )
       }      
     } else {
@@ -76,7 +77,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
         empty.plot(); title(main=ifelse(s==slides[1],a,""))
       } else {
         mymatplot(dat.tmp$depth, dat.tmp[,c("perc.I","perc.U")],
-                  type="l", lty=c(1,1), col=rev(c("red","blue")), lwd=2,
+                  type="l", lty=c(1,1), col=(c("blue","red")), lwd=2,
                   main=ifelse(s==slides[1],a,""),
                   make.legend=F,
                   legend=tissue.types[!c(all(is.na(dat.tmp$perc.I)), all(is.na(dat.tmp$perc.U)))],
@@ -84,7 +85,9 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
                   xlab=dist %.% " (um)", xlim=xlim.ls[[dist]],
                   ylab="", ylim=c(0,ylim.ratio[a]), 
                   # yaxt=ifelse(a==toplot[1],"s","n"),
-                  bty="n", impute.missing.for.line = F)
+                  bty="n", impute.missing.for.line = F,
+                  add.minus.50 = F
+        )
       }
     }  
     
