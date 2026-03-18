@@ -85,8 +85,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
                   xlab=dist %.% " (um)", xlim=xlim.ls[[dist]],
                   ylab="", ylim=c(0,ylim.ratio[a]), 
                   # yaxt=ifelse(a==toplot[1],"s","n"),
-                  bty="n", impute.missing.for.line = F,
-                  add.minus.50 = F
+                  bty="n", impute.missing.for.line = F
         )
       }
     }  

@@ -7,7 +7,6 @@ if (Sys.info()[["sysname"]] == "Windows") setwd(paste0(dirname(rstudioapi::getAc
 dir.create("reports", showWarnings = FALSE, recursive=TRUE)
 dir.create("output", showWarnings = FALSE, recursive=TRUE)
 
-
 source("R/data.R") # writes a Rdata file with the data
 
 
