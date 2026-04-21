@@ -1,6 +1,6 @@
 nohup*.out
 *.pdf
-R/forRmd.RData
+R/*.RData
 output/
 .DS_Store
 R/.Rhistory

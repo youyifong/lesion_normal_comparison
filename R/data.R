@@ -407,6 +407,7 @@ count_dat = c(count_dat, out)
 # save the objects except cell_dat to a file
 # cell_dat is large and only used for plotting histograms
 save(list = setdiff(ls(), "cell_dat"), file = "R/forRmd.RData")
+save(cell_dat, file = "R/cell_dat.RData")
 
 
 # check if all select slides to have a set of key markers:

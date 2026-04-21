@@ -1,107 +1,181 @@
 ---
 title: "Associate CD15 Count with Epithelial Lesion Size"
-output: pdf_document
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    extra_dependencies: ["float"]
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.width = 5, fig.height = 5, fig.pos = "H", fig.align = 'center')
 knitr::opts_knit$set(root.dir = '..')
 ```
 
 ```{r load-data, include=FALSE}
-source("R/data.R")
+library(kyotil)
+library(glue)
+load("R/forRmd.RData")   # load the objects from a file
+load("R/cell_dat.RData") # load the objects from a file
+key.markers <- c("CD15", "CD3", "CD11c", "CD123", "CD56", "CD68")
+tissue_size_2 <- read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region_2.csv"))
+tissue_size_2$biopsy <- get.slide.name(tissue_size_2$biopsy)
 ```
 
-## Analysis 1: Combined regions per biopsy
-
-Combine intact/ulcer epithelial regions within each biopsy, treating each ulcer as independent (ignoring ptid/slide/ulcer structure).
-
-```{r combined-regions}
-a <- "CD15"
-
-all.res <- NULL
-for (biopsy in biopsies) {
-
-  slides <- slides.by.biopsy[[biopsy]]
-
-  res <- mysapply(slides, function(s) {
-
-    if (!is.null(cell_dat[[s]][[a]])) {
-
-      size.ulcer.epi <- sum(subset(tissue_size, biopsy == s & region == 'ulcerative' & dist_type == 'dist2DEJ' & depth < 0)$area)
-
-      cell.ulcer.epi <- nrow(subset(cell_dat[[s]][[a]], region == 'ulcerative' & epi))
-
-      c(cell_count = cell.ulcer.epi, size = size.ulcer.epi)
-
-    } else {
-      c(0, 0)
-    }
-
-  })
-
-  all.res <- rbind(all.res, res)
-}
-
-all.res <- all.res[all.res[, 'size'] > 0, ]
-knitr::kable(all.res)
-```
-
-```{r plot-combined}
-corplot(cell_count ~ size, all.res, add.diagonal.line = FALSE, log = "xy")
-```
-
-## Analysis 2: Each region as a separate observation
+## Analysis 1: Each region as a separate observation
 
 Treat each intact/ulcer region individually using region-level size data.
 
-```{r per-region}
-a <- "CD15"
+```{r per-region-compute, include=FALSE}
+cor.summary.1 <- data.frame(marker = key.markers, r = NA_real_, p = NA_real_)
+results.1 <- list()
 
-tissue_size_2 <- read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region_2.csv"))
-tissue_size_2$biopsy <- get.slide.name(tissue_size_2$biopsy)
+for (a in key.markers) {
 
-all.res <- NULL
-for (biopsy in biopsies) {
+  all.res <- NULL
+  for (biopsy in biopsies) {
 
-  slides <- slides.by.biopsy[[biopsy]]
+    slides <- slides.by.biopsy[[biopsy]]
+    slides <- slides[slides != "LG1_Les"]
 
-  res <- lapply(slides, function(s) {
+    res <- lapply(slides, function(s) {
 
-    # myprint(s)
+      # myprint(s)
 
-    if (!is.null(cell_dat[[s]][[a]])) {
+      if (!is.null(cell_dat[[s]][[a]])) {
 
-      size.ulcer.epi <- subset(tissue_size_2, biopsy == s & region == 'ulcerative' & dist_type == 'dist2DEJ' & depth < 0)
+        size.ulcer.epi <- subset(tissue_size_2, biopsy == s & region == 'ulcerative' & dist_type == 'dist2DEJ' & depth < 0)
 
-      if (nrow(size.ulcer.epi) > 0) {
-        size.ulcer.epi <- aggregate(area ~ region_id, size.ulcer.epi, sum)
+        if (nrow(size.ulcer.epi) > 0) {
+          size.ulcer.epi <- aggregate(area ~ region_id, size.ulcer.epi, sum)
 
-        cell.ulcer.epi <- subset(cell_dat[[s]][[a]], region == 'ulcerative' & epi)
+          cell.ulcer.epi <- subset(cell_dat[[s]][[a]], region == 'ulcerative' & epi)
 
-        sapply(1:nrow(size.ulcer.epi), function(i) {
-          region_id <- size.ulcer.epi[i, "region_id"]
-          col_id <- grep(glue("epi_region_{region_id}_lesion"), colnames(cell.ulcer.epi))
-          c(cell_count = sum(cell.ulcer.epi[[col_id]] == "True"), size = size.ulcer.epi[i, "area"])
-        })
+          sapply(1:nrow(size.ulcer.epi), function(i) {
+            region_id <- size.ulcer.epi[i, "region_id"]
+            col_id <- grep(glue("epi_region_{region_id}_lesion"), colnames(cell.ulcer.epi))
+            c(cell_count = sum(cell.ulcer.epi[[col_id]] == "True"), size = size.ulcer.epi[i, "area"])
+          })
+        }
+
       }
 
+    })
+    res <- res[sapply(res, function(x) !is.null(x))]
+
+    if (len(res) > 0) {
+      tmp <- do.call(cbind, res)
+      colnames(tmp) <- names(res) %.% (1:ncol(tmp))
+      all.res <- rbind(all.res, t(tmp))
     }
-
-  })
-  res <- res[sapply(res, function(x) !is.null(x))]
-
-  if (len(res) > 0) {
-    tmp <- do.call(cbind, res)
-    colnames(tmp) <- names(res) %.% (1:ncol(tmp))
-
-    all.res <- rbind(all.res, t(tmp))
   }
-}
 
-knitr::kable(all.res)
+  ct <- cor.test(log(all.res[, 'cell_count'] + 1), log(all.res[, 'size'] + 1), method = "spearman")
+  cor.summary.1[cor.summary.1$marker == a, c('r', 'p')] <- c(ct$estimate, ct$p.value)
+  results.1[[a]] <- all.res
+}
 ```
 
-```{r plot-per-region}
-corplot(cell_count ~ size, all.res, add.diagonal.line = FALSE, log = "xy")
+```{r per-region-render, results='asis', echo=FALSE}
+for (a in key.markers) {
+  all.res <- results.1[[a]]
+  child_out <- knitr::knit_child(text = c(
+    "```{=latex}",
+    "\\clearpage",
+    "```",
+    "",
+    paste("###", a),
+    "",
+    paste0('```{r per-region-', a, ', echo=FALSE, results="asis", fig.width=5, fig.height=5, fig.pos="H", fig.align="center"}'),
+    'print(knitr::kable(all.res, caption = paste(a, "- per region"), booktabs = TRUE) |>',
+    '  kableExtra::kable_styling(latex_options = "HOLD_position"))',
+    'corplot(cell_count ~ size, all.res, add.diagonal.line = FALSE, log = "xy")',
+    '```'
+  ), envir = environment(), quiet = TRUE)
+  cat(child_out, sep = '\n')
+}
+```
+
+\newpage
+
+### Correlation summary
+
+```{r cor-summary-1}
+cor.summary.1$p <- format.pval(cor.summary.1$p, digits = 2)
+cor.summary.1$r  <- round(cor.summary.1$r, 3)
+knitr::kable(cor.summary.1, col.names = c("Marker", "Spearman cor", "p-value"))
+```
+
+\newpage
+
+## Analysis 2: Combined regions per biopsy
+
+Combine intact/ulcer epithelial regions within each biopsy, treating each ulcer as independent (ignoring ptid/slide/ulcer structure).
+
+```{r combined-regions-compute, include=FALSE}
+cor.summary.2 <- data.frame(marker = key.markers, r = NA_real_, p = NA_real_)
+results.2 <- list()
+
+for (a in key.markers) {
+
+  all.res <- NULL
+  for (biopsy in biopsies) {
+
+    slides <- slides.by.biopsy[[biopsy]]
+    slides <- slides[slides != "LG1_Les"]
+
+    res <- mysapply(slides, function(s) {
+
+      if (!is.null(cell_dat[[s]][[a]])) {
+
+        size.ulcer.epi <- sum(subset(tissue_size, biopsy == s & region == 'ulcerative' & dist_type == 'dist2DEJ' & depth < 0)$area)
+
+        cell.ulcer.epi <- nrow(subset(cell_dat[[s]][[a]], region == 'ulcerative' & epi))
+
+        c(cell_count = cell.ulcer.epi, size = size.ulcer.epi)
+
+      } else {
+        c(0, 0)
+      }
+
+    })
+
+    all.res <- rbind(all.res, res)
+  }
+
+  all.res <- all.res[all.res[, 'size'] > 0, ]
+
+  ct <- cor.test(log(all.res[, 'cell_count'] + 1), log(all.res[, 'size'] + 1), method = "spearman")
+  cor.summary.2[cor.summary.2$marker == a, c('r', 'p')] <- c(ct$estimate, ct$p.value)
+  results.2[[a]] <- all.res
+}
+```
+
+```{r combined-regions-render, results='asis', echo=FALSE}
+for (a in key.markers) {
+  all.res <- results.2[[a]]
+  child_out <- knitr::knit_child(text = c(
+    "```{=latex}",
+    "\\clearpage",
+    "```",
+    "",
+    paste("###", a),
+    "",
+    paste0('```{r combined-regions-', a, ', echo=FALSE, results="asis", fig.width=5, fig.height=5, fig.pos="H", fig.align="center"}'),
+    'print(knitr::kable(all.res, caption = paste(a, "- combined regions"), booktabs = TRUE) |>',
+    '  kableExtra::kable_styling(latex_options = "HOLD_position"))',
+    'corplot(cell_count ~ size, all.res, add.diagonal.line = FALSE, log = "xy")',
+    '```'
+  ), envir = environment(), quiet = TRUE)
+  cat(child_out, sep = '\n')
+}
+```
+
+\newpage
+
+### Correlation summary
+
+```{r cor-summary-2}
+cor.summary.2$p <- format.pval(cor.summary.2$p, digits = 2)
+cor.summary.2$r  <- round(cor.summary.2$r, 3)
+knitr::kable(cor.summary.2, col.names = c("Marker", "Spearman cor", "p-value"))
 ```
