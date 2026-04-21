@@ -1,0 +1,107 @@
+---
+title: "Associate CD15 Count with Epithelial Lesion Size"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = '..')
+```
+
+```{r load-data, include=FALSE}
+source("R/data.R")
+```
+
+## Analysis 1: Combined regions per biopsy
+
+Combine intact/ulcer epithelial regions within each biopsy, treating each ulcer as independent (ignoring ptid/slide/ulcer structure).
+
+```{r combined-regions}
+a <- "CD15"
+
+all.res <- NULL
+for (biopsy in biopsies) {
+
+  slides <- slides.by.biopsy[[biopsy]]
+
+  res <- mysapply(slides, function(s) {
+
+    if (!is.null(cell_dat[[s]][[a]])) {
+
+      size.ulcer.epi <- sum(subset(tissue_size, biopsy == s & region == 'ulcerative' & dist_type == 'dist2DEJ' & depth < 0)$area)
+
+      cell.ulcer.epi <- nrow(subset(cell_dat[[s]][[a]], region == 'ulcerative' & epi))
+
+      c(cell_count = cell.ulcer.epi, size = size.ulcer.epi)
+
+    } else {
+      c(0, 0)
+    }
+
+  })
+
+  all.res <- rbind(all.res, res)
+}
+
+all.res <- all.res[all.res[, 'size'] > 0, ]
+knitr::kable(all.res)
+```
+
+```{r plot-combined}
+corplot(cell_count ~ size, all.res, add.diagonal.line = FALSE, log = "xy")
+```
+
+## Analysis 2: Each region as a separate observation
+
+Treat each intact/ulcer region individually using region-level size data.
+
+```{r per-region}
+a <- "CD15"
+
+tissue_size_2 <- read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region_2.csv"))
+tissue_size_2$biopsy <- get.slide.name(tissue_size_2$biopsy)
+
+all.res <- NULL
+for (biopsy in biopsies) {
+
+  slides <- slides.by.biopsy[[biopsy]]
+
+  res <- lapply(slides, function(s) {
+
+    # myprint(s)
+
+    if (!is.null(cell_dat[[s]][[a]])) {
+
+      size.ulcer.epi <- subset(tissue_size_2, biopsy == s & region == 'ulcerative' & dist_type == 'dist2DEJ' & depth < 0)
+
+      if (nrow(size.ulcer.epi) > 0) {
+        size.ulcer.epi <- aggregate(area ~ region_id, size.ulcer.epi, sum)
+
+        cell.ulcer.epi <- subset(cell_dat[[s]][[a]], region == 'ulcerative' & epi)
+
+        sapply(1:nrow(size.ulcer.epi), function(i) {
+          region_id <- size.ulcer.epi[i, "region_id"]
+          col_id <- grep(glue("epi_region_{region_id}_lesion"), colnames(cell.ulcer.epi))
+          c(cell_count = sum(cell.ulcer.epi[[col_id]] == "True"), size = size.ulcer.epi[i, "area"])
+        })
+      }
+
+    }
+
+  })
+  res <- res[sapply(res, function(x) !is.null(x))]
+
+  if (len(res) > 0) {
+    tmp <- do.call(cbind, res)
+    colnames(tmp) <- names(res) %.% (1:ncol(tmp))
+
+    all.res <- rbind(all.res, t(tmp))
+  }
+}
+
+knitr::kable(all.res)
+```
+
+```{r plot-per-region}
+corplot(cell_count ~ size, all.res, add.diagonal.line = FALSE, log = "xy")
+```

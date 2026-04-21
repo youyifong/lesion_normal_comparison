@@ -19,7 +19,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
   }
   
   if (biopsy=="select_slides") {
-    # 13 select slides on one page"
+    # 13 select slides on one page
     slides = select.slides
   } else if (biopsy=="lesion_slides") {
     # 9 slides with lesions on one page"
@@ -55,7 +55,8 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
                     xlim=xlim.ls[[dist]], xlab=dist %.% " (um)", 
                     ylim=ylim.ls[[dist]], ylab="", span=0.3,
                     yaxt=ifelse(a==toplot[1],"s","n"), # only have y axis in column 1
-                    add.minus.50 = dist=='dist2skin'
+                    hist.to.show=2,
+                    add.minus.50 = T
         )
       }      
     } else {

@@ -14,7 +14,8 @@ get.peak = function(x_start, freq) {
 
 for (marker_set in c(1,2,3)) {
 for (biopsy in c("select_slides", biopsies)) {
-    
+# tissue.type="ulcerative"; dist="dist2DEJ"; s="CF5_Les"; marker_set=1; biopsy='select_slides'
+  
   if (marker_set==1) {
     markers = key.markers
   } else if (marker_set==2) {
@@ -47,7 +48,6 @@ for (biopsy in c("select_slides", biopsies)) {
   lapply (slides, function(s) {
   sapply (dist.labels, simplify="array", function(dist) {
   sapply (tissue.types, function(tissue.type) { 
-    # tissue.type="ulcerative"; dist="dist2skin"; s="CF5_Les"; marker_set=1
     myprint(tissue.type, dist, s, marker_set)
   
     if (marker_set==1 | marker_set==2) {
@@ -63,15 +63,23 @@ for (biopsy in c("select_slides", biopsies)) {
         # print(markers.1)
         # print(subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type))
         # print(ylim.ls[[dist]])
+        
+        cols=seq_along(markers)
+        cols[2]='red'
+        cols=cols[match(markers.1, markers)]
+        
         all.freq = scaled.hist(dat.ls,
            scale.factors=lapply(markers.1, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type)),
            xlim=xlim.ls[[dist]], ylim=ylim.ls[[dist]],
            xlab=dist %.% " (um)", ylab="Cells/100x100 um2",
            main=ifelse(s==slides[1],tissue.type,""),
-           col=seq_along(markers)[match(markers.1, markers)],
+           cols=cols,
            cex.legend=0.7,
            yaxt=ifelse(!yaxis.first.col.only | tissue.types[1]==tissue.type & dist.labels[1]==dist,"s","n"), # only have y axis in column 1
-           legend=markers.1, span=0.3)
+           legend=markers.1, span=0.3,
+           hist.to.show=1,
+           add.minus.50=T
+           )
       }
       
     } else {

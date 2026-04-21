@@ -51,6 +51,11 @@ Marker groups
 
 ```{bash}
 python py/get_biopsy_size_by_depth_and_region_32bit.py --grid 5
+
+
+# count each intact/ulcer region within a biopsy separately
+python py/get_biopsy_size_by_depth_and_region_32bit_2.py --grid 5
+
 ```
 
 
