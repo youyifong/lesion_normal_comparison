@@ -1,0 +1,325 @@
+---
+title: "Associate CD15 Count with Epithelial Lesion Size"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    extra_dependencies: ["float"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.width = 5, fig.height = 5, fig.pos = "H", fig.align = 'center')
+
+options(knitr.duplicate.label = 'allow')
+```
+
+```{r load-data, include=FALSE}
+library(kyotil)
+library(glue)
+load("R/forRmd.RData")   # load the objects from a file
+load("R/cell_dat.RData") # load the objects from a file
+key.markers <- c("CD15", "CD3", "CD11c", "CD123", "CD56", "CD68")
+tissue_size_2 <- read.csv(paste0(data.dir, "/tissue_size_by_depth_and_region_2.csv"))
+tissue_size_2$biopsy <- get.slide.name(tissue_size_2$biopsy)
+```
+
+## Analysis 1: Each region as a separate observation
+
+Treat each intact/ulcer region individually using region-level size data.
+
+Pearson correlation coefficients are computed on the antilog scale. 
+
+LG1_Les is skipped to avoid coding error because there is no epithelial lesion in that slide.
+
+```{r per-region-compute, include=FALSE}
+cor.summary.1 <- data.frame(marker = key.markers, r = NA_real_, p = NA_real_, r_density = NA_real_, p_density = NA_real_)
+results.1 <- list()
+
+for (a in key.markers) {
+
+  all.res <- NULL
+  for (biopsy in biopsies) {
+
+    slides <- slides.by.biopsy[[biopsy]]
+    slides <- slides[slides != "LG1_Les"]
+
+    res <- lapply(slides, function(s) {
+
+      # myprint(s)
+
+      if (!is.null(cell_dat[[s]][[a]])) {
+
+        size.ulcer.epi <- subset(tissue_size_2, biopsy == s & region == 'ulcerative' & dist_type == 'dist2DEJ' & depth < 0)
+
+        if (nrow(size.ulcer.epi) > 0) {
+          size.ulcer.epi <- aggregate(area ~ region_id, size.ulcer.epi, sum)
+
+          cell.ulcer.epi <- subset(cell_dat[[s]][[a]], region == 'ulcerative' & epi)
+
+          sapply(1:nrow(size.ulcer.epi), function(i) {
+            region_id <- size.ulcer.epi[i, "region_id"]
+            col_id <- grep(glue("epi_region_{region_id}_lesion"), colnames(cell.ulcer.epi))
+            c(cell_count = sum(cell.ulcer.epi[[col_id]] == "True"), size = size.ulcer.epi[i, "area"])
+          })
+        }
+
+      }
+
+    })
+    res <- res[sapply(res, function(x) !is.null(x))]
+
+    if (len(res) > 0) {
+      tmp <- do.call(cbind, res)
+      colnames(tmp) <- names(res) %.% (1:ncol(tmp))
+      all.res <- rbind(all.res, t(tmp))
+    }
+  }
+
+  all.res <- cbind(all.res, density = all.res[, 'cell_count'] / all.res[, 'size'])
+  ct <- cor.test(all.res[, 'cell_count'], all.res[, 'size'], method = "pearson")
+  ct_density <- cor.test(all.res[, 'density'], all.res[, 'size'], method = "pearson")
+  cor.summary.1[cor.summary.1$marker == a, 'r']         <- as.numeric(ct$estimate)
+  cor.summary.1[cor.summary.1$marker == a, 'p']         <- as.numeric(ct$p.value)
+  cor.summary.1[cor.summary.1$marker == a, 'r_density'] <- as.numeric(ct_density$estimate)
+  cor.summary.1[cor.summary.1$marker == a, 'p_density'] <- as.numeric(ct_density$p.value)
+  results.1[[a]] <- all.res
+}
+```
+
+```{r per-region-render, results='asis', echo=FALSE}
+for (a in key.markers) {
+  all.res <- results.1[[a]]
+  child_out <- knitr::knit_child(text = c(
+    "```{=latex}",
+    "\\clearpage",
+    "```",
+    "",
+    paste("###", a),
+    "",
+    paste0('```{r per-region-', a, ', echo=FALSE, results="asis", fig.width=10, fig.height=5, fig.pos="H", fig.align="center"}'),
+    'all.res.fmt <- as.data.frame(all.res)',
+    'all.res.fmt$size    <- formatDouble(all.res.fmt$size,    digits = 1)',
+    'all.res.fmt$density <- formatDouble(all.res.fmt$density, digits = 1)',
+    'print(knitr::kable(all.res.fmt, caption = paste(a, "- per region"), booktabs = TRUE, align = c("l", "r", "r", "r")) |>',
+    '  kableExtra::kable_styling(latex_options = "HOLD_position"))',
+    'par(mfrow = c(1, 2)); reduce_margin()',
+    'corplot(cell_count ~ size, all.res, add.diagonal.line = FALSE, log = "xy")',
+    'corplot(density ~ size, all.res, add.diagonal.line = FALSE, log = "")',
+    '```'
+  ), envir = environment(), quiet = TRUE)
+  cat(child_out, sep = '\n')
+}
+```
+
+\newpage
+
+### For manuscript
+
+```{r scatter-cd15-cd3-1, fig.width=8, fig.height=3.6}
+cd15  <- results.1[["CD15"]]
+cd3   <- results.1[["CD3"]]
+cd123 <- results.1[["CD123"]]
+par(mfrow = c(1, 2)); reduce_margin()
+# CD15 and CD3
+plot(cd15[, "size"], cd15[, "cell_count"],
+     col = "blue", pch = 16, xlab = "size", ylab = "cell_count",
+     xlim = range(c(cd15[, "size"], cd3[, "size"])),
+     ylim = range(c(cd15[, "cell_count"], cd3[, "cell_count"])))
+points(cd3[, "size"], cd3[, "cell_count"], col = "red", pch = 17)
+legend("topleft", legend = c("CD15", "CD3"), col = c("blue", "red"), pch = c(16, 17))
+# CD15, CD3, and CD123
+plot(cd15[, "size"], cd15[, "cell_count"],
+     col = "blue", pch = 16, xlab = "size", ylab = "cell_count",
+     xlim = range(c(cd15[, "size"], cd3[, "size"], cd123[, "size"])),
+     ylim = range(c(cd15[, "cell_count"], cd3[, "cell_count"], cd123[, "cell_count"])))
+points(cd3[, "size"],   cd3[, "cell_count"],   col = "red",   pch = 17)
+points(cd123[, "size"], cd123[, "cell_count"], col = "green", pch = 15)
+legend("topleft", legend = c("CD15", "CD3", "CD123"), col = c("blue", "red", "green"), pch = c(16, 17, 15))
+```
+
+```{r density-scatter-1, fig.width=8, fig.height=3.6}
+cd15  <- results.1[["CD15"]]
+cd3   <- results.1[["CD3"]]
+cd123 <- results.1[["CD123"]]
+r.cd15  <- round(cor(cd15[,  "density"], cd15[,  "size"]), 2)
+r.cd3   <- round(cor(cd3[,   "density"], cd3[,   "size"]), 2)
+r.cd123 <- round(cor(cd123[, "density"], cd123[, "size"]), 2)
+plot(cd15[, "size"], cd15[, "density"],
+     col = "blue", pch = 16, xlab = "size", ylab = "density",
+     xlim = range(c(cd15[, "size"], cd3[, "size"], cd123[, "size"])),
+     ylim = range(c(cd15[, "density"], cd3[, "density"], cd123[, "density"])),
+     main = paste0("CD15: r=", r.cd15, "  CD3: r=", r.cd3, "  CD123: r=", r.cd123))
+points(cd3[,   "size"], cd3[,   "density"], col = "red",   pch = 17)
+points(cd123[, "size"], cd123[, "density"], col = "green", pch = 15)
+legend("topleft", legend = c("CD15", "CD3", "CD123"), col = c("blue", "red", "green"), pch = c(16, 17, 15))
+```
+
+```{r cor-summary-1}
+cor.summary.1$p         <- formatPvalues(as.numeric(cor.summary.1$p),         p.digits = 3)
+cor.summary.1$r         <- formatDouble(as.numeric(cor.summary.1$r),         digits = 2)
+cor.summary.1$p_density <- formatPvalues(as.numeric(cor.summary.1$p_density), p.digits = 3)
+cor.summary.1$r_density <- formatDouble(as.numeric(cor.summary.1$r_density), digits = 2)
+knitr::kable(cor.summary.1, col.names = c("Marker", "Pearson cor", "p-value", "Pearson cor", "p-value"), booktabs = TRUE, align = c("l", "c", "c", "c", "c")) |>
+  kableExtra::add_header_above(c(" " = 1, "count vs size" = 2, "density vs size" = 2))
+```
+
+\newpage
+
+## Analysis 2: Combined regions per slide
+
+Combine intact/ulcer epithelial regions within each slide, treating each ulcer as independent (ignoring ptid/slide/ulcer structure).
+
+```{r combined-regions-compute, include=FALSE}
+cor.summary.2 <- data.frame(marker = key.markers, r = NA_real_, p = NA_real_, r_density = NA_real_, p_density = NA_real_)
+results.2 <- list()
+
+for (a in key.markers) {
+
+  all.res <- NULL
+  for (biopsy in biopsies) {
+
+    slides <- slides.by.biopsy[[biopsy]]
+    slides <- slides[slides != "LG1_Les"]
+
+    res <- mysapply(slides, function(s) {
+
+      if (!is.null(cell_dat[[s]][[a]])) {
+
+        size.ulcer.epi <- sum(subset(tissue_size, biopsy == s & region == 'ulcerative' & dist_type == 'dist2DEJ' & depth < 0)$area)
+
+        cell.ulcer.epi <- nrow(subset(cell_dat[[s]][[a]], region == 'ulcerative' & epi))
+
+        c(cell_count = cell.ulcer.epi, size = size.ulcer.epi)
+
+      } else {
+        c(0, 0)
+      }
+
+    })
+
+    all.res <- rbind(all.res, res)
+  }
+
+  all.res <- all.res[all.res[, 'size'] > 0, ]
+  all.res <- cbind(all.res, density = all.res[, 'cell_count'] / all.res[, 'size'])
+  ct <- cor.test(all.res[, 'cell_count'], all.res[, 'size'], method = "pearson")
+  ct_density <- cor.test(all.res[, 'density'], all.res[, 'size'], method = "pearson")
+  cor.summary.2[cor.summary.2$marker == a, 'r']         <- as.numeric(ct$estimate)
+  cor.summary.2[cor.summary.2$marker == a, 'p']         <- as.numeric(ct$p.value)
+  cor.summary.2[cor.summary.2$marker == a, 'r_density'] <- as.numeric(ct_density$estimate)
+  cor.summary.2[cor.summary.2$marker == a, 'p_density'] <- as.numeric(ct_density$p.value)
+  results.2[[a]] <- all.res
+}
+```
+
+```{r combined-regions-render, results='asis', echo=FALSE}
+for (a in key.markers) {
+  all.res <- results.2[[a]]
+  child_out <- knitr::knit_child(text = c(
+    "```{=latex}",
+    "\\clearpage",
+    "```",
+    "",
+    paste("###", a),
+    "",
+    paste0('```{r combined-regions-', a, ', echo=FALSE, results="asis", fig.width=10, fig.height=5, fig.pos="H", fig.align="center"}'),
+    'all.res.fmt <- as.data.frame(all.res)',
+    'all.res.fmt$size    <- formatDouble(all.res.fmt$size,    digits = 1)',
+    'all.res.fmt$density <- formatDouble(all.res.fmt$density, digits = 1)',
+    'print(knitr::kable(all.res.fmt, caption = paste(a, "- combined regions"), booktabs = TRUE, align = c("l", "r", "r", "r")) |>',
+    '  kableExtra::kable_styling(latex_options = "HOLD_position"))',
+    'par(mfrow = c(1, 2)); reduce_margin()',
+    'corplot(cell_count ~ size, all.res, add.diagonal.line = FALSE, log = "xy")',
+    'corplot(density ~ size, all.res, add.diagonal.line = FALSE, log = "")',
+    '```'
+  ), envir = environment(), quiet = TRUE)
+  cat(child_out, sep = '\n')
+}
+```
+
+\newpage
+
+### For manuscript
+
+```{r scatter-cd15-cd3-2, fig.width=8, fig.height=3.6}
+cd15  <- results.2[["CD15"]]
+cd3   <- results.2[["CD3"]]
+cd123 <- results.2[["CD123"]]
+par(mfrow = c(1, 2)); reduce_margin()
+# CD15 and CD3
+plot(cd15[, "size"], cd15[, "cell_count"],
+     col = "blue", pch = 16, xlab = "size", ylab = "cell_count",
+     xlim = range(c(cd15[, "size"], cd3[, "size"])),
+     ylim = range(c(cd15[, "cell_count"], cd3[, "cell_count"])))
+points(cd3[, "size"], cd3[, "cell_count"], col = "red", pch = 17)
+legend("topleft", legend = c("CD15", "CD3"), col = c("blue", "red"), pch = c(16, 17))
+# CD15, CD3, and CD123
+plot(cd15[, "size"], cd15[, "cell_count"],
+     col = "blue", pch = 16, xlab = "size", ylab = "cell_count",
+     xlim = range(c(cd15[, "size"], cd3[, "size"], cd123[, "size"])),
+     ylim = range(c(cd15[, "cell_count"], cd3[, "cell_count"], cd123[, "cell_count"])))
+points(cd3[, "size"],   cd3[, "cell_count"],   col = "red",   pch = 17)
+points(cd123[, "size"], cd123[, "cell_count"], col = "green", pch = 15)
+legend("topleft", legend = c("CD15", "CD3", "CD123"), col = c("blue", "red", "green"), pch = c(16, 17, 15))
+```
+
+```{r density-scatter-2ab, fig.width=8, fig.height=3.6}
+cd15  <- results.2[["CD15"]]
+cd3   <- results.2[["CD3"]]
+cd123 <- results.2[["CD123"]]
+r.cd15  <- round(cor(cd15[,  "density"], cd15[,  "size"]), 2)
+r.cd3   <- round(cor(cd3[,   "density"], cd3[,   "size"]), 2)
+r.cd123 <- round(cor(cd123[, "density"], cd123[, "size"]), 2)
+par(mfrow = c(1, 2)); reduce_margin()
+# CD15 and CD3
+plot(cd15[, "size"], cd15[, "density"],
+     col = "blue", pch = 16, xlab = "size", ylab = "density",
+     xlim = range(c(cd15[, "size"], cd3[, "size"])),
+     ylim = range(c(cd15[, "density"], cd3[, "density"])),
+     main = paste0("CD15: r=", r.cd15, "  CD3: r=", r.cd3))
+points(cd3[, "size"], cd3[, "density"], col = "red", pch = 17)
+abline(lm(density ~ size, data = as.data.frame(cd15)), col = "blue")
+abline(lm(density ~ size, data = as.data.frame(cd3)),  col = "red")
+legend("topleft", legend = c("CD15", "CD3"), col = c("blue", "red"), pch = c(16, 17))
+# CD15, CD3, and CD123
+plot(cd15[, "size"], cd15[, "density"],
+     col = "blue", pch = 16, xlab = "size", ylab = "density",
+     xlim = range(c(cd15[, "size"], cd3[, "size"], cd123[, "size"])),
+     ylim = range(c(cd15[, "density"], cd3[, "density"], cd123[, "density"])),
+     main = paste0("CD15: r=", r.cd15, "  CD3: r=", r.cd3, "  CD123: r=", r.cd123))
+points(cd3[,   "size"], cd3[,   "density"], col = "red",   pch = 17)
+points(cd123[, "size"], cd123[, "density"], col = "green", pch = 15)
+abline(lm(density ~ size, data = as.data.frame(cd15)),  col = "blue")
+abline(lm(density ~ size, data = as.data.frame(cd3)),   col = "red")
+abline(lm(density ~ size, data = as.data.frame(cd123)), col = "green")
+legend("topleft", legend = c("CD15", "CD3", "CD123"), col = c("blue", "red", "green"), pch = c(16, 17, 15))
+```
+
+```{r barplot-r-2, fig.width=5, fig.height=8}
+marker.order <- c("CD68", "CD56", "CD3", "CD123", "CD11c", "CD15")
+cor.summary.2 <- cor.summary.2[match(marker.order, cor.summary.2$marker), ]
+rownames(cor.summary.2) <- NULL
+par(mfrow = c(2, 1), mar = c(4, 6, 2, 1))
+cols <- "gray"
+names.count   <- paste0(cor.summary.2$marker, "\n(p=", formatPvalues(as.numeric(cor.summary.2$p),         p.digits = 3), ")")
+names.density <- paste0(cor.summary.2$marker, "\n(p=", formatPvalues(as.numeric(cor.summary.2$p_density), p.digits = 3), ")")
+barplot(as.numeric(cor.summary.2$r), names.arg = names.count, horiz = TRUE,
+        las = 1, xlab = "Pearson cor", main = "count vs size",
+        col = cols, space = 1.2, width = 0.35, xlim = c(-1, 1))
+barplot(as.numeric(cor.summary.2$r_density), names.arg = names.density, horiz = TRUE,
+        las = 1, xlab = "Pearson cor", main = "density vs size",
+        col = cols, space = 1.2, width = 0.35, xlim = c(-1, 1))
+```
+
+\newpage
+
+```{r cor-summary-2}
+p.fmt         <- formatPvalues(as.numeric(cor.summary.2$p),         p.digits = 3)
+r.fmt         <- formatDouble(as.numeric(cor.summary.2$r),         digits = 2)
+p_density.fmt <- formatPvalues(as.numeric(cor.summary.2$p_density), p.digits = 3)
+r_density.fmt <- formatDouble(as.numeric(cor.summary.2$r_density), digits = 2)
+cor.summary.2.display <- data.frame(marker = cor.summary.2$marker,
+                                    r = r.fmt, p = p.fmt,
+                                    r_density = r_density.fmt, p_density = p_density.fmt)
+knitr::kable(cor.summary.2.display, col.names = c("Marker", "Pearson cor", "p-value", "Pearson cor", "p-value"), booktabs = TRUE, align = c("l", "c", "c", "c", "c")) |>
+  kableExtra::add_header_above(c(" " = 1, "count vs size" = 2, "density vs size" = 2))
+```

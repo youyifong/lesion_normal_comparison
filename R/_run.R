@@ -27,3 +27,7 @@ rmarkdown::render("report_32bit_v2_cor.Rmd", output_file = sprintf("reports/repo
 
 # clinical 
 source("R/plot_shedding_lesion_history.R")
+
+
+# for manus
+rmarkdown::render("count_size_cor_epi_lesion.Rmd", output_file = sprintf("reports/count_size_cor_epi_lesion_%s.pdf", format(Sys.Date(), "%Y%m%d")))
