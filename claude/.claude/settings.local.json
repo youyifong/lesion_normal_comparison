@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(powershell.exe -Command \"[console]::beep\\(880, 300\\)\")",
+      "Bash(powershell.exe -NoProfile -Command \"[System.Media.SystemSounds]::Beep.Play\\(\\)\")",
+      "Read(//c/Users/youyi/AppData/Local/Temp/**)",
+      "Bash(powershell.exe -NoProfile -Command \"Get-ItemProperty -Path 'HKCU:\\\\Software\\\\ClaudeHook' -ErrorAction SilentlyContinue\")",
+      "Bash(rundll32 user32.dll,MessageBeep)",
+      "Bash(echo \"exit: $?\")",
+      "Read(//c/Users/youyi/AppData/Roaming/Claude//**)",
+      "Read(//c/Users/youyi/AppData/Local/Claude//**)",
+      "Bash(bash -c 'date +%s > /tmp/claude_start_time.txt')"
+    ]
+  }
+}
