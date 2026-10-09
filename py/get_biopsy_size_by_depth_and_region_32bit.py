@@ -208,7 +208,7 @@ res=[]
 for folder in directories:
     roi_dir = chipcytometry_images_dir + folder + '/TSP_stitched/ROI_regions/'
     if os.path.exists(roi_dir):
-        print(roi_dir)
+        print("starting to work in ", roi_dir)
 
         try:
             out = do_biopsy(roi_dir)

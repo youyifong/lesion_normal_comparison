@@ -50,11 +50,13 @@ Marker groups
 ### Tissue stats
 
 ```{bash}
-python py/get_biopsy_size_by_depth_and_region_32bit.py --grid 5
+# makes Chipcytometry_images_from32bit/tissue_size_by_depth_and_region.csv
+nohup python py/get_biopsy_size_by_depth_and_region_32bit.py --grid 5 &
 
 
 # count each intact/ulcer region within a biopsy separately
-python py/get_biopsy_size_by_depth_and_region_32bit_2.py --grid 5
+# makes Chipcytometry_images_from32bit/tissue_size_by_depth_and_region_2.csv
+nohup python py/get_biopsy_size_by_depth_and_region_32bit_2.py --grid 5 &
 
 ```
 

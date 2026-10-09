@@ -17,6 +17,7 @@ source("R/compare_markers.R")
 #source("R/compare_biopsies.R")
 rmarkdown::render("report_32bit_v2_density_curves.Rmd", output_file = sprintf("reports/report_32bit_v2_density_curves_%s.pdf", format(Sys.Date(), "%Y%m%d")))
 
+
 source("R/make_counts_tables.R") 
 rmarkdown::render("report_32bit_v2_density_tables.Rmd", output_file = sprintf("reports/report_32bit_v2_density_tables_%s.pdf", format(Sys.Date(), "%Y%m%d")))
 
