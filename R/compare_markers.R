@@ -68,15 +68,16 @@ for (biopsy in c("select_slides", biopsies)) {
         cols[2]='red'
         cols=cols[match(markers.1, markers)]
         
+        scale.factors = lapply(markers.1, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type))
         all.freq = scaled.hist(dat.ls,
-           scale.factors=lapply(markers.1, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type)),
+           scale.factors=scale.factors,
            xlim=xlim.ls[[dist]], ylim=ylim.ls[[dist]],
            xlab=dist %.% " (um)", ylab="Cells/100x100 um2",
            main=ifelse(s==slides[1],tissue.type,""),
            cols=cols,
            cex.legend=0.7,
            yaxt=ifelse(!yaxis.first.col.only | tissue.types[1]==tissue.type & dist.labels[1]==dist,"s","n"), # only have y axis in column 1
-           legend=markers.1, span=0.3,
+           legend=markers.1, span=hist.span(scale.factors),
            hist.to.show=1,
            add.minus.50=T
            )

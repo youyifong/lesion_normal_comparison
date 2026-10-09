@@ -81,6 +81,12 @@ dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 tissue.types=c("intact","ulcerative"); names(tissue.types)=tissue.types
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 ylim.ls=list(dist2DEJ=c(0,100), dist2skin=c(0,100))
+# loess in scaled.hist needs floor(n*span) >= 2 points per local fit; with fewer depth bins predict() fails, so skip smoothing
+hist.span=function(scale.factors, span=0.3, bin.width=100, add.minus.50=TRUE) {
+  depths = unlist(lapply(scale.factors, function(x) x$depth))
+  n.bins = if (length(depths)==0) 0 else diff(range(depths))/bin.width + 1
+  if (floor((n.bins + add.minus.50) * span) >= 2) span else NULL
+}
 red=rgb(red=1, blue=0, green=0, alpha=1)
 blue=rgb(red=0, blue=1, green=0, alpha=1)
 
