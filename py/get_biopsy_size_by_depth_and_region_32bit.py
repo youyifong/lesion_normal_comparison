@@ -2,6 +2,7 @@
 Compute the size of biopsy in the unit of 100um x 100um by depth in 200 px (equivalently, 100 um) increments for all biopsies.
 Save the results in Chipcytometry_images_from32bit/biopsy_size_by_depth_and_region.csv. The depth column is the starting point of the bin.
 It takes a long time to run at the default grid size of 5 px, so you can change it to 10 px or 20 px to speed up the process.
+Use --slides SUBJ/SLIDE ... to compute only those slides and merge them into the existing csv (their old rows are replaced).
 """
 
 from shapely.geometry import Polygon, Point
@@ -14,6 +15,8 @@ from tsp.geom import pnt2line
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--grid', type=float, default=5.0, help='size of patches in px')
+parser.add_argument('--slides', nargs='+', metavar='SUBJ/SLIDE',
+                    help='only compute these slides, e.g. RC/RC1_4wph, and merge them into the existing csv')
 args = parser.parse_known_args()[0]
 grid_spacing = args.grid
 
@@ -195,13 +198,19 @@ def do_biopsy(roi_dir):
 
 
 chipcytometry_images_dir = '../Chipcytometry_images_from32bit/'
-children_dirs = [d for d in os.listdir(chipcytometry_images_dir) if os.path.isdir(os.path.join(chipcytometry_images_dir, d))]
-directories = []
-for child in children_dirs:
-    child_path = os.path.join(chipcytometry_images_dir, child)
-    directories.extend(
-        [os.path.join(child, g) for g in os.listdir(child_path) if os.path.isdir(os.path.join(child_path, g))]
-    )
+if args.slides:
+    directories = [s.strip('/') for s in args.slides]
+    missing = [s for s in directories if not os.path.isdir(os.path.join(chipcytometry_images_dir, s))]
+    if missing:
+        raise SystemExit(f"slide folders not found under {chipcytometry_images_dir}: {missing}")
+else:
+    children_dirs = [d for d in os.listdir(chipcytometry_images_dir) if os.path.isdir(os.path.join(chipcytometry_images_dir, d))]
+    directories = []
+    for child in children_dirs:
+        child_path = os.path.join(chipcytometry_images_dir, child)
+        directories.extend(
+            [os.path.join(child, g) for g in os.listdir(child_path) if os.path.isdir(os.path.join(child_path, g))]
+        )
 
 res=[]
 
@@ -269,4 +278,11 @@ for folder in directories:
 
 
 df = pd.DataFrame(res)
-df.to_csv(chipcytometry_images_dir+'/tissue_size_by_depth_and_region.csv', index=False)
+out_file = chipcytometry_images_dir + '/tissue_size_by_depth_and_region.csv'
+if args.slides:
+    if df.empty:
+        raise SystemExit("none of the requested slides were processed; existing csv left unchanged")
+    if os.path.exists(out_file):
+        old = pd.read_csv(out_file)
+        df = pd.concat([old[~old['biopsy'].isin(df['biopsy'])], df], ignore_index=True)
+df.to_csv(out_file, index=False)

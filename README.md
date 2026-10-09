@@ -53,6 +53,9 @@ Marker groups
 # makes Chipcytometry_images_from32bit/tissue_size_by_depth_and_region.csv
 nohup python py/get_biopsy_size_by_depth_and_region_32bit.py --grid 5 &
 
+# add or redo specific slides only; their rows are merged into the existing csv
+nohup python py/get_biopsy_size_by_depth_and_region_32bit.py --grid 5 --slides RC/RC1_4wph DD/DD_2wph &
+
 
 # count each intact/ulcer region within a biopsy separately
 # makes Chipcytometry_images_from32bit/tissue_size_by_depth_and_region_2.csv
