@@ -46,14 +46,15 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
         dat.ls = lapply(tissue.types, function (t) subset(cell_dat[[s]][[a]], region==t)[[dist]])
         # remove empty element
         dat.ls =  dat.ls[sapply(dat.ls, length)>0]
+        scale.factors = lapply(tissue.types, function(t) 
+                      subset(tissue_size, biopsy==s & dist_type==dist & region==t))
         scaled.hist(dat.ls,
-                    scale.factors=lapply(tissue.types, function(t) 
-                      subset(tissue_size, biopsy==s & dist_type==dist & region==t)),
+                    scale.factors=scale.factors,
                     main=ifelse(s==slides[1],a,""),
                     col=(c("blue","red")),
                     # legend=names(dat.ls), # remove legend for publication figure
                     xlim=xlim.ls[[dist]], xlab=dist %.% " (um)", 
-                    ylim=ylim.ls[[dist]], ylab="", span=0.3,
+                    ylim=ylim.ls[[dist]], ylab="", span=hist.span(scale.factors),
                     yaxt=ifelse(a==toplot[1],"s","n"), # only have y axis in column 1
                     hist.to.show=2,
                     add.minus.50 = T
