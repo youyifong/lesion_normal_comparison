@@ -7,6 +7,10 @@ key.markers=c("CD3", "CD15", "CD11c", "CD123", "CD56", "CD68")
 cell_types=c("CD8T", "CD4T", "Treg")
 get.slide.name=function(ss)  sapply(ss, function (s) sub(".*?/(.*)", "\\1", s)) # "DD/DD1_Les" -> DD1_Les
 get.initial=function(ss)  sapply(ss, function (s) sub("^([^0-9_]+).*", "\\1", s) ) # "DD1_Les" -> "DD"
+# timepoint from the slide name suffix, e.g. "CF1_2wph" -> "2wph", "SK3_8wph_in_use" -> "8wph"; NA if the suffix is not in timepoint.map
+timepoint.map = c(Les="Les", H="H", Healed="H", "2wph"="2wph", "4wph"="4wph", "8wph"="8wph", "9wph"="8wph", "8wcon"="8wcon")
+get.timepoint=function(ss) sapply(ss, function (s) unname(timepoint.map[sub("^[A-Za-z]+[0-9]*_([A-Za-z0-9]+).*", "\\1", s)]))
+timepoints = unique(timepoint.map); names(timepoints)=timepoints
 
 depths = c(1000, 500, Inf)
 modes = c("DEJ", "Skin"); names(modes)=modes
@@ -60,6 +64,12 @@ select.slides = c("AS1_Les", "CF1_Les", "CJ1_Les", "DD1_Les", "EB_Les", "JK1_Les
 biopsies=sapply(select.slides, function(x) get.initial(x)); names(biopsies)=biopsies
 avg_slides = glue("{biopsies}_Les_avg")# average norm.counts of all slides from a single biopsy
 slides.by.biopsy = lapply(biopsies, function(b) all.slides[startsWith(all.slides,b)])
+# the same split by timepoint, e.g. slides.by.biopsy.tp$`2wph`$CF; biopsies without a slide at a timepoint are dropped
+slides.by.biopsy.tp = lapply(timepoints, function(tp) {
+  out = lapply(biopsies, function(b) all.slides[get.initial(all.slides)==b & get.timepoint(all.slides) %in% tp])
+  out[sapply(out, length)>0]
+})
+avg_slides.tp = lapply(timepoints, function(tp) as.character(glue("{names(slides.by.biopsy.tp[[tp]])}_{tp}_avg"))) # avg_slides.tp$Les == avg_slides
 
 severity = read.csv("../HSV406/Lesion_HSV_rates_04082025_plus.csv")
 # rename HSV.activity.rate to Activity.rate
@@ -353,12 +363,13 @@ count_dat = lapply(all.slides, function(s) {
 
 
 
-# add avg.slides 
-out = lapply(biopsies, function(b){
+# add avg.slides, one per biopsy and timepoint, e.g. CF_Les_avg, CF_2wph_avg 
+for (tp in timepoints) {
+out = lapply(names(slides.by.biopsy.tp[[tp]]), function(b){
       lapply(depth_vals, function(max_depth) { 
       # b="SA"; max_depth="DEJ1000"; s="SA3_Les"
   
-  slides = slides.by.biopsy[[b]]
+  slides = slides.by.biopsy.tp[[tp]][[b]]
   
   # find the union of markers for slides
   markers=c(); for (s in slides) markers=c(markers, markers.ls[[s]])
@@ -405,9 +416,9 @@ out = lapply(biopsies, function(b){
   list(norm.counts=out, sizes=NA, counts=NA, densities=NA) # no depth density for average slide
 })
 })
-names(out) = glue("{biopsies}_Les_avg")
-
+names(out) = avg_slides.tp[[tp]]
 count_dat = c(count_dat, out)
+}
 
 
 # save the objects except cell_dat to a file
