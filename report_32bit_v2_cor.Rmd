@@ -280,6 +280,8 @@ for (slide_set in c(1,3)) {
 }
 }
 
+save(cnt.tables, file="R/cnt.tables.RData") # printed by report_32bit_v2_density_tables.Rmd
+
 ```
 
 # Multivariate regression with HSV activity rate and shedding rate

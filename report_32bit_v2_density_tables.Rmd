@@ -19,6 +19,7 @@ library(kyotil)
 # library(kableExtra)
 library(glue)
 load("R/forRmd.RData")# load the objects from a file
+load("R/cnt.tables.RData")# made by report_32bit_v2_cor.Rmd, which must be rendered first
 library(knitr)
 ```
 
