@@ -67,8 +67,6 @@ Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png 
 
 
 
-\newpage
-# Correlation with HSV activity rate and shedding rate
 
 Based on the previous report, we decided to 
 
@@ -125,9 +123,6 @@ mylegend(x=1, pch=1:len(biopsies), col=1:len(biopsies), legend=biopsies, cex=.6)
 mylegend(x=2, pch=1:len(biopsies), col=1:len(biopsies), legend=sample_numbers, cex=.6)
 ```
 
-
-\newpage
-
 ```{r correlates, results='asis', echo=FALSE, fig.height=12, fig.width=11, fig.align='center'}
 
 # count_dat comprises a list of slides
@@ -138,7 +133,7 @@ xx=c("DEJ1000", "DEJ500", "Skin1000", "Skin500"); names(xx)=xx
 
 cnt.tables=list() # collect first, print tables after plots
 for (tp in timepoints) { # lesion first, then the post-lesion timepoints
-if (tp!="Les") cat(glue("\n\n\\newpage\n# Correlation by timepoint: {tp}\n\n"))
+cat(glue("\n\n\\newpage\n# Correlation by timepoint: {tp}\n\n"))
 for (marker_set in c(1,3,2)) {
 for (slide_set in c(1,3)) {
   
