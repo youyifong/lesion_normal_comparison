@@ -70,6 +70,14 @@ slides.by.biopsy.tp = lapply(timepoints, function(tp) {
   out[sapply(out, length)>0]
 })
 avg_slides.tp = lapply(timepoints, function(tp) as.character(glue("{names(slides.by.biopsy.tp[[tp]])}_{tp}_avg"))) # avg_slides.tp$Les == avg_slides
+# one representative slide per biopsy and post-lesion timepoint where a biopsy has several slides (Post_heal_representative_slides_10132026.xlsx)
+representative.slides = c("CF2_2wph", "EB2_H", "EB2_2wph", "EB1_4wph", "EB1_8wph", "EW2_H", "EW2_2wph", "EW2_4wph", "LM2_H", "RC1_H", "RC1_2wph", "RC2_4wph", "RC2_8wph", "SK1_4wph", "SK1_8wph")
+select.slides.tp = lapply(timepoints, function(tp) {
+  if (tp=="Les") return(select.slides)
+  out = sapply(slides.by.biopsy.tp[[tp]], function(x) if (length(x)==1) x else { r = intersect(x, representative.slides); if (length(r)==1) r else NA })
+  if (any(is.na(out))) message(glue("{tp}: no representative slide for {concatList(names(out)[is.na(out)], ', ')}; dropped from the select slides"))
+  out = out[!is.na(out)]; names(out)=out; out
+})
 
 severity = read.csv("../HSV406/Lesion_HSV_rates_04082025_plus.csv")
 # rename HSV.activity.rate to Activity.rate

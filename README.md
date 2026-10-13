@@ -36,6 +36,27 @@ The only clone of lesion_normal_comparison is on the cluster.
          - dermis region boundary. Type: polygon. File name example: AS_Les_**dermis_region**_1_normal.roi
 
 
+### Post-lesion slides
+
+Slides with cell data per participant and timepoint (from the marker listing in the 2026-10-12 correlation report; regenerate from `markers.ls` after K adds slides). Brackets flag missing key markers. All `*_8wcon` slides have only the six key markers. Where a participant has several slides at a timepoint, the one used for the select-slide analysis is listed in `Post_heal_representative_slides_10132026.xlsx` and hardcoded as `representative.slides` in `R/data.R`.
+
+| Participant | H | 2wph | 4wph | 8wph | 8wcon |
+|---|---|---|---|---|---|
+| CF | CF_H [no CD68] | CF1_2wph [no CD15/CD56/CD68], CF2_2wph [no CD68] | CF_4wph [no CD68] | CF_8wph [no CD68] | CF1_8wcon [no CD68], CF2_8wcon |
+| DD | DD_H | DD_2wph | DD_4wph | DD_8wph | DD_8wcon |
+| EB | EB1_H, EB2_H | EB1_2wph, EB2_2wph | EB1_4wph, EB2_4wph | EB1_8wph, EB2_8wph | EB_8wcon |
+| EW | EW1_H, EW2_H | EW1_2wph, EW2_2wph | EW1_4wph, EW2_4wph | - | - |
+| JK | - | - | - | JK_8wph (no marker files, excluded) | - |
+| JM | - | - | - | - | JM_8wcon |
+| JT | - | - | - | - | JT_8wcon |
+| LM | LM1_H, LM2_H | LM_2wph | - | LM_9wph (counted as 8wph) | - |
+| LS | - | LS_2wph [no CD56] | LS_4wph [no CD68] | LS_8wph | LS_8wcon |
+| RC | RC1_H, RC2_H | RC1_2wph, RC2_2wph | RC1_4wph, RC2_4wph | RC1_8wph, RC2_8wph | - |
+| SK | SK_H [no CD68] | SK_2wph [no CD68] | SK1_4wph, SK2_4wph [both no CD68] | SK1_8wph [no CD68], SK2_8wph [only CD3], SK3_8wph [only CD3/CD68] | SK_8wcon [no CD68] |
+
+Totals: H 11 slides / 7 participants; 2wph 12 / 8; 4wph 11 / 7; 8wph 12 / 7 usable; 8wcon 8 / 7.
+
+
 ### Background
 
 Marker groups

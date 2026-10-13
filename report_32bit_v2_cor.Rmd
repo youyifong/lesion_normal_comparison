@@ -52,7 +52,14 @@ kable(tab, align = 'c', caption="HSV clinical manifestations.")
 
 ```{r results='asis', echo=FALSE}
 tab = t(sapply(slides.by.biopsy.tp, function(x) c(biopsies=length(x), slides=length(unlist(x)))))
-kable(tab, caption="Number of biopsies and slides per timepoint. Post-lesion timepoints are analyzed as per-biopsy averages across slides.")
+kable(tab, caption="Number of biopsies and slides per timepoint. Post-lesion timepoints are analyzed as select slides (one per biopsy) and as per-biopsy averages across slides.")
+```
+
+```{r results='asis', echo=FALSE}
+parts = sort(unique(unlist(lapply(timepoints[-1], function(tp) names(slides.by.biopsy.tp[[tp]])))))
+tab = sapply(timepoints[-1], function(tp) { x = select.slides.tp[[tp]]; x[match(parts, get.initial(x))] })
+rownames(tab) = parts; tab[is.na(tab)] = "-"
+kable(tab, caption="Select slide per participant and post-lesion timepoint. Where a participant has several slides, the choice follows Post_heal_representative_slides_10132026.xlsx.")
 ```
 The key markers are: CD3 CD11c CD123 CD15 CD56 CD68. 
 
@@ -130,13 +137,13 @@ mylegend(x=2, pch=1:len(biopsies), col=1:len(biopsies), legend=sample_numbers, c
 xx=c("DEJ1000", "DEJ500", "Skin1000", "Skin500"); names(xx)=xx
 
 cnt.tables=list() # collect first, print tables after plots
-for (tp in timepoints) { # lesion first, then the post-lesion timepoints; select slides exist only for lesion
+for (tp in timepoints) { # lesion first, then the post-lesion timepoints
 if (tp!="Les") cat(glue("\n\n\\newpage\n# Correlation by timepoint: {tp}\n\n"))
 for (marker_set in c(1,3,2)) {
-for (slide_set in (if (tp=="Les") c(1,3) else 3)) {
+for (slide_set in c(1,3)) {
   
   if(slide_set==1) {
-    slides=select.slides
+    slides=select.slides.tp[[tp]]
   } else if (slide_set==2) {
     slides=all.slides
   } else {
@@ -263,7 +270,7 @@ for (slide_set in (if (tp=="Les") c(1,3) else 3)) {
       if (iter==1) # only need to do this once because only cnts not rates are collected
         for (x in xx) cnt.tables = append(cnt.tables, list(
           mykable(round(norm.counts[[x]][, -which (names(norm.counts[[x]]) %in% c("initial", "SR"))], ifelse(marker_set==2,2,0)), 
-                caption=paste0(a, ", ", x, ", ", ifelse(slide_set==1, "select slide", if (tp=="Les") "slides average" else paste(tp, "slides average")), ". Normalized counts in different regions: ", ifelse(startsWith(x,"DEJ"), "dermis intact (DI); dermis ulcerative (DU); epidermis intact (EI); epidermis ulcerative (EU)", "intact (I); ulcerative (U)"), ". Total = row sum.")) 
+                caption=paste0(a, ", ", x, ", ", paste0(if (tp=="Les") "" else paste0(tp, " "), ifelse(slide_set==1, "select slide", "slides average")), ". Normalized counts in different regions: ", ifelse(startsWith(x,"DEJ"), "dermis intact (DI); dermis ulcerative (DU); epidermis intact (EI); epidermis ulcerative (EU)", "intact (I); ulcerative (U)"), ". Total = row sum.")) 
         ))
       
     R2.matrix = cbind(R2.matrix, R2)
@@ -271,7 +278,7 @@ for (slide_set in (if (tp=="Les") c(1,3) else 3)) {
       
     } # for a: marker
   
-    mtext(ifelse(slide_set==3, paste0("Average Slides", if (tp=="Les") "" else paste0(" (", tp, ")"), ". "), "Select Slides. ")%.%concatList(toplot.1, ", "), side = 3, outer = TRUE, line = 2, cex = .9)
+    mtext(paste0(ifelse(slide_set==3, "Average Slides", "Select Slides"), if (tp=="Les") "" else paste0(" (", tp, ")"), ". ")%.%concatList(toplot.1, ", "), side = 3, outer = TRUE, line = 2, cex = .9)
     
     cat("\\newpage")
     
