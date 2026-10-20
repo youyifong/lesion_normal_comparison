@@ -303,7 +303,8 @@ for (iter in 1:2) {
       breaks = function(x) seq(1, max(x), by=10), # Optional: Force ticks at every day (1, 2, 3...)
       # expand = expansion(mult = c(0, 0.05))      # Removes the empty padding before Day 1
     )  
-  ggsave(glue("output/clinical_outcome_profile_combined{ifelse(iter==2, '_22', '')}.png"), width = 10, height = 8*ifelse(iter==1,1,22/37))
+  # width 8.6 makes the day spacing equal the dot diameter (measured: 30 px dots 35 px apart at width 10, 300 dpi)
+  ggsave(glue("output/clinical_outcome_profile_combined{ifelse(iter==2, '_22', '')}.png"), width = 8.6, height = 8*ifelse(iter==1,1,22/37))
   
 }
 
