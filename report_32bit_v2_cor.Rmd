@@ -25,7 +25,7 @@ library(knitr)
 
 # Introduction
 
-## Slides and markers
+## Samples and markers
 
 There are `r len(biopsies)` lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion. List of available markers per slide: 
 \bigskip
@@ -42,7 +42,12 @@ The key markers are: CD3 CD11c CD123 CD15 CD56 CD68.
 
 Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. 
 
-## Select slides
+Notes on samples:
+
+- CF1_Les has no CD68
+- RC1_Les, RC2_Les, RC3_Les, and RC_Les_avg have no CD123
+- SA1_Les, SA2_Les, SA3_Les, and SA_Les_avg have no Foxp3, hence no Treg
+- SG1_Les, SG2_Les, SG3_Les, and SG_Les_avg have no Foxp3, hence no Treg
 
 Most lesion biopsies have multiple sections. The following choices of representative slides are made: 
 
@@ -71,7 +76,7 @@ rownames(tab) = parts; tab[is.na(tab)] = "-"
 kable(tab, caption="Select slide per participant and post-lesion timepoint. Where a participant has several slides, the choice follows Post_heal_representative_slides_10132026.xlsx.")
 ```
 
-## Clinical rates
+## Clinical data
 
 The three clinical rates are (column letters refer to `JoinFile_20190719_JZ_KP.xlsx`, the daily record per participant):
 
@@ -81,7 +86,7 @@ The three clinical rates are (column letters refer to `JoinFile_20190719_JZ_KP.x
 
 Column L is the PCR value for one site, the biopsied lesion, on each day; column P is a per-day flag for PCR positivity at any lesion site (the biopsied site in L or a new lesion site in O). The sweep rate and the PCR positivity rate are both PCR-based, the latter pooling all sampled sites; only the activity rate uses diary-reported lesions. The first two rates come from `HSV406/Lesion_HSV_rates_04082025.csv`; the third is computed in `R/plot_shedding_lesion_history.R` from the daily records.
 
-Each point is one participant with a lesion biopsy (AS included); point symbols follow the legend for biopsies at the end of this section. The dashed line is the least-squares fit and the gray line is y = x. Because the PCR positivity rate pools the genital sweep with the lesion sites, it is at least the genital sweep rate for every participant, up to rounding of the sweep rate.
+Each point is one participant with a lesion biopsy (AS included); point symbols follow the legend for biopsies below the panels. The dashed line is the least-squares fit and the gray line is y = x. Because the PCR positivity rate pools the genital sweep with the lesion sites, it is at least the genital sweep rate for every participant, up to rounding of the sweep rate.
 
 ```{r clinical_rates_scatter, echo=FALSE, fig.height=3.8, fig.width=11, fig.align='center'}
 rates = data.frame(
@@ -104,15 +109,20 @@ for (v in list(c("sweep","activity"), c("sweep","pcr"), c("activity","pcr"))) {
 }
 ```
 
-## Clinical outcome profile
+```{r biopsy_legend, fig.height=5, fig.width=5, echo=FALSE}
+empty.plot()
+title(main="Legend for biopsies")
+mylegend(x=1, pch=1:len(biopsies), col=1:len(biopsies), legend=biopsies, cex=.6)
+mylegend(x=2, pch=1:len(biopsies), col=1:len(biopsies), legend=sample_numbers, cex=.6)
+```
 
-Daily records for each participant. Dot color is the largest log10 HSV copy number that day across the biopsy tissue, genital sweep, and lesion-site PCRs (white is a zero value; no dot is a missing sample), and the symbols mark the site of a recorded lesion. Participants are ordered by HSV activity ("With All Day" in the HSV Activity Site sheet of `JoinFile_20190719_JZ_KP.xlsx`), highest at the bottom. The figure is made by `R/plot_shedding_lesion_history.R`.
+The figure below shows the daily records behind these rates. Participants are ordered by "With All Day" in the HSV Activity Site sheet of `JoinFile_20190719_JZ_KP.xlsx`; the figure is made by `R/plot_shedding_lesion_history.R`.
 
-```{r clinical_outcome_profile, echo=FALSE, out.width="100%", fig.align='center'}
+```{r clinical_outcome_profile, echo=FALSE, out.width="100%", fig.align='center', fig.pos='H', fig.cap="Clinical outcome profile. Each row is one participant and each dot one study day, with the lesion visit on day 1. Dot color is the largest log10 HSV copy number that day across the biopsy tissue, genital sweep, and lesion-site PCRs (white, a zero value; no dot, a missing sample). Symbols mark the site of a recorded lesion, from the primary-lesion and new-lesion records; a day with two sites shows both. BUTT, buttocks; PRNL, perianal or perineal; FEM\\_GEN, female genital (labia or mons); GEN, genital; LEG, leg. Participants are ordered by HSV activity, highest at the bottom."}
 knitr::include_graphics("output/clinical_outcome_profile_combined.png")
 ```
 
-## Analysis choices
+## Methods
 
 Based on the previous report, we decided to 
 
@@ -126,7 +136,7 @@ Based on the previous report, we decided to
   - EI
   
 
-## Notes on methods
+Notes on methods:
 
 - Density is the number of cells/mm$^2$. The size of biopsy is on the order of mm$^2$.
 - Depth density function is a function of the number of cells per 100x100 um2 tissue over the distance to skin or DEJ in 100 um increment. Each bin in the histogram represents the count in a 100x100 um2 area. 
@@ -138,18 +148,12 @@ Based on the previous report, we decided to
 - The association is done on intact only. Previously we explored association with ulcerative + intact, but decided to focus on intact
 
 
-## Methods for manuscript
+**Methods for manuscript**:
 
 Cellular density was quantified as the number of cells per mm². To characterize the spatial distribution of cells across tissue depth, we computed a depth density function defined as the number of cells per 100×100 µm² tissue area as a function of distance from the skin surface or dermal-epidermal junction (DEJ), binned in 100 µm increments. To summarize cellular abundance in a manner that accounts for variable tissue geometry, we computed a normalized count, defined as the number of cells in a vertical strip 100 µm wide, which is equivalent to the area under the depth density function. Gaps in the depth density ratio function reflect bins where the denominator is zero. An average slide was computed as the mean normalized count across slides. For average slides, the ratio was computed as the ratio of summed normalized counts across all slides for the two markers of interest. 
 
 
 
-## Notes on samples
-
-- CF1_Les has no CD68
-- RC1_Les, RC2_Les, RC3_Les, and RC_Les_avg have no CD123
-- SA1_Les, SA2_Les, SA3_Les, and SA_Les_avg have no Foxp3, hence no Treg
-- SG1_Les, SG2_Les, SG3_Les, and SG_Les_avg have no Foxp3, hence no Treg
 
 
 ## Notes on results
@@ -162,14 +166,6 @@ Cellular density was quantified as the number of cells per mm². To characterize
 
 <!-- - The CD15 dist2skin peak in DD/lesion is near skin while the corresponding dist2DEJ peak is near DEJ is due to the fact that the DEJ line is very curvy. -->
 
-## Legend for biopsies
-
-```{r biopsy_legend, fig.height=5, fig.width=5, echo=FALSE}
-empty.plot()
-title(main="Legend for biopsies")
-mylegend(x=1, pch=1:len(biopsies), col=1:len(biopsies), legend=biopsies, cex=.6)
-mylegend(x=2, pch=1:len(biopsies), col=1:len(biopsies), legend=sample_numbers, cex=.6)
-```
 
 ```{r correlates, results='asis', echo=FALSE, fig.height=12, fig.width=11, fig.align='center'}
 
