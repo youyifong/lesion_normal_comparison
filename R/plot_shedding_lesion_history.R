@@ -224,7 +224,7 @@ for (iter in 1:2) {
   # shapes chosen to stay distinct when small (circle vs square was not); the dagger is a font glyph,
   # so stroke has no effect on it and it needs a larger size
   site_shapes <- c(BUTT="circle open", PRNL="plus", FEM_GEN="triangle open", GEN="triangle down open", LEG="\u2020")
-  site_sizes  <- c(BUTT=1.6, PRNL=1.6, FEM_GEN=1.6, GEN=1.6, LEG=3.2)
+  site_sizes  <- c(BUTT=.6, PRNL=.6, FEM_GEN=.6, GEN=.6, LEG=1.4)
   
   
   ggplot() +
@@ -247,23 +247,23 @@ for (iter in 1:2) {
   geom_point(
     data = df_sites[!is_dagger, ],
     aes(x = day, y = y_pos, shape = val_chr),
-    size = 1.6,
-    stroke = 1.3,
-    colour = "white",   # <-- halo, drawn for all sites before any glyph; the dagger is larger than the dot and needs none
+    size = .6,
+    stroke = .9,
+    colour = "white",   # <-- halo, drawn for all sites before any glyph; a white copy behind the dagger shows as offset bars, so it has none
     show.legend = FALSE,
     na.rm = TRUE
   ) +
   geom_point(
     data = df_sites[!is_dagger, ],
     aes(x = day, y = y_pos, shape = val_chr, size = val_chr),
-    stroke = .6,
+    stroke = .5,
     colour = "black",
     na.rm = TRUE
   ) +
   geom_point(
     data = df_sites[is_dagger, ],
     aes(x = day, y = y_pos, shape = val_chr, size = val_chr),
-    stroke = .6,        # <-- no effect on the dagger; keeps this layer's legend keys identical to the layer above
+    stroke = .5,        # <-- no effect on the dagger; keeps this layer's legend keys identical to the layer above
     colour = "black",
     na.rm = TRUE
   ) +
