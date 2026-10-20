@@ -240,9 +240,10 @@ for (iter in 1:2) {
   ) +
   scale_color_gradient(
     low = "white", high = "firebrick4", na.value = "transparent",
-    name = "Copy number (log10)"
+    name = "Copy number (log10)",
+    guide = guide_colourbar(theme = theme(legend.key.width = unit(8, "lines")))  # long bar in the horizontal legend
   ) +
-    
+
   # ------------------------------------------------------------------
   # Categorical variable plotted as black glyphs over a white halo, so they stay legible on dark dots
   # while the copy-number color still shows through the open shapes
@@ -294,7 +295,9 @@ for (iter in 1:2) {
     # theme_minimal() +
     theme_gray() +
     theme(
-      legend.position = "right",
+      legend.position = "bottom",
+      legend.box = "horizontal",   # copy-number bar and lesion-site key side by side under the panel
+      legend.title.position = "top",
       axis.text.y = element_text(size = 6),
       axis.title.y = element_blank(),
       axis.ticks.y = element_blank(),
