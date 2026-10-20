@@ -225,6 +225,8 @@ for (iter in 1:2) {
   # so stroke has no effect on it and it needs a larger size
   site_shapes <- c(BUTT="circle open", PRNL="plus", FEM_GEN="triangle open", GEN="triangle down open", LEG="\u2020")
   site_sizes  <- c(BUTT=.6, PRNL=.6, FEM_GEN=.6, GEN=.6, LEG=1.4)
+  site_strokes <- c(BUTT=.25, PRNL=.5, FEM_GEN=.25, GEN=.25, LEG=.5)  # thinner outlines for circle and triangles
+  df_sites$halo_stroke <- site_strokes[as.character(df_sites$val_chr)] + .4    # halo just wider than its glyph
   
   
   ggplot() +
@@ -246,24 +248,21 @@ for (iter in 1:2) {
   # while the copy-number color still shows through the open shapes
   geom_point(
     data = df_sites[!is_dagger, ],
-    aes(x = day, y = y_pos, shape = val_chr),
+    aes(x = day, y = y_pos, shape = val_chr, stroke = I(halo_stroke)),
     size = .6,
-    stroke = .9,
     colour = "white",   # <-- halo, drawn for all sites before any glyph; a white copy behind the dagger shows as offset bars, so it has none
     show.legend = FALSE,
     na.rm = TRUE
   ) +
   geom_point(
     data = df_sites[!is_dagger, ],
-    aes(x = day, y = y_pos, shape = val_chr, size = val_chr),
-    stroke = .5,
+    aes(x = day, y = y_pos, shape = val_chr, size = val_chr, stroke = val_chr),
     colour = "black",
     na.rm = TRUE
   ) +
   geom_point(
     data = df_sites[is_dagger, ],
-    aes(x = day, y = y_pos, shape = val_chr, size = val_chr),
-    stroke = .5,        # <-- no effect on the dagger; keeps this layer's legend keys identical to the layer above
+    aes(x = day, y = y_pos, shape = val_chr, size = val_chr, stroke = val_chr),
     colour = "black",
     na.rm = TRUE
   ) +
@@ -275,7 +274,14 @@ for (iter in 1:2) {
   ) +
   scale_size_manual(
     values = site_sizes,
-    name   = "Lesion site",  # same name as the shape scale, so the two merge into one legend
+    name   = "Lesion site",  # same name as the shape scale, so the scales merge into one legend
+    drop   = FALSE,
+    na.translate = FALSE
+  ) +
+  scale_discrete_manual(
+    aesthetics = "stroke",
+    values = site_strokes,
+    name   = "Lesion site",
     drop   = FALSE,
     na.translate = FALSE
   ) +
