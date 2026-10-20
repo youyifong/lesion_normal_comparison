@@ -3,6 +3,7 @@ title: "report_32bit"
 output: 
   pdf_document:
     number_sections: true
+    toc: true
     includes:
       in_header: header.tex
 header-includes:
@@ -24,6 +25,8 @@ library(knitr)
 
 # Introduction
 
+## Slides and markers
+
 There are `r len(biopsies)` lesion biopsies in total, including AS. Different biopsy samples or even different slices from the same biopsy sample may have different amount of lesion tissues. Some completely lack lesion. List of available markers per slide: 
 \bigskip
 
@@ -34,6 +37,12 @@ print(lapply(markers.ls, function(x) if(length(x)==0) "" else concatList(x, " ")
 ```
 \endgroup
 \bigskip
+
+The key markers are: CD3 CD11c CD123 CD15 CD56 CD68. 
+
+Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. 
+
+## Select slides
 
 Most lesion biopsies have multiple sections. The following choices of representative slides are made: 
 
@@ -50,14 +59,6 @@ rownames(tab)=NULL
 kable(tab, align = 'c', caption="HSV clinical manifestations.")
 ```
 
-The three clinical rates are (column letters refer to `JoinFile_20190719_JZ_KP.xlsx`, the daily record per participant):
-
-- Genital sweep rate (`Shedding.rate`): the fraction of study days on which HSV DNA was detected by PCR in the daily swab of the entire genital area (column K), independent of whether an ulcer was present.
-- HSV activity rate (`Activity.rate`): the fraction of days with any HSV activity, i.e., a PCR-positive day at any lesion site (column P) or a diary-reported lesion day (column Q, from the lesion records in columns J and N); the two are combined in column R.
-- PCR positivity rate (`PCR.positivity.rate`): the fraction of days on which the maximum PCR value across the genital sweep (column K), the biopsied lesion site (column L), and any new lesion site (column O) was positive.
-
-Column L is the PCR value for one site, the biopsied lesion, on each day; column P is a per-day flag for PCR positivity at any lesion site (the biopsied site in L or a new lesion site in O). The sweep rate and the PCR positivity rate are both PCR-based, the latter pooling all sampled sites; only the activity rate uses diary-reported lesions. The first two rates come from `HSV406/Lesion_HSV_rates_04082025.csv`; the third is computed in `R/plot_shedding_lesion_history.R` from the daily records.
-
 ```{r results='asis', echo=FALSE}
 tab = t(sapply(slides.by.biopsy.tp, function(x) c(biopsies=length(x), slides=length(unlist(x)))))
 kable(tab, caption="Number of biopsies and slides per timepoint. Post-lesion timepoints are analyzed as select slides (one per biopsy) and as per-biopsy averages across slides.")
@@ -69,12 +70,41 @@ tab = sapply(timepoints[-1], function(tp) { x = select.slides.tp[[tp]]; x[match(
 rownames(tab) = parts; tab[is.na(tab)] = "-"
 kable(tab, caption="Select slide per participant and post-lesion timepoint. Where a participant has several slides, the choice follows Post_heal_representative_slides_10132026.xlsx.")
 ```
-The key markers are: CD3 CD11c CD123 CD15 CD56 CD68. 
 
-Note that the CD68 antibody stained the epidermis of some tissues. CD68_raw.png is the raw image, and CD68.png is the processed image with reduced epidermis brightness to improve quality of segmentation. 
+## Clinical rates
 
+The three clinical rates are (column letters refer to `JoinFile_20190719_JZ_KP.xlsx`, the daily record per participant):
 
+- Genital sweep rate (`Shedding.rate`): the fraction of study days on which HSV DNA was detected by PCR in the daily swab of the entire genital area (column K), independent of whether an ulcer was present.
+- HSV activity rate (`Activity.rate`): the fraction of days with any HSV activity, i.e., a PCR-positive day at any lesion site (column P) or a diary-reported lesion day (column Q, from the lesion records in columns J and N); the two are combined in column R.
+- PCR positivity rate (`PCR.positivity.rate`): the fraction of days on which the maximum PCR value across the genital sweep (column K), the biopsied lesion site (column L), and any new lesion site (column O) was positive.
 
+Column L is the PCR value for one site, the biopsied lesion, on each day; column P is a per-day flag for PCR positivity at any lesion site (the biopsied site in L or a new lesion site in O). The sweep rate and the PCR positivity rate are both PCR-based, the latter pooling all sampled sites; only the activity rate uses diary-reported lesions. The first two rates come from `HSV406/Lesion_HSV_rates_04082025.csv`; the third is computed in `R/plot_shedding_lesion_history.R` from the daily records.
+
+Each point is one participant with a lesion biopsy (AS included); point symbols follow the legend for biopsies at the end of this section. The dashed line is the least-squares fit and the gray line is y = x. Because the PCR positivity rate pools the genital sweep with the lesion sites, it is at least the genital sweep rate for every participant, up to rounding of the sweep rate.
+
+```{r clinical_rates_scatter, echo=FALSE, fig.height=3.8, fig.width=11, fig.align='center'}
+rates = data.frame(
+    initial  = biopsies
+  , sweep    = severity[match(biopsies, severity$initial), "Shedding.rate"]
+  , activity = severity[match(biopsies, severity$initial), "Activity.rate"]
+  , pcr      = 100*severity[match(biopsies, severity$initial), "PCR.positivity.rate"]
+)
+rate.labels = c(sweep="Genital sweep rate (%)", activity="HSV activity rate (%)", pcr="PCR positivity rate (%)")
+par(mfrow=c(1,3))
+for (v in list(c("sweep","activity"), c("sweep","pcr"), c("activity","pcr"))) {
+  fit.lm = lm(rates[[v[2]]] ~ rates[[v[1]]])
+  p = summary(fit.lm)$coefficients[2,4]
+  plot(rates[[v[1]]], rates[[v[2]]], xlab=rate.labels[v[1]], ylab=rate.labels[v[2]], xlim=c(0,100), ylim=c(0,100),
+       col=match(rates$initial, biopsies), pch=match(rates$initial, biopsies))
+  abline(0, 1, col="gray")
+  abline(fit.lm, lty=2)
+  legend("topleft", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)), paste("p=", formatDouble(p, digits=3))),
+         bty="n", text.col=ifelse(p < 0.05, "red", "black"))
+}
+```
+
+## Analysis choices
 
 Based on the previous report, we decided to 
 
@@ -88,7 +118,7 @@ Based on the previous report, we decided to
   - EI
   
 
-Notes on methods:
+## Notes on methods
 
 - Density is the number of cells/mm$^2$. The size of biopsy is on the order of mm$^2$.
 - Depth density function is a function of the number of cells per 100x100 um2 tissue over the distance to skin or DEJ in 100 um increment. Each bin in the histogram represents the count in a 100x100 um2 area. 
@@ -100,13 +130,13 @@ Notes on methods:
 - The association is done on intact only. Previously we explored association with ulcerative + intact, but decided to focus on intact
 
 
-**Methods for manuscript**:
+## Methods for manuscript
 
 Cellular density was quantified as the number of cells per mm². To characterize the spatial distribution of cells across tissue depth, we computed a depth density function defined as the number of cells per 100×100 µm² tissue area as a function of distance from the skin surface or dermal-epidermal junction (DEJ), binned in 100 µm increments. To summarize cellular abundance in a manner that accounts for variable tissue geometry, we computed a normalized count, defined as the number of cells in a vertical strip 100 µm wide, which is equivalent to the area under the depth density function. Gaps in the depth density ratio function reflect bins where the denominator is zero. An average slide was computed as the mean normalized count across slides. For average slides, the ratio was computed as the ratio of summed normalized counts across all slides for the two markers of interest. 
 
 
 
-Notes on samples:
+## Notes on samples
 
 - CF1_Les has no CD68
 - RC1_Les, RC2_Les, RC3_Les, and RC_Les_avg have no CD123
@@ -114,7 +144,7 @@ Notes on samples:
 - SG1_Les, SG2_Les, SG3_Les, and SG_Les_avg have no Foxp3, hence no Treg
 
 
-Notes on results:
+## Notes on results
 
 - Treg counts from JK1_Les and JK3_Les are quite different: 19 and 161. This led the R2 for Treg/CD3 in DI to be higher for select slides than for average slides. 
 
@@ -123,6 +153,8 @@ Notes on results:
 <!-- - Comparing the CD15 cell distribution in CF between intact and ulcerative, we see that the lesion peak is shifted to the left compared to the normal peak. This pattern is more clear in CF than in DD. We don't see this pattern for CD3. -->
 
 <!-- - The CD15 dist2skin peak in DD/lesion is near skin while the corresponding dist2DEJ peak is near DEJ is due to the fact that the DEJ line is very curvy. -->
+
+## Legend for biopsies
 
 ```{r biopsy_legend, fig.height=5, fig.width=5, echo=FALSE}
 empty.plot()
