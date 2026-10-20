@@ -50,13 +50,13 @@ rownames(tab)=NULL
 kable(tab, align = 'c', caption="HSV clinical manifestations.")
 ```
 
-The three clinical rates are:
+The three clinical rates are (column letters refer to `JoinFile_20190719_JZ_KP.xlsx`, the daily record per participant):
 
-- Genital sweep rate (`Shedding.rate`): the fraction of study days on which HSV DNA was detected by PCR in the daily swab of the entire genital area, independent of whether an ulcer was present.
-- HSV activity rate (`Activity.rate`): the fraction of days with any HSV activity, i.e., a PCR-positive day at any lesion site or a diary-reported lesion day.
-- PCR positivity rate (`PCR.positivity.rate`): the fraction of days on which the maximum PCR value across the genital sweep, the biopsied lesion site, and any new lesion site was positive.
+- Genital sweep rate (`Shedding.rate`): the fraction of study days on which HSV DNA was detected by PCR in the daily swab of the entire genital area (column K), independent of whether an ulcer was present.
+- HSV activity rate (`Activity.rate`): the fraction of days with any HSV activity, i.e., a PCR-positive day at any lesion site (column P) or a diary-reported lesion day (column Q, from the lesion records in columns J and N); the two are combined in column R.
+- PCR positivity rate (`PCR.positivity.rate`): the fraction of days on which the maximum PCR value across the genital sweep (column K), the biopsied lesion site (column L), and any new lesion site (column O) was positive.
 
-The first two come from `HSV406/Lesion_HSV_rates_04082025.csv`; the third is computed in `R/plot_shedding_lesion_history.R` from the daily PCR records.
+Column L is the PCR value for one site, the biopsied lesion, on each day; column P is a per-day flag for PCR positivity at any lesion site (the biopsied site in L or a new lesion site in O). The sweep rate and the PCR positivity rate are both PCR-based, the latter pooling all sampled sites; only the activity rate uses diary-reported lesions. The first two rates come from `HSV406/Lesion_HSV_rates_04082025.csv`; the third is computed in `R/plot_shedding_lesion_history.R` from the daily records.
 
 ```{r results='asis', echo=FALSE}
 tab = t(sapply(slides.by.biopsy.tp, function(x) c(biopsies=length(x), slides=length(unlist(x)))))
