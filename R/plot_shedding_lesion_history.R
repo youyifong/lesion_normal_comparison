@@ -209,14 +209,15 @@ for (iter in 1:2) {
   # Combine
   shedding_plot_data_combined <- bind_rows(df_value, df_value2, df_value3)
   
-  # CATEGORICAL AS HOLLOW FOREGROUND SYMBOLS (no background tiles)
+  # CATEGORICAL AS FOREGROUND SYMBOLS (no background tiles)
   df_cat <- subset(shedding_plot_data_combined, variable == "value2")
   df_cat$val_chr <- factor(df_cat$val_chr, levels=c("BUTT", "PRNL", "FEM_GEN", "GEN", "LEG"))  # ensure factor
   df_cat3 <- subset(shedding_plot_data_combined, variable == "value3")
   df_cat3$val_chr <- factor(df_cat3$val_chr, levels=c("BUTT", "PRNL", "FEM_GEN", "GEN", "LEG"))  # ensure factor
-  
-  # pick hollow shapes (21–25 support outline + fill)
-  shape_vals <- c(21, 22, 24, 25, 23, 21)
+
+  # site is encoded by shape and fill; fills avoid the red copy-number ramp and pass a colorblind check as a set
+  site_shapes <- c(BUTT=21, PRNL=22, FEM_GEN=24, GEN=25, LEG=23)
+  site_fills  <- c(BUTT="#2a78d6", PRNL="#1baf7a", FEM_GEN="#eda100", GEN="#008300", LEG="#0b0b0b")
   
   
   ggplot() +
@@ -234,31 +235,35 @@ for (iter in 1:2) {
   ) +
     
   # ------------------------------------------------------------------
-  # Categorical variable now plotted as SHAPE-only foreground symbols
+  # Categorical variable plotted as foreground symbols, smaller than the dot so the copy-number color shows around them
   # column N first, so that primary site will not be overridden by new site
   geom_point(
     data = df_cat3,
-    aes(x = day, y = y_pos, shape = val_chr),
-    size = .6,
-    stroke =.5,
-    fill = NA,          # <-- hollow centers (transparent)
-    colour = "black",   # <-- outline color fixed (not mapped)
+    aes(x = day, y = y_pos, shape = val_chr, fill = val_chr),
+    size = 1.8,
+    stroke = .5,
+    colour = "white",   # <-- white ring keeps the symbol legible on dark dots
     na.rm = TRUE
   ) +
   geom_point(
     data = df_cat,
-    aes(x = day, y = y_pos, shape = val_chr),
-    size = .6,
-    stroke =.5,
-    fill = NA,          # <-- hollow centers (transparent)
-    colour = "black",   # <-- outline color fixed (not mapped)
+    aes(x = day, y = y_pos, shape = val_chr, fill = val_chr),
+    size = 1.8,
+    stroke = .5,
+    colour = "white",
     na.rm = TRUE
   ) +
   scale_shape_manual(
-    values = shape_vals,
+    values = site_shapes,
     name   = "Lesion site",
     drop   = FALSE,
     na.translate = FALSE   # <--- HIDE NA from the legend
+  ) +
+  scale_fill_manual(
+    values = site_fills,
+    name   = "Lesion site",  # same name as the shape scale, so the two merge into one legend
+    drop   = FALSE,
+    na.translate = FALSE
   ) +
   
   ggnewscale::new_scale_color() +  # keep this (now switching cleanly to numeric layer)
