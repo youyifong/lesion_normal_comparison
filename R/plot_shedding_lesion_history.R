@@ -215,9 +215,16 @@ for (iter in 1:2) {
   df_cat3 <- subset(shedding_plot_data_combined, variable == "value3")
   df_cat3$val_chr <- factor(df_cat3$val_chr, levels=c("BUTT", "PRNL", "FEM_GEN", "GEN", "LEG"))  # ensure factor
 
-  # site is encoded by shape and fill; fills avoid the red copy-number ramp and pass a colorblind check as a set
-  site_shapes <- c(BUTT=21, PRNL=22, FEM_GEN=24, GEN=25, LEG=23)
-  site_fills  <- c(BUTT="#2a78d6", PRNL="#1baf7a", FEM_GEN="#eda100", GEN="#008300", LEG="#0b0b0b")
+  # column N first, then J, so that primary site will not be overridden by new site;
+  # open and line glyphs are see-through, so a day with two sites shows both
+  df_sites <- rbind(df_cat3, df_cat)
+  # ggplot cannot mix a one-character shape with named shapes in one layer, so the dagger gets its own layers
+  is_dagger <- df_sites$val_chr %in% "LEG"
+
+  # shapes chosen to stay distinct when small (circle vs square was not); the dagger is a font glyph,
+  # so stroke has no effect on it and it needs a larger size
+  site_shapes <- c(BUTT="circle open", PRNL="plus", FEM_GEN="triangle open", GEN="triangle down open", LEG="\u2020")
+  site_sizes  <- c(BUTT=1.6, PRNL=1.6, FEM_GEN=1.6, GEN=1.6, LEG=3.2)
   
   
   ggplot() +
@@ -235,22 +242,29 @@ for (iter in 1:2) {
   ) +
     
   # ------------------------------------------------------------------
-  # Categorical variable plotted as foreground symbols, smaller than the dot so the copy-number color shows around them
-  # column N first, so that primary site will not be overridden by new site
+  # Categorical variable plotted as black glyphs over a white halo, so they stay legible on dark dots
+  # while the copy-number color still shows through the open shapes
   geom_point(
-    data = df_cat3,
-    aes(x = day, y = y_pos, shape = val_chr, fill = val_chr),
-    size = 1.8,
-    stroke = .5,
-    colour = "white",   # <-- white ring keeps the symbol legible on dark dots
+    data = df_sites[!is_dagger, ],
+    aes(x = day, y = y_pos, shape = val_chr),
+    size = 1.6,
+    stroke = 1.3,
+    colour = "white",   # <-- halo, drawn for all sites before any glyph; the dagger is larger than the dot and needs none
+    show.legend = FALSE,
     na.rm = TRUE
   ) +
   geom_point(
-    data = df_cat,
-    aes(x = day, y = y_pos, shape = val_chr, fill = val_chr),
-    size = 1.8,
-    stroke = .5,
-    colour = "white",
+    data = df_sites[!is_dagger, ],
+    aes(x = day, y = y_pos, shape = val_chr, size = val_chr),
+    stroke = .6,
+    colour = "black",
+    na.rm = TRUE
+  ) +
+  geom_point(
+    data = df_sites[is_dagger, ],
+    aes(x = day, y = y_pos, shape = val_chr, size = val_chr),
+    stroke = .6,        # <-- no effect on the dagger; keeps this layer's legend keys identical to the layer above
+    colour = "black",
     na.rm = TRUE
   ) +
   scale_shape_manual(
@@ -259,8 +273,8 @@ for (iter in 1:2) {
     drop   = FALSE,
     na.translate = FALSE   # <--- HIDE NA from the legend
   ) +
-  scale_fill_manual(
-    values = site_fills,
+  scale_size_manual(
+    values = site_sizes,
     name   = "Lesion site",  # same name as the shape scale, so the two merge into one legend
     drop   = FALSE,
     na.translate = FALSE
