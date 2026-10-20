@@ -12,3 +12,4 @@ report/report.out
 *.bak
 .Rhistory
 .idea
+.claude/settings.local.json
