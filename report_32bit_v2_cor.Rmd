@@ -226,7 +226,7 @@ for (slide_set in c(1,3)) {
             paste("R2=", round(summary(fit.lm)$r.squared, 3)),
             # extract p value from fit.lm
             paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
-          ), bty="n")
+          ), bty="n", text.col=ifelse(summary(fit.lm)$coefficients[2,4] < 0.05, "red", "black"))
           # add a line for the fit
           abline(fit.lm, col="black", lty=2)
         })
@@ -243,7 +243,7 @@ for (slide_set in c(1,3)) {
         legend("topright", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)),
           # extract p value from fit.lm
           paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
-        ), bty="n")
+        ), bty="n", text.col=ifelse(summary(fit.lm)$coefficients[2,4] < 0.05, "red", "black"))
         # add a line for the fit
         abline(fit.lm, col="black", lty=2)
       })}
@@ -258,7 +258,7 @@ for (slide_set in c(1,3)) {
         legend("topright", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)),
           # extract p value from fit.lm
           paste("p=", formatDouble(summary(fit.lm)$coefficients[2,4], digits=3))
-        ), bty="n")
+        ), bty="n", text.col=ifelse(summary(fit.lm)$coefficients[2,4] < 0.05, "red", "black"))
         # add a line for the fit
         abline(fit.lm, col="black", lty=2)
       })
