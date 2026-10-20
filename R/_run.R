@@ -11,14 +11,7 @@ source("R/data.R") # writes a Rdata file with the data
 }
 
 
-# density curves
-source("R/compare_intact_ulcerative.R")
-source("R/compare_markers.R")
-#source("R/compare_biopsies.R")
-rmarkdown::render("report_32bit_v2_density_curves.Rmd", output_file = sprintf("reports/report_32bit_v2_density_curves_%s.pdf", format(Sys.Date(), "%Y%m%d")))
-
-
-# clinical; makes output/clinical_outcome_profile_combined.png, which the correlation report includes
+# clinical 
 source("R/plot_shedding_lesion_history.R")
 
 
@@ -26,8 +19,17 @@ source("R/plot_shedding_lesion_history.R")
 rmarkdown::render("report_32bit_v2_cor.Rmd", output_file = sprintf("reports/report_32bit_v2_cor_%s.pdf", format(Sys.Date(), "%Y%m%d")))
 
 
+# density curves
+source("R/compare_intact_ulcerative.R")
+source("R/compare_markers.R")
+#source("R/compare_biopsies.R")
+rmarkdown::render("report_32bit_v2_density_curves.Rmd", output_file = sprintf("reports/report_32bit_v2_density_curves_%s.pdf", format(Sys.Date(), "%Y%m%d")))
+
+
+
 source("R/make_counts_tables.R") 
 rmarkdown::render("report_32bit_v2_density_tables.Rmd", output_file = sprintf("reports/report_32bit_v2_density_tables_%s.pdf", format(Sys.Date(), "%Y%m%d")))
+
 
 
 # for manus
