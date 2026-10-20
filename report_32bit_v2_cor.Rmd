@@ -104,6 +104,14 @@ for (v in list(c("sweep","activity"), c("sweep","pcr"), c("activity","pcr"))) {
 }
 ```
 
+## Clinical outcome profile
+
+Daily records for each participant. Dot color is the largest log10 HSV copy number that day across the biopsy tissue, genital sweep, and lesion-site PCRs (white is a zero value; no dot is a missing sample), and the symbols mark the site of a recorded lesion. Participants are ordered by HSV activity ("With All Day" in the HSV Activity Site sheet of `JoinFile_20190719_JZ_KP.xlsx`), highest at the bottom. The figure is made by `R/plot_shedding_lesion_history.R`.
+
+```{r clinical_outcome_profile, echo=FALSE, out.width="100%", fig.align='center'}
+knitr::include_graphics("output/clinical_outcome_profile_combined.png")
+```
+
 ## Analysis choices
 
 Based on the previous report, we decided to 
