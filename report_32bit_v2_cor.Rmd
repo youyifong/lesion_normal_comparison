@@ -50,6 +50,14 @@ rownames(tab)=NULL
 kable(tab, align = 'c', caption="HSV clinical manifestations.")
 ```
 
+The three clinical rates are:
+
+- Genital sweep rate (`Shedding.rate`): the fraction of study days on which HSV DNA was detected by PCR in the daily swab of the entire genital area, independent of whether an ulcer was present.
+- HSV activity rate (`Activity.rate`): the fraction of days with any HSV activity, i.e., a PCR-positive day at any lesion site or a diary-reported lesion day.
+- PCR positivity rate (`PCR.positivity.rate`): the fraction of days on which the maximum PCR value across the genital sweep, the biopsied lesion site, and any new lesion site was positive.
+
+The first two come from `HSV406/Lesion_HSV_rates_04082025.csv`; the third is computed in `R/plot_shedding_lesion_history.R` from the daily PCR records.
+
 ```{r results='asis', echo=FALSE}
 tab = t(sapply(slides.by.biopsy.tp, function(x) c(biopsies=length(x), slides=length(unlist(x)))))
 kable(tab, caption="Number of biopsies and slides per timepoint. Post-lesion timepoints are analyzed as select slides (one per biopsy) and as per-biopsy averages across slides.")
