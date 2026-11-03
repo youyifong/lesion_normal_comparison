@@ -18,6 +18,9 @@ source("R/plot_shedding_lesion_history.R")
 # correlation study; also saves R/cnt.tables.RData, which the tables report loads
 rmarkdown::render("report_32bit_v2_cor.Rmd", output_file = sprintf("reports/report_32bit_v2_cor_%s.pdf", format(Sys.Date(), "%Y%m%d")))
 
+# marker trajectories over timepoints, and 8wph versus 8wcon
+rmarkdown::render("report_32bit_v2_longitudinal.Rmd", output_file = sprintf("reports/report_32bit_v2_longitudinal_%s.pdf", format(Sys.Date(), "%Y%m%d")))
+
 
 # density curves
 source("R/compare_intact_ulcerative.R")
