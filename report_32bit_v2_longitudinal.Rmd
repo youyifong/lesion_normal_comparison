@@ -29,7 +29,7 @@ regions = list(
   , c("Skin500",  "I",  "I (Skin500)")
   , c("DEJ1000",  "EI", "EI")
 )
-marker.sets = list("Key markers"=key.markers, "T cell subsets"=cell_types)
+marker.sets = list("Key markers"=key.markers) # T cell subsets are rarely available after the lesion visit
 slide.sets = c(select="Select slides", avg="Average slides")
 tp.slides = function(slide_set, tp) if (slide_set=="select") select.slides.tp[[tp]] else avg_slides.tp[[tp]]
 
@@ -51,8 +51,8 @@ get.long = function(slide_set, a, region) {
   matrix(out, nrow=length(biopsies), dimnames=list(biopsies, timepoints))
 }
 
-# lesion through 8wph are connected; 8wcon, from a different site, is drawn apart
-tp.connected = setdiff(timepoints, "8wcon")
+# trajectories run from lesion through 8wph; 8wcon, from a different site, is only used in the 8wph comparison
+tp.trajectory = setdiff(timepoints, "8wcon")
 ```
 
 # Introduction
@@ -80,53 +80,46 @@ mylegend(x=2, pch=1:len(biopsies), col=1:len(biopsies), legend=sample_numbers, c
 
 # Marker trajectories over time
 
-Each row is a marker and each column a region. In the first figure of each pair, each participant's normalized counts are joined by a line from the lesion visit through 8 weeks post-heal; a line skips a missing timepoint. The 8 week control (8wcon) is shown to the right of the dotted line and is not joined, because it comes from a different site. The second figure pools participants: a box plot of all values at each timepoint, with the individual points overlaid. Lesion has many more participants than the later timepoints, so differences in spread partly reflect sample size.
+Each row is a marker and each column a region. Each participant's normalized counts are joined by a line from the lesion visit through 8 weeks post-heal; a line skips a missing timepoint. The 8 week control (8wcon) is left out because it comes from a different site; it is compared with 8wph in the next section. The gray box behind each timepoint pools all participants at that timepoint (median, quartiles, and whiskers to the most extreme value within 1.5 interquartile ranges). Lesion has many more participants than the later timepoints, so differences in spread partly reflect sample size.
 
 ```{r trajectories, results='asis', echo=FALSE, fig.height=11, fig.width=9, out.width='100%', fig.pos='H', fig.align='center'}
 for (slide_set in names(slide.sets)) {
 for (set in names(marker.sets)) {
   toplot = marker.sets[[set]]
 
-  for (pooled in c(FALSE, TRUE)) {
-    cat(glue("\n\n## {slide.sets[slide_set]}, {set}{ifelse(pooled, ', pooled', '')}\n\n"))
-    par(mfrow=c(6,length(regions)), oma=c(0,0,3,0))
-    reduce_margin()
+  cat(glue("\n\n## {slide.sets[slide_set]}, {set}\n\n"))
+  par(mfrow=c(6,length(regions)), oma=c(0,0,3,0))
+  reduce_margin()
+  par(mar=c(3.5, 3, 2, 1)) # room for the vertical timepoint labels
 
-    for (a in toplot) {
-      for (region in regions) {
-        dat = get.long(slide_set, a, region)
-        if (all(is.na(dat))) {empty.plot(); title(main=glue("{a}, {region[3]}: no data"), cex.main=.9); next}
+  for (a in toplot) {
+    for (region in regions) {
+      dat = get.long(slide_set, a, region)[, tp.trajectory, drop=F]
+      if (all(is.na(dat))) {empty.plot(); title(main=glue("{a}, {region[3]}: no data"), cex.main=.9); next}
 
-        x = seq_along(timepoints)
-        plot(range(x), range(dat, na.rm=T), type="n", xaxt="n", xlab="", ylab=a, main=glue("Normalized Count {region[3]}"), cex.main=.9)
-        axis(1, at=x, labels=timepoints, cex.axis=.8)
-        abline(v=length(tp.connected)+.5, lty=3, col="gray")
+      x = seq_along(tp.trajectory)
+      plot(range(x)+c(-.4,.4), range(dat, na.rm=T), type="n", xaxt="n", xlab="", ylab=a, main=glue("Normalized Count {region[3]}"), cex.main=.9)
+      axis(1, at=x, labels=tp.trajectory, cex.axis=.8, las=2) # vertical so that every timepoint label fits
 
-        if (!pooled) {
-          for (b in rownames(dat)) {
-            y = dat[b, tp.connected]; ok = !is.na(y)
-            if (sum(ok)>1) lines(x[seq_along(tp.connected)][ok], y[ok], col=match(b, biopsies))
-          }
-          points(rep(x, each=nrow(dat)), dat, col=match(rownames(dat), biopsies), pch=match(rownames(dat), biopsies))
-        } else {
-          boxplot(lapply(timepoints, function(tp) dat[,tp]), at=x, add=TRUE, xaxt="n", yaxt="n", outline=FALSE, border="gray50", col=NA)
-          # jitter so participants at the same timepoint do not overlap
-          set.seed(1)
-          points(rep(x, each=nrow(dat)) + runif(length(dat), -.2, .2), dat, col=match(rownames(dat), biopsies), pch=match(rownames(dat), biopsies))
-        }
+      # boxes first so that the participant lines and points are drawn on top
+      boxplot(lapply(tp.trajectory, function(tp) dat[,tp]), at=x, add=TRUE, xaxt="n", yaxt="n", outline=FALSE, border="gray60", col="gray92", boxwex=.6, staplewex=0, lty=1)
+      for (b in rownames(dat)) {
+        y = dat[b, ]; ok = !is.na(y)
+        if (sum(ok)>1) lines(x[ok], y[ok], col=match(b, biopsies))
       }
+      points(rep(x, each=nrow(dat)), dat, col=match(rownames(dat), biopsies), pch=match(rownames(dat), biopsies))
     }
-
-    mtext(glue("{slide.sets[slide_set]}. {ifelse(pooled, 'Pooled by timepoint', 'Trajectories by participant')}. ") %.% concatList(toplot, ", "), side=3, outer=TRUE, line=1, cex=.9)
-    cat("\n\n\\newpage\n\n")
   }
+
+  mtext(glue("{slide.sets[slide_set]}. Trajectories by participant. ") %.% concatList(toplot, ", "), side=3, outer=TRUE, line=1, cex=.9)
+  cat("\n\n\\newpage\n\n")
 }
 }
 ```
 
 # 8 week post-heal versus 8 week control
 
-Each point is one participant with both an 8 week post-heal (8wph) and an 8 week control (8wcon) biopsy. In the first figure of each pair, the x-axis is the control count and the y-axis is the post-heal count; points above the gray y = x line have more cells at the site of the earlier lesion. The legend gives the number of pairs and the p value from a two-sided Wilcoxon signed-rank test of the paired difference, in red when p < 0.05. The second figure plots the paired difference (8wph minus 8wcon) against the genital sweep rate, to check whether the post-heal site has more cells in participants who shed more. The dashed line is the least-squares fit. Panels with fewer than 3 pairs are left empty, and a marker set with no such panel is skipped. With n pairs the smallest possible signed-rank p value is 2/2^n, i.e., 0.125 for 4 pairs and 0.0625 for 5, so this test cannot reach p < 0.05 with fewer than 6 pairs.
+Each point is one participant with both an 8 week post-heal (8wph) and an 8 week control (8wcon) biopsy. The x-axis is the control count and the y-axis is the post-heal count; points above the gray y = x line have more cells at the site of the earlier lesion. The legend gives the number of pairs and the p value from a two-sided Wilcoxon signed-rank test of the paired difference; the legend is red when p < 0.05. Panels with fewer than 3 pairs are left empty, and a marker set with no such panel is skipped. With n pairs the smallest possible signed-rank p value is 2/2^n, i.e., 0.125 for 4 pairs and 0.0625 for 5, so this test cannot reach p < 0.05 with fewer than 6 pairs.
 
 ```{r ph_vs_con, results='asis', echo=FALSE, fig.height=11, fig.width=9, out.width='100%', fig.pos='H', fig.align='center'}
 for (slide_set in names(slide.sets)) {
@@ -135,40 +128,27 @@ for (set in names(marker.sets)) {
   n.pairs = sapply(toplot, function(a) sapply(regions, function(region) sum(complete.cases(get.long(slide_set, a, region)[, c("8wph","8wcon"), drop=F]))))
   if (all(n.pairs < 3)) {cat(glue("\n\n## {slide.sets[slide_set]}, {set}\n\nFewer than 3 participants have both 8wph and 8wcon values for any of these markers.\n\n")); next}
 
-  for (vs.rate in c(FALSE, TRUE)) {
-    cat(glue("\n\n## {slide.sets[slide_set]}, {set}{ifelse(vs.rate, ', difference versus genital sweep rate', '')}\n\n"))
-    par(mfrow=c(6,length(regions)), oma=c(0,0,3,0))
-    reduce_margin()
+  cat(glue("\n\n## {slide.sets[slide_set]}, {set}\n\n"))
+  par(mfrow=c(6,length(regions)), oma=c(0,0,3,0))
+  reduce_margin()
 
-    for (a in toplot) {
-      for (region in regions) {
-        dat = get.long(slide_set, a, region)[, c("8wph","8wcon")]
-        dat = dat[complete.cases(dat), , drop=F]
-        if (nrow(dat)<3) {empty.plot(); title(main=glue("{a}, {region[3]}: {nrow(dat)} pairs"), cex.main=.9); next}
-        col = match(rownames(dat), biopsies); pch = col
+  for (a in toplot) {
+    for (region in regions) {
+      dat = get.long(slide_set, a, region)[, c("8wph","8wcon")]
+      dat = dat[complete.cases(dat), , drop=F]
+      if (nrow(dat)<3) {empty.plot(); title(main=glue("{a}, {region[3]}: {nrow(dat)} pairs"), cex.main=.9); next}
+      col = match(rownames(dat), biopsies); pch = col
 
-        if (!vs.rate) {
-          p = suppressWarnings(wilcox.test(dat[,"8wph"], dat[,"8wcon"], paired=TRUE)$p.value)
-          lim = range(dat)
-          plot(dat[,"8wcon"], dat[,"8wph"], xlim=lim, ylim=lim, xlab=glue("{a}, 8wcon"), ylab=glue("{a}, 8wph"), main=glue("Normalized Count {region[3]}"), cex.main=.9, col=col, pch=pch)
-          abline(0, 1, col="gray")
-          legend("topleft", legend=c(glue("n= {nrow(dat)}"), paste("p=", formatDouble(p, digits=3))), bty="n", text.col=c("black", ifelse(p < 0.05, "red", "black")))
-        } else {
-          diff = dat[,"8wph"] - dat[,"8wcon"]
-          SR = severity[match(rownames(dat), severity$initial), "Shedding.rate"]
-          fit.lm = lm(diff ~ SR)
-          p = summary(fit.lm)$coefficients[2,4]
-          plot(SR, diff, xlab="Shedding.rate", ylab=glue("{a}, 8wph - 8wcon"), main=glue("Normalized Count {region[3]}"), cex.main=.9, col=col, pch=pch)
-          abline(h=0, col="gray")
-          abline(fit.lm, lty=2)
-          legend("topleft", legend=c(paste("R2=", round(summary(fit.lm)$r.squared, 3)), paste("p=", formatDouble(p, digits=3))), bty="n", text.col=ifelse(p < 0.05, "red", "black"))
-        }
-      }
+      p = suppressWarnings(wilcox.test(dat[,"8wph"], dat[,"8wcon"], paired=TRUE)$p.value)
+      lim = range(dat)
+      plot(dat[,"8wcon"], dat[,"8wph"], xlim=lim, ylim=lim, xlab=glue("{a}, 8wcon"), ylab=glue("{a}, 8wph"), main=glue("Normalized Count {region[3]}"), cex.main=.9, col=col, pch=pch)
+      abline(0, 1, col="gray")
+      legend("topleft", legend=c(glue("n= {nrow(dat)}"), paste("p=", formatDouble(p, digits=3))), bty="n", text.col=ifelse(p < 0.05, "red", "black"))
     }
-
-    mtext(glue("{slide.sets[slide_set]}. {ifelse(vs.rate, '8wph - 8wcon versus genital sweep rate', '8wph versus 8wcon')}. ") %.% concatList(toplot, ", "), side=3, outer=TRUE, line=1, cex=.9)
-    cat("\n\n\\newpage\n\n")
   }
+
+  mtext(glue("{slide.sets[slide_set]}. 8wph versus 8wcon. ") %.% concatList(toplot, ", "), side=3, outer=TRUE, line=1, cex=.9)
+  cat("\n\n\\newpage\n\n")
 }
 }
 ```
