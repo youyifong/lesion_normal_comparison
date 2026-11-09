@@ -4,6 +4,7 @@
 # ulcerative/intact x DD/CF
 
 dir.exists("output/figures") || dir.create("output/figures", recursive = TRUE)
+if (!exists("fig.suffix")) fig.suffix = "" # set by _run.R, e.g. "_ylim10"
 
 # flag for adding y axis only in the first column
 yaxis.first.col.only=F
@@ -36,7 +37,7 @@ for (biopsy in c("select_slides", biopsies)) {
     slides = slides.by.biopsy[[biopsy]]
   }
   
-  mypng(mfrow=c(length(slides),4), file=glue("output/figures/compare_markers_{biopsy}_set{marker_set}"), 
+  mypng(mfrow=c(length(slides),4), file=glue("output/figures/compare_markers_{biopsy}_set{marker_set}{fig.suffix}"),
         res=700, type = "cairo",
         width=8*ifelse(marker_set==3,1.15,1), height=4/2*length(slides), 
         # mar=c(4,ifelse(marker_set==3,2,0),2,0), # superceded by reduce_margin

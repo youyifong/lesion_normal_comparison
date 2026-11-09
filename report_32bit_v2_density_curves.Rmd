@@ -10,6 +10,8 @@ header-includes:
   - \counterwithin{table}{section}
   - \counterwithin{figure}{section}
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
+params:
+  fig_suffix: ""
 ---
 <!-- This file can be rendered in Rstudio on Windows using files from the remote drive or from command line on the Hutch server -->
 
@@ -19,12 +21,13 @@ library(kyotil)
 # library(kableExtra)
 library(glue)
 load("R/forRmd.RData")# load the objects from a file
+sfx = params$fig_suffix # "" or "_ylim10", the figure version made by _run.R
 library(knitr)
 ```
 
 <!-- # Depth density function -->
 
-The y-axis of the density curves runs to 100 cells/100x100 um2 for lesion slides and to 10 for slides from the other timepoints (H, 2wph, 4wph, 8wph, 8wcon), which have far fewer cells. Values above the limit are cut off.
+`r if (sfx=="_ylim10") "The y-axis of the density curves runs to 100 cells/100x100 um2 for lesion slides and to 10 for slides from the other timepoints (H, 2wph, 4wph, 8wph, 8wcon), which have far fewer cells. Values above the limit are cut off." else "The y-axis of the density curves runs to 100 cells/100x100 um2 for all slides; a companion report (file name ending in ylim10) shows the post-lesion slides on a 0-10 scale."`
 
 
 # Intact vs. ulcerative - select slides
@@ -33,13 +36,13 @@ In this subsection, there are two sets of figures, one for dist2skin and one for
 
 \newpage
 ```{r intact+ulcer select, results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set1.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set2.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set3.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set1"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set2"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_select_slides_set3"%.%sfx%.%".png}\\end{figure}\n")
 
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set1.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set2.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set3.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set1"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set2"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_select_slides_set3"%.%sfx%.%".png}\\end{figure}\n")
 ```
 
 # Intact vs. ulcerative - lesion slides
@@ -48,13 +51,13 @@ In this subsection, there are two sets of figures, one for dist2skin and one for
 
 \newpage
 ```{r intact+ulcer lesion, results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set1.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set2.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set3.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set1"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set2"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_lesion_slides_set3"%.%sfx%.%".png}\\end{figure}\n")
 
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set1.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set2.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set3.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set1"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set2"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_lesion_slides_set3"%.%sfx%.%".png}\\end{figure}\n")
 ```
 
 # Intact vs. ulcerrative - all slides
@@ -65,13 +68,13 @@ In this subsection, each figure shows all slides from a single biopsy.
 ```{r intact+ulcer all, results='asis', echo=FALSE}
 for (b in biopsies) {
   cat("## ", b, "\n")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set1.png}\\end{figure}\n\\newpage")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set2.png}\\end{figure}\n\\newpage")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set3.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set1"%.%sfx%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set2"%.%sfx%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2skin_"%.%b%.%"_set3"%.%sfx%.%".png}\\end{figure}\n\\newpage")
   
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set1.png}\\end{figure}\n\\newpage")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set2.png}\\end{figure}\n\\newpage")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set3.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set1"%.%sfx%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set2"%.%sfx%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_normal_lesion_dist2DEJ_"%.%b%.%"_set3"%.%sfx%.%".png}\\end{figure}\n\\newpage")
 }
 ```
 
@@ -81,9 +84,9 @@ In this subsection, there is one figure showing 13 representative slides.
 
 
 ```{r results='asis', echo=FALSE}
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set1.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set2.png}\\end{figure}\n")
-cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set3.png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set1"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set2"%.%sfx%.%".png}\\end{figure}\n")
+cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_select_slides_set3"%.%sfx%.%".png}\\end{figure}\n")
 ```
 
 # Markers comparison - all slides
@@ -94,9 +97,9 @@ In this subsection, each figure shows all slides from a single biopsy.
 ```{r, results='asis', echo=FALSE}
 for (b in biopsies) {
   cat("## ", b, "\n")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set1.png}\\end{figure}\n\\newpage")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set2.png}\\end{figure}\n\\newpage")
-  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set3.png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set1"%.%sfx%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set2"%.%sfx%.%".png}\\end{figure}\n\\newpage")
+  cat("\\begin{figure}[H]\n\\centering\n\\includegraphics[width=\\textwidth]{output/figures/compare_markers_"%.%b%.%"_set3"%.%sfx%.%".png}\\end{figure}\n\\newpage")
 }
 ```
         

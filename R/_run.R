@@ -19,11 +19,15 @@ source("R/plot_shedding_lesion_history.R")
 rmarkdown::render("report_32bit_v2_cor.Rmd", output_file = sprintf("reports/report_32bit_v2_cor_%s.pdf", format(Sys.Date(), "%Y%m%d")))
 
 
-# density curves
-source("R/compare_intact_ulcerative.R")
-source("R/compare_markers.R")
-#source("R/compare_biopsies.R")
-rmarkdown::render("report_32bit_v2_density_curves.Rmd", output_file = sprintf("reports/report_32bit_v2_density_curves_ylim10_%s.pdf", format(Sys.Date(), "%Y%m%d")))
+# density curves, in two versions: post-lesion slides on the lesion y-axis scale (0-100), and on 0-10
+for (fig.suffix in c("", "_ylim10")) {
+  ylim.post.lesion = if (fig.suffix=="") NULL else c(0,10)
+  source("R/compare_intact_ulcerative.R")
+  source("R/compare_markers.R")
+  #source("R/compare_biopsies.R")
+  rmarkdown::render("report_32bit_v2_density_curves.Rmd", params = list(fig_suffix = fig.suffix),
+                    output_file = sprintf("reports/report_32bit_v2_density_curves%s_%s.pdf", fig.suffix, format(Sys.Date(), "%Y%m%d")))
+}
 
 
 

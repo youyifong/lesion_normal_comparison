@@ -5,6 +5,7 @@
 # 4 markers in intact
 
 dir.exists("output/figures") || dir.create("output/figures", recursive = TRUE)
+if (!exists("fig.suffix")) fig.suffix = "" # set by _run.R, e.g. "_ylim10"
 
 for (dist in dist.labels) {
 for (marker_set in c(1,2,3)) {
@@ -32,7 +33,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
         res=600, type = "cairo",
         width=ifelse(marker_set==3,2.3,2)*length(toplot), height=30/13*length(slides), 
         mar=c(4,ifelse(marker_set==3,2,0),2,0), oma=c(1,5,0,0),
-        file=glue("output/figures/compare_normal_lesion_{dist}_{biopsy}_set{marker_set}"))
+        file=glue("output/figures/compare_normal_lesion_{dist}_{biopsy}_set{marker_set}{fig.suffix}"))
   
   for (s in slides) { 
   for (a in toplot) {
