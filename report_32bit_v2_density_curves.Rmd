@@ -24,6 +24,8 @@ library(knitr)
 
 <!-- # Depth density function -->
 
+The y-axis of the density curves runs to 100 cells/100x100 um2 for lesion slides and to 10 for slides from the other timepoints (H, 2wph, 4wph, 8wph, 8wcon), which have far fewer cells. Values above the limit are cut off.
+
 
 # Intact vs. ulcerative - select slides
 

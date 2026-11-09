@@ -71,7 +71,7 @@ for (biopsy in c("select_slides", biopsies)) {
         scale.factors = lapply(markers.1, function(a) subset(tissue_size, biopsy==s & dist_type==dist & region==tissue.type))
         all.freq = scaled.hist(dat.ls,
            scale.factors=scale.factors,
-           xlim=xlim.ls[[dist]], ylim=ylim.ls[[dist]],
+           xlim=xlim.ls[[dist]], ylim=get.ylim(s, dist),
            xlab=dist %.% " (um)", ylab="Cells/100x100 um2",
            main=ifelse(s==slides[1],tissue.type,""),
            cols=cols,

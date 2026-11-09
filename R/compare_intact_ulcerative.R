@@ -54,7 +54,7 @@ for (biopsy in c("lesion_slides", "select_slides", biopsies)) {
                     col=(c("blue","red")),
                     # legend=names(dat.ls), # remove legend for publication figure
                     xlim=xlim.ls[[dist]], xlab=dist %.% " (um)", 
-                    ylim=ylim.ls[[dist]], ylab="", span=hist.span(scale.factors),
+                    ylim=get.ylim(s, dist), ylab="", span=hist.span(scale.factors),
                     yaxt=ifelse(a==toplot[1],"s","n"), # only have y axis in column 1
                     hist.to.show=2,
                     add.minus.50 = T

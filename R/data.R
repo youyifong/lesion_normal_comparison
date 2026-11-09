@@ -99,6 +99,9 @@ dist.labels=c("dist2skin", "dist2DEJ"); names(dist.labels)=dist.labels
 tissue.types=c("intact","ulcerative"); names(tissue.types)=tissue.types
 xlim.ls=list(dist2DEJ=c(-750,1750), dist2skin=c(0,2500))
 ylim.ls=list(dist2DEJ=c(0,100), dist2skin=c(0,100))
+# post-lesion slides have far fewer cells, so their density curves use a smaller y-axis limit
+ylim.post.lesion=c(0,10)
+get.ylim=function(s, dist) if (get.timepoint(s) %in% "Les") ylim.ls[[dist]] else ylim.post.lesion
 # loess in scaled.hist needs floor(n*span) >= 2 points per local fit; with fewer depth bins predict() fails, so skip smoothing
 hist.span=function(scale.factors, span=0.3, bin.width=100, add.minus.50=TRUE) {
   depths = unlist(lapply(scale.factors, function(x) x$depth))

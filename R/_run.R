@@ -23,7 +23,7 @@ rmarkdown::render("report_32bit_v2_cor.Rmd", output_file = sprintf("reports/repo
 source("R/compare_intact_ulcerative.R")
 source("R/compare_markers.R")
 #source("R/compare_biopsies.R")
-rmarkdown::render("report_32bit_v2_density_curves.Rmd", output_file = sprintf("reports/report_32bit_v2_density_curves_%s.pdf", format(Sys.Date(), "%Y%m%d")))
+rmarkdown::render("report_32bit_v2_density_curves.Rmd", output_file = sprintf("reports/report_32bit_v2_density_curves_ylim10_%s.pdf", format(Sys.Date(), "%Y%m%d")))
 
 
 
